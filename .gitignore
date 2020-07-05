@@ -3,4 +3,4 @@ __pycache__/
 data/*
 !data/.gitkeep
 models/*
-models/.gitkeep
+!models/.gitkeep
