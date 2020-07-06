@@ -1,7 +1,6 @@
 import sys
 import os
 import fasttext
-sys.path.append(os.getcwd())
 
 class Common():
     # Get the fasttext model (we are using the largest one they offer [600B tokens])

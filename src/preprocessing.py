@@ -2,7 +2,6 @@ import os
 import sys
 import pandas as pd
 from nltk.corpus import stopwords
-sys.path.append(os.getcwd())
 
 # Have to download the stopwords
 # nltk.download('stopwords')

@@ -1,11 +1,8 @@
 import os
 import sys
-
 import numpy as np
 import pandas as pd
-sys.path.append(os.getcwd())
-
-from common import Common
+from src.common import Common
 
 """
 Create the numpy files of all the training embedddings
