@@ -6,4 +6,5 @@ data/computers_numpy/*
 data/computers_train/*
 !data/computers_train/.gitkeep
 models/*
+!models/Softmax-LSTM-50-epochs.h5
 !models/.gitkeep

@@ -9,8 +9,12 @@ The iPython Notebook is meant to be used as a testing ground for the neural netw
 
 The  `src` directory are the helper functions to create data and generate the mode.
 
+The `models` directory contains the different models trained so far and also the fastText model (read the important section to download it)
+
 #### Important
-* Download the training set used at http://data.dws.informatik.uni-mannheim.de/largescaleproductcorpus/data/v2/trainsets/cameras_train.zip and put it into the `computers_train` directory.
+* Download the [training set used](http://data.dws.informatik.uni-mannheim.de/largescaleproductcorpus/data/v2/trainsets/cameras_train.zip) and put it into the `computers_train` directory.
+
+* Download and unzip the [fastText model](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip) and put the `.bin` file into the `models` directory
 
 ## Notes About Network
 
