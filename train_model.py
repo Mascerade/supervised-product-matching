@@ -7,9 +7,9 @@ import nltk
 import os
 import tensorflow as tf
 
-from src.preprocessing import *
-from src.embeddings import *
-from src.model import *
+from src.preprocessing import create_simple_data, create_train_df
+from src.embeddings import load_embeddings_and_labels, save_embeddings, create_embeddings
+from src.model import siamese_network, save_model
 from src.common import Common
 
 # Create and save the data if the simple and normalized data does not exist

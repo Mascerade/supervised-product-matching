@@ -27,7 +27,7 @@ def preprocessing(orig_data):
     
     # Creates the stopwords
     to_stop = stopwords.words('english')
-    punctuation = "!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~ "
+    punctuation = "!”#$%&’()*+,-./:;<=>?@[\\]^_`{|}~ "
     for c in punctuation:
         to_stop.append(c)
 

@@ -34,7 +34,9 @@ def save_embeddings(df, embeddings_name, labels_name):
     Saves the embeddings given the embeddings file name and labels file name
     """
     if not os.path.exists('data/computers_numpy/' + embeddings_name + '.npy'):
+        print('Creating the embeddings and labels...')
         embeddings, labels = create_embeddings(df)
+        print('Saving the embeddings and labels...')
         with open('data/computers_numpy/' + embeddings_name + '.npy', 'wb') as f:
             np.save(f, embeddings)
 
