@@ -1,8 +1,8 @@
 __pycache__/
 .ipynb_checkpoints/
-data/*
-!data/.gitkeep
+data/computers_numpy/*
 !data/computers_numpy/.gitkeep
+data/computers_train/*
 !data/computers_train/.gitkeep
 models/*
 !models/.gitkeep

@@ -1,5 +1,19 @@
 # Product Matching Neural Network
 
+## Usage
+The iPython Notebook is meant to be used as a testing ground for the neural network. `TestingGrounds.ipynb` is just a place to understand the different functions and the models. It is also where I write new code before putting it into actual python files.
+
+`train_model.py` is where to train the model. It is faster to do in the console as opposed to an iPython Notebook. 
+
+`test_model.py` allows you to test your own different titles/strings to see how well the model does. It outputs a list where the first value is the probability the two titles do not represent the same entity and the second value is the probability that they do.
+
+The  `src` directory are the helper functions to create data and generate the mode.
+
+#### Important
+* Download the training set used at http://data.dws.informatik.uni-mannheim.de/largescaleproductcorpus/data/v2/trainsets/cameras_train.zip and put it into the `computers_train` directory.
+
+## Notes About Network
+
 ### Fasttext
 * I have just been experimenting with the FastText word embedding matrix
    * I got the largest one they had (600 billion tokens) and it works with n-grams so even if a word is not explicitly in the word embedding, it will stil find a similar word to it and get a word embedding based on that.
@@ -25,7 +39,7 @@
       * There are 26 million offers, with office products making up about 13.13% of the dataset, so surely they could have used some of those
       * If the issue were the correlation between the different product categories (electronics related to book related to health related to toys etc.), then why would they pair computers and cameras with watches and shoes?
 
-### Updates
+### Updates Regarding Network
 * Update 6/29/2020: I have determined the way I will go about the embedding and the actual neural network
    * First, I will use fasttext to create the embeddings BEFORE inputting into the siamese network. This will make it so that we can use the n-grams function of fasttext.
    * The only downside of this is that the input to the network is the embedding instead of the text data which is probably looked down upon.
