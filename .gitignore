@@ -1,9 +1,9 @@
 .vscode/
 __pycache__/
 .ipynb_checkpoints/
-data/computers_numpy/*
-!data/computers_numpy/.gitkeep
-data/computers_train/*
-!data/computers_train/.gitkeep
+data/numpy_data/*
+!data/numpy_data/.gitkeep
+data/train/*
+!data/train/.gitkeep
 models/*
 !models/.gitkeep
