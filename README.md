@@ -9,7 +9,10 @@ The iPython Notebook is meant to be used as a testing ground for the neural netw
 
 The  `src` directory are the helper functions to create data and generate the mode.
 
-The `models` directory contains the different models trained so far and also the fastText model (read the important section to download it)
+The `models` directory contains the different models trained so far and also the fastText model (read the important section to download it).
+
+The `data_scrapers` directory contains scripts to scrape data for creating training data.
+
 
 #### Important
 * Download the [training set used](http://data.dws.informatik.uni-mannheim.de/largescaleproductcorpus/data/v2/trainsets/cameras_train.zip) and put it into the `computers_train` directory.
@@ -28,6 +31,8 @@ The `models` directory contains the different models trained so far and also the
    * \* The FastText embedding layer is not actually part of the network. The training data is just the titles converted to the FastText embeddings, and then you input FastText embeddings for predictions.
 
 ### Dataset
+
+#### WDC Product Corpus
 * For the training data, I am going to use the WDC Gold Standard database of products (http://webdatacommons.org/largescaleproductcorpus/v2/index.html)
 
 * After further looking at the data, it seems like each product in the dataset as a cluser_id.
@@ -43,19 +48,10 @@ The `models` directory contains the different models trained so far and also the
       * There are 26 million offers, with office products making up about 13.13% of the dataset, so surely they could have used some of those
       * If the issue were the correlation between the different product categories (electronics related to book related to health related to toys etc.), then why would they pair computers and cameras with watches and shoes?
 
-### Updates Regarding Network
-* Update 6/29/2020: I have determined the way I will go about the embedding and the actual neural network
-   * First, I will use fasttext to create the embeddings BEFORE inputting into the siamese network. This will make it so that we can use the n-grams function of fasttext.
-   * The only downside of this is that the input to the network is the embedding instead of the text data which is probably looked down upon.
-   * The acutal neural network is LSTM -> Dropout -> LSTM -> Dropout -> LSTM -> Dropout -> Dense -> Dropout -> Dense and the last dense layer is the output, which will will be used for the constrastive loss function
+#### Custom Made Laptop Data
+* After creating the initial model (v0.1), I decided that I wanted to create data catered specifically to getting better at laptop data, as it is a common electronic to shop for
 
-* Update 7/1/2020: This simply is not working. The training set loss gets stuck around 0.3330 with an accuracy around 0.80 and the validation loss is ~1.990 meaning it is clearly not generalizing well. I don't think constrastive loss is the way to go about this problem.
+* The data can be found at https://www.kaggle.com/ionaskel/laptop-prices
 
-* Update 7/1/2020: I changed to a sigmoid output and binary cross-entropy as the loss function. Hopefully this will act as more of a similarity function
-   * In addition, the dataset is messed up. There are about 10,000 positive examples and 40,000 negative examples, which explains why the model was simply learning to predict negative on everything, yielding an 80% accuracy on training, while getting 100% on the validation and 100% on the test. I will have to properly cleanse the data.
-
-* Update 7/2/2020: I organized the data to have an equal balance of postive and negative examples. Now, there are 19,380 total examples of title pairs split 50-50 between positive and negative.
-   * Training on this we are still just getting training accuracy equivalent to the distribution of data of the training set. Very frustrating. We used 2 epochs and a batch size of 64.
-   * This is still using contrastive loss
-
-* Update 7/2/200: FINALLYYYYYYYY!!!!! I got the model to work! Instead of using contrastive loss, I used a square-distance layer for the encodings and fed that into a softmax layer that outputs the probability of a match vs. not a match. For the loss function, I used Cross-Entropy Loss. I got an accuracy of 87% on the test set with ~91% on the training set, which means there is a bit of variance, only ~4%.  
+* I normalize the data and then substitute different key attributes (CPU, Graphics, Size, etc.) in order to create negative data and remove certain attributes (Screentype, brand, laptop type, etc.) and add in random words manufacturers like to use, like "premium", "NEW", etc. in order to to create the positive data
+   * *You can see all the code for that in `TestingGrounds` (it has not been implemented for a release yet)
