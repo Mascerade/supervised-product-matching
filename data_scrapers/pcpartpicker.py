@@ -58,11 +58,13 @@ def cpu_collector():
     df.to_csv('data/train/cpu_data.csv')
 
 def get_links():
-    link_file = open('data/pcpartpicker_links/ram_links.txt', 'a')
+    part_type = input('What part type do you want (CPU, CPU cooler,  memory, storage, motherboard, video card, power supply, case)? ')
+    file_name = input('What should the name of the file be? ')
+    link_file = open('data/pcpartpicker_links/{}.txt'.format(file_name), 'a')
 
     for page in range(75):
         driver = webdriver.Chrome()
-        driver.get('https://pcpartpicker.com/products/memory/#page=' + str(page + 1))
+        driver.get('https://pcpartpicker.com/products/{}/#page={}'.format(part_type, str(page + 1)))
         soup = BeautifulSoup(driver.page_source, 'lxml')
         time.sleep(1)
         driver.quit()
@@ -79,8 +81,11 @@ def get_links():
 def get_pos_data():
     # Gets postive examples of different ram titles from different retailers
     # Left off on Kingston HyperX Fury RGB 32 GB (line 224 of ram_links.txt)
-    link_file = open('data/pcpartpicker_links/ram_links.txt', 'r')
-    column_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc']
+    # Left off on Intel Core i3-3240 Dual-Core Processor 3.4 Ghz (line 106 of cpu_links.txt)
+    file_name = input('What file do you want to open? ')
+    csv_name = input('What would you like the finished CSV to be? ')
+    link_file = open('data/pcpartpicker_links/{}.txt'.format(file_name), 'r')
+    column_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo']
     df = pd.DataFrame(columns = column_names)
 
     try:
@@ -90,7 +95,7 @@ def get_pos_data():
             soup = BeautifulSoup(driver.page_source, 'lxml')
             time.sleep(3)
             driver.quit()
-            title_dict = {'amazon': '', 'bestbuy': '', 'newegg': '', 'walmart': '', 'memoryc': ''}
+            title_dict = {'amazon': '', 'bestbuy': '', 'newegg': '', 'walmart': '', 'memoryc': '', 'bhphotovideo': ''}
 
             for retailer in soup.find_all('td', attrs={'class': 'td__logo'}):
                 link = 'https://www.pcpartpicker.com' + retailer.find('a')['href']
@@ -140,15 +145,25 @@ def get_pos_data():
                     title_dict['memoryc'] = soup.find('section', attrs={'class': 'forCartImageItem'}).find('h1').text.strip()
                     print('memoryc', title_dict['memoryc'])
                 
+                elif 'bhphotovideo' in link:
+                    driver = webdriver.Chrome()
+                    driver.get(link)
+                    soup = BeautifulSoup(driver.page_source, 'lxml')
+                    driver.quit()
+
+                    title_dict['bhphotovideo'] = soup.find('h1', {'data-selenium': 'productTitle'}).text.strip()
+                    print('bhphotovideo', title_dict['bhphotovideo'])
+
                 else:
                     continue
                 
             df = df.append(pd.DataFrame([list(title_dict.values())], columns=column_names))
 
-    except Exception:
-        df.to_csv('data/train/pos_ram_titles.csv')
+    except Exception as e:
+        print(str(e))
+        df.to_csv('data/train/{}.csv'.format(csv_name))
 
-    df.to_csv('data/train/pos_ram_titles.csv')
+    df.to_csv('data/train/{}.csv'.format(csv_name))
     link_file.close()
 
 get_pos_data()
