@@ -76,4 +76,64 @@ def get_links():
 
     link_file.close()
 
-get_links()
+def get_pos_data():
+    link_file = open('data/pcpartpicker_links/ram_links.txt', 'r')
+
+    for link in link_file:
+        driver = webdriver.Chrome()
+        driver.get(link)
+        soup = BeautifulSoup(driver.page_source, 'lxml')
+        time.sleep(3)
+        driver.quit()
+
+        for retailer in soup.find_all('td', attrs={'class': 'td__logo'}):
+            link = 'https://www.pcpartpicker.com' + retailer.find('a')['href']
+
+            if 'amazon' in link:
+                driver = webdriver.Chrome()
+                driver.get(link)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
+                driver.quit()
+
+                title = soup.find('span', attrs={'id': 'productTitle'}).text.strip()
+                print(title)
+
+            if 'bestbuy' in link:
+                driver = webdriver.Chrome()
+                driver.get(link)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
+                driver.quit()
+
+                title = soup.find('h1', attrs={'class': 'heading-5 v-fw-regular'}).text.strip()
+                print(title)
+
+            if 'newegg' in link:
+                driver = webdriver.Chrome()
+                driver.get(link)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
+                driver.quit()
+
+                title = soup.find('h1', attrs={'id': 'grpDescrip_h'}).text.strip()
+                print(title)
+
+            if 'walmart' in link:
+                driver = webdriver.Chrome()
+                driver.get(link)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
+                driver.quit()
+
+                title = soup.find('h1', attrs={'class': 'prod-ProductTitle prod-productTitle-buyBox font-bold'}).text.strip()
+                print(title)
+            
+            if 'memoryc' in link:
+                driver = webdriver.Chrome()
+                driver.get(link)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
+                driver.quit()
+
+                title = soup.find('section', attrs={'class': 'forCartImageItem'}).find('h1').text.strip()
+                print(title)
+
+    link_file.close()
+
+get_pos_data()
