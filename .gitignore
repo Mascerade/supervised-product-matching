@@ -5,7 +5,7 @@ data/numpy_data/*
 !data/numpy_data/.gitkeep
 data/train/*
 !data/train/.gitkeep
-data/pcpartpicker_links/*
-!data/pcpartpicker_links/.gitkeep
+data/pcpartpicker_misc/*
+!data/pcpartpicker_misc/.gitkeep
 models/*
 !models/.gitkeep
