@@ -1,0 +1,282 @@
+1596379887559	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilefPh6qI"
+*** You are running in headless mode.
+1596379897912	Marionette	INFO	Listening on port 36583
+1596379898075	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: , line 0: uncaught exception: undefined
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+1596380125957	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile3SrUlg"
+*** You are running in headless mode.
+1596380127864	Marionette	INFO	Listening on port 45421
+1596380127964	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596380155121	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5VIc8t"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596380193524	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilecWPboK"
+*** You are running in headless mode.
+1596380195647	Marionette	INFO	Listening on port 33297
+1596380195729	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596380375505	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileDWdN2g"
+*** You are running in headless mode.
+1596380377442	Marionette	INFO	Listening on port 45501
+1596380377511	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+1596380553548	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileXt4jvh"
+*** You are running in headless mode.
+1596380555502	Marionette	INFO	Listening on port 41779
+1596380555557	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596380666479	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileG6FPYu"
+1596380668521	Marionette	INFO	Listening on port 36599
+1596380668585	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596380842175	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiles9h8NL"
+1596380844274	Marionette	INFO	Listening on port 37685
+1596380844287	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: , line 0: uncaught exception: undefined
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+JavaScript warning: https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101, line 6: Script terminated by timeout at:
+gg@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:52052
+eg@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:51529
+dg@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:51088
+lg.prototype.a@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:52726
+Uf/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:47194
+x@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:3128
+Uf@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:47167
+Tg/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:61360
+x@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:3128
+Tg@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:61269
+Rg@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:58008
+Og.prototype.zb@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:57635
+He/a.a<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:32891
+Qd/</<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:25834
+Nd/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:25373
+xd/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:22819
+Nd@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:25681
+Qd/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:25807
+xd/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:22819
+xd/<@https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101:6:22863
+
+console.error: services.settings: 
+  main/fxmonitor-breaches Signature failed  TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+console.warn: services.settings: main/cfr sync interrupted by shutdown
+console.warn: services.settings: main/search-config sync interrupted by shutdown
+console.warn: services.settings: main/search-default-override-allowlist sync interrupted by shutdown
+console.warn: services.settings: main/url-classifier-skip-urls sync interrupted by shutdown
+console.warn: services.settings: main/cfr-fxa sync interrupted by shutdown
+console.warn: services.settings: main/hijack-blocklists sync interrupted by shutdown
+console.warn: services.settings: main/language-dictionaries sync interrupted by shutdown
+console.warn: services.settings: main/anti-tracking-url-decoration sync interrupted by shutdown
+console.warn: services.settings: main/sites-classification sync interrupted by shutdown
+JavaScript error: resource://gre/modules/IndexedDB.jsm, line 370: UnknownError: IDBDatabase.transaction: Can't start IndexedDB transaction during shutdown
+1596380959669	Marionette	INFO	Stopped listening on port 36599
+1596380959741	Marionette	INFO	Stopped listening on port 37685
+1596381037876	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilebjEne3"
+1596381039897	Marionette	INFO	Listening on port 34925
+1596381039983	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596381057450	Marionette	INFO	Stopped listening on port 34925
+1596381149520	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAesqIp"
+*** You are running in headless mode.
+1596381151527	Marionette	INFO	Listening on port 42935
+1596381151629	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596381157035	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileXGpM95"
+*** You are running in headless mode.
+1596381158846	Marionette	INFO	Listening on port 44535
+1596381158940	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596381164507	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilem6uGrb"
+*** You are running in headless mode.
+1596381166454	Marionette	INFO	Listening on port 33315
+1596381166513	Marionette	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1596381208911	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilegF7wtD"
+*** You are running in headless mode.
+1596381210858	Marionette	INFO	Listening on port 43853
+1596381210918	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596381234947	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileAbfCGm"
+*** You are running in headless mode.
+1596381236916	Marionette	INFO	Listening on port 42927
+1596381236954	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596381323768	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile715aOc"
+*** You are running in headless mode.
+1596381325718	Marionette	INFO	Listening on port 37263
+1596381325779	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: , line 0: uncaught exception: undefined
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+1596381573617	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilezUeSoD"
+*** You are running in headless mode.
+1596381575671	Marionette	INFO	Listening on port 36055
+1596381575724	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596382798210	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiletVW9e7"
+*** You are running in headless mode.
+1596382800221	Marionette	INFO	Listening on port 36941
+1596382800317	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596383319816	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile7fFqQE"
+*** You are running in headless mode.
+1596383321780	Marionette	INFO	Listening on port 35779
+1596383321823	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596383569152	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile4p7ipt"
+*** You are running in headless mode.
+1596383570944	Marionette	INFO	Listening on port 35951
+1596383571008	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596384404759	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilePN3FNW"
+*** You are running in headless mode.
+1596384406989	Marionette	INFO	Listening on port 38615
+1596384407067	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596384573390	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile3ABQZy"
+*** You are running in headless mode.
+1596384577155	Marionette	INFO	Listening on port 45707
+1596384577199	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596385216467	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileKLj73n"
+*** You are running in headless mode.
+1596385219159	Marionette	INFO	Listening on port 37943
+1596385219174	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: services.settings: 
+  pinning/pins Signature failed  TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  Message: TypeError: NetworkError when attempting to fetch resource.
+1596385560541	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileBr8P7z"
+*** You are running in headless mode.
+1596385562839	Marionette	INFO	Listening on port 35037
+1596385562850	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596572433367	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileFBSbG0"
+*** You are running in headless mode.
+1596572443272	Marionette	INFO	Listening on port 36061
+1596572443317	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596572463001	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilelh4s8n"
+1596572465269	Marionette	INFO	Listening on port 33371
+1596572465307	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596572505213	Marionette	INFO	Stopped listening on port 33371
+1596572544811	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile4ABZSP"
+1596572546838	Marionette	INFO	Listening on port 39885
+1596572546917	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: , line 0: uncaught exception: undefined
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+1596572578566	Marionette	INFO	Stopped listening on port 39885
+1596572704554	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileYeGytd"
+1596572706631	Marionette	INFO	Listening on port 42485
+1596572706659	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596572741679	Marionette	INFO	Stopped listening on port 42485
+1596572796101	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile0P4qlf"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596572819014	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileHXl4hK"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596572839057	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiQAIhZ"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596572988151	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepq4ZmB"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596572996732	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileukxqsR"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/jason which is owned by jason.)
+1596573035872	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilel7iBBm"
+*** You are running in headless mode.
+1596573037928	Marionette	INFO	Listening on port 33291
+1596573037979	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573055085	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileI3HYSZ"
+1596573057183	Marionette	INFO	Listening on port 37333
+1596573057190	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573077741	Marionette	INFO	Stopped listening on port 37333
+1596573138968	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileSwoKAZ"
+1596573141363	Marionette	INFO	Listening on port 46773
+1596573141384	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573152409	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile88m1in"
+1596573155957	Marionette	INFO	Listening on port 41443
+1596573156018	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573166038	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile4AV3WO"
+1596573168120	Marionette	INFO	Listening on port 45537
+1596573168145	Marionette	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1596573180219	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileWwemX5"
+1596573182238	Marionette	INFO	Listening on port 40961
+1596573182326	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573187889	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile3a8EC0"
+1596573190522	Marionette	INFO	Listening on port 37831
+1596573190596	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573199551	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileu8eSIj"
+1596573201599	Marionette	INFO	Listening on port 38631
+1596573201661	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573207235	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileQgo3qS"
+1596573209543	Marionette	INFO	Listening on port 35649
+1596573209641	Marionette	WARN	TLS certificate errors will be ignored for this session
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1596573217401	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileey7f9n"
+1596573219705	Marionette	INFO	Listening on port 35657
+1596573219711	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573230427	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileG6rBPM"
+1596573232548	Marionette	INFO	Listening on port 37243
+1596573232634	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: , line 0: uncaught exception: undefined
+JavaScript error: , line 0: NotSupportedError: The media resource indicated by the src attribute or assigned media provider object was not suitable.
+1596573253473	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMj2Bxl"
+1596573255827	Marionette	INFO	Listening on port 44201
+1596573255881	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573267728	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepb04uq"
+1596573270751	Marionette	INFO	Listening on port 41857
+1596573270838	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573279881	Marionette	INFO	Stopped listening on port 37243
+1596573281581	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile2IHnNF"
+1596573283825	Marionette	INFO	Listening on port 38867
+1596573283889	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573294498	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileWHIkjv"
+1596573297604	Marionette	INFO	Listening on port 39431
+1596573297705	Marionette	WARN	TLS certificate errors will be ignored for this session
+1596573306263	Marionette	INFO	Stopped listening on port 39431
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: WebGL warning: <Create>: getContext: Disallowing antialiased backbuffers due to blacklisting. (FEATURE_FAILURE_OLD_FGLRX)
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: WebGL warning: <Create>: Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+* Exhausted GL driver options.
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: WebGL warning: <Create>: getContext: Disallowing antialiased backbuffers due to blacklisting. (FEATURE_FAILURE_OLD_FGLRX)
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: WebGL warning: <Create>: Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+JavaScript warning: https://www.amazon.com/ line 6 > scriptElement, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+* Exhausted GL driver options.
+JavaScript warning: https://images-na.ssl-images-amazon.com/images/I/71PFM4X9vbL.js?AUIClients/FWCIMAssets, line 428: WebGL warning: <Create>: getContext: Disallowing antialiased backbuffers due to blacklisting. (FEATURE_FAILURE_OLD_FGLRX)
+JavaScript warning: https://images-na.ssl-images-amazon.com/images/I/71PFM4X9vbL.js?AUIClients/FWCIMAssets, line 428: WebGL warning: <Create>: Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+JavaScript warning: https://images-na.ssl-images-amazon.com/images/I/71PFM4X9vbL.js?AUIClients/FWCIMAssets, line 428: Failed to create WebGL context: WebGL creation failed: 
+* Refused to create native OpenGL context because of blacklist entry: FEATURE_FAILURE_OLD_FGLRX
+* Exhausted GL driver options.
+JavaScript warning: https://cdn.pcpartpicker.com/static/forever/hash/site-bd0f3347704da714555c8160a12671d8.js, line 16: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://cdn.pcpartpicker.com/static/forever/hash/site-bd0f3347704da714555c8160a12671d8.js, line 16: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1596573371545	Marionette	INFO	Stopped listening on port 44201
+JavaScript warning: https://cdn.pcpartpicker.com/static/forever/hash/site-bd0f3347704da714555c8160a12671d8.js, line 16: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1596573426995	Marionette	INFO	Stopped listening on port 41857
+JavaScript warning: https://cdn.pcpartpicker.com/static/forever/hash/site-bd0f3347704da714555c8160a12671d8.js, line 16: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1596573465061	Marionette	INFO	Stopped listening on port 38867
+1596573503314	Marionette	INFO	Stopped listening on port 35657
