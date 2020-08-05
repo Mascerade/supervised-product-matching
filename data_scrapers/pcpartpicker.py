@@ -2,9 +2,19 @@ import requests
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
+from stem import Signal
+from stem.control import Controller
+from tbselenium.tbdriver import TorBrowserDriver
 import os
 import time
 import random
+
+# signal TOR for a new connection (IP)
+def switchIP():
+    with Controller.from_port(port = 9051) as controller:
+        time.sleep(5)
+        controller.authenticate()
+        controller.signal(Signal.NEWNYM)
 
 def ram_collector():
     column_names = ['name', 'speed']
@@ -58,16 +68,18 @@ def cpu_collector():
     df.to_csv('data/train/cpu_data.csv')
 
 def get_links():
-    part_type = input('What part type do you want (CPU, CPU cooler,  memory, storage, motherboard, video card, power supply, case)? ')
+    part_type = input('What part type do you want (CPU, CPU cooler,  memory, internal hard drive, motherboard, video card, power supply, case)? ')
+    pages = input('How many pages are there? ')
     file_name = input('What should the name of the file be? ')
-    link_file = open('data/pcpartpicker_links/{}.txt'.format(file_name), 'a')
+    link_file = open('data/pcpartpicker_misc/{}.txt'.format(file_name), 'a')
 
-    for page in range(75):
-        driver = webdriver.Chrome()
-        driver.get('https://pcpartpicker.com/products/{}/#page={}'.format(part_type, str(page + 1)))
-        soup = BeautifulSoup(driver.page_source, 'lxml')
-        time.sleep(1)
-        driver.quit()
+    for page in range(int(pages)):
+        soup = None
+        switchIP()
+        with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
+            driver.get('https://pcpartpicker.com/products/{}/#page={}'.format(part_type, str(page + 1)))
+            time.sleep(random.randint(13, 20))
+            soup = BeautifulSoup(driver.page_source, 'lxml')
 
         for product in soup.find_all('tr', attrs={'class': 'tr__product'}):
             try:
@@ -84,19 +96,21 @@ def get_pos_data():
     # Left off on Intel Core i3-3240 Dual-Core Processor 3.4 Ghz (line 106 of cpu_links.txt)
     file_name = input('What file do you want to open? ')
     csv_name = input('What would you like the finished CSV to be? ')
-    link_file = open('data/pcpartpicker_links/{}.txt'.format(file_name), 'r')
+    link_file = open('data/pcpartpicker_misc/{}.txt'.format(file_name), 'r')
     column_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo']
     df = pd.DataFrame(columns = column_names)
 
     try:
         for link in link_file:
-            driver = webdriver.Chrome()
-            driver.get(link)
-            soup = BeautifulSoup(driver.page_source, 'lxml')
-            time.sleep(3)
-            driver.quit()
-            title_dict = {'amazon': '', 'bestbuy': '', 'newegg': '', 'walmart': '', 'memoryc': '', 'bhphotovideo': ''}
+            # Change the IP that Tor gives us
+            switchIP()
+            soup = None
+            with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
+                driver.get(link)
+                time.sleep(15)
+                soup = BeautifulSoup(driver.page_source, 'lxml')
 
+            title_dict = {'amazon': '', 'bestbuy': '', 'newegg': '', 'walmart': '', 'memoryc': '', 'bhphotovideo': ''}
             for retailer in soup.find_all('td', attrs={'class': 'td__logo'}):
                 link = 'https://www.pcpartpicker.com' + retailer.find('a')['href']
 
@@ -159,11 +173,11 @@ def get_pos_data():
                 
             df = df.append(pd.DataFrame([list(title_dict.values())], columns=column_names))
 
-    except Exception as e:
+    except (Exception, KeyboardInterrupt) as e:
         print(str(e))
         df.to_csv('data/train/{}.csv'.format(csv_name))
 
     df.to_csv('data/train/{}.csv'.format(csv_name))
     link_file.close()
 
-# get_pos_data()
+get_pos_data()
