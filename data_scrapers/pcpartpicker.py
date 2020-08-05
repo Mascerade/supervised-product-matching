@@ -166,4 +166,4 @@ def get_pos_data():
     df.to_csv('data/train/{}.csv'.format(csv_name))
     link_file.close()
 
-get_pos_data()
+# get_pos_data()

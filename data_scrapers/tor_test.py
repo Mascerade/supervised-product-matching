@@ -16,6 +16,7 @@ def switchIP():
 def my_proxy(PROXY_HOST,PROXY_PORT):
     fp = webdriver.FirefoxProfile()
     # Direct = 0, Manual = 1, PAC = 2, AUTODETECT = 4, SYSTEM = 5
+    fp.set_preference('general.useragent.override', 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0')
     fp.set_preference("network.proxy.type", 1)
     fp.set_preference("network.proxy.socks",PROXY_HOST)
     fp.set_preference("network.proxy.socks_port",int(PROXY_PORT))
@@ -24,11 +25,13 @@ def my_proxy(PROXY_HOST,PROXY_PORT):
     #options.headless = True
     return webdriver.Firefox(options=options, firefox_profile=fp)
 
-for x in range(10):
-    proxy = my_proxy("127.0.0.1", 9050)
-    proxy.get("https://whatsmyip.com/")
-    html = proxy.page_source
-    soup = BeautifulSoup(html, 'lxml')
-    print(soup.find("span", {"id": "ipv4"}))
-    print(soup.find("span", {"id": "ipv6"}))
-    switchIP()
+proxy = my_proxy("127.0.0.1", 9050)
+proxy.get("https://pcpartpicker.com/products/cpu/")
+html = proxy.page_source
+soup = BeautifulSoup(html, 'lxml')
+cookies = proxy.get_cookies()
+for cookie in cookies:
+    print(cookie)
+# print(soup.find("span", {"id": "ipv4"}))
+# print(soup.find("span", {"id": "ipv6"}))
+# switchIP()
