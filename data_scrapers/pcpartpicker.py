@@ -97,8 +97,8 @@ def get_pos_data():
     file_name = input('What file do you want to open? ')
     csv_name = input('What would you like the finished CSV to be? ')
     link_file = open('data/pcpartpicker_misc/{}.txt'.format(file_name), 'r')
-    column_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo']
-    df = pd.DataFrame(columns = column_names)
+    retailer_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo', 'adorama']
+    df = pd.DataFrame(columns=retailer_names)
 
     try:
         for link in link_file:
@@ -110,73 +110,70 @@ def get_pos_data():
                 time.sleep(15)
                 soup = BeautifulSoup(driver.page_source, 'lxml')
 
-            title_dict = {'amazon': '', 'bestbuy': '', 'newegg': '', 'walmart': '', 'memoryc': '', 'bhphotovideo': ''}
+            title_dict = dict(zip(retailer_names, ['' for x in range(len(retailer_names))]))
+
             for retailer in soup.find_all('td', attrs={'class': 'td__logo'}):
                 link = 'https://www.pcpartpicker.com' + retailer.find('a')['href']
+                soup = None
+                for name in retailer_names:
+                    if name in link:
+                        if name == 'adorama':
+                            switchIP()
+                            with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
+                                driver.get(link)
+                                time.sleep(15)
+                                soup = BeautifulSoup(driver.page_source, 'lxml')
+                            #soup = BeautifulSoup(driver.page_source, 'lxml')
+                            driver.quit()
 
-                if 'amazon' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
+                        else:
+                            driver = webdriver.Chrome()
+                            driver.get(link)
+                            soup = BeautifulSoup(driver.page_source, 'lxml')
+                            driver.quit()
+    
+                        try:
+                            if 'amazon' in link:
+                                title_dict['amazon'] = soup.find('span', attrs={'id': 'productTitle'}).text.strip()
+                                print('amazon', title_dict['amazon'])
 
-                    title_dict['amazon'] = soup.find('span', attrs={'id': 'productTitle'}).text.strip()
-                    print('amazon', title_dict['amazon'])
+                            elif 'bestbuy' in link:
+                                title_dict['bestbuy'] = soup.find('h1', attrs={'class': 'heading-5 v-fw-regular'}).text.strip()
+                                print('bestbuy', title_dict['bestbuy'])
 
-                elif 'bestbuy' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
+                            elif 'newegg' in link:
+                                title_dict['newegg'] = soup.find('h1', attrs={'id': 'grpDescrip_h'}).text.strip()
+                                print('newegg', title_dict['newegg'])
 
-                    title_dict['bestbuy'] = soup.find('h1', attrs={'class': 'heading-5 v-fw-regular'}).text.strip()
-                    print('bestbuy', title_dict['bestbuy'])
+                            elif 'walmart' in link:
+                                title_dict['walmart'] = soup.find('h1', attrs={'class': 'prod-ProductTitle prod-productTitle-buyBox font-bold'}).text.strip()
+                                print('walmart', title_dict['walmart'])
+                            
+                            elif 'memoryc' in link:
+                                title_dict['memoryc'] = soup.find('section', attrs={'class': 'forCartImageItem'}).find('h1').text.strip()
+                                print('memoryc', title_dict['memoryc'])
+                            
+                            elif 'bhphotovideo' in link:
+                                title_dict['bhphotovideo'] = soup.find('h1', {'data-selenium': 'productTitle'}).text.strip()
+                                print('bhphotovideo', title_dict['bhphotovideo'])
 
-                elif 'newegg' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
+                            elif 'adorama' in link:
+                                title_dict['adorama'] = soup.find('div', attrs={'class': 'primary-info cf clear'}).find('h1').find('span').text.strip()
+                                print('adorama', title_dict['adorama'])
 
-                    title_dict['newegg'] = soup.find('h1', attrs={'id': 'grpDescrip_h'}).text.strip()
-                    print('newegg', title_dict['newegg'])
+                            else:
+                                continue
 
-                elif 'walmart' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
-
-                    title_dict['walmart'] = soup.find('h1', attrs={'class': 'prod-ProductTitle prod-productTitle-buyBox font-bold'}).text.strip()
-                    print('walmart', title_dict['walmart'])
+                        except Exception:
+                            pass
                 
-                elif 'memoryc' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
-
-                    title_dict['memoryc'] = soup.find('section', attrs={'class': 'forCartImageItem'}).find('h1').text.strip()
-                    print('memoryc', title_dict['memoryc'])
-                
-                elif 'bhphotovideo' in link:
-                    driver = webdriver.Chrome()
-                    driver.get(link)
-                    soup = BeautifulSoup(driver.page_source, 'lxml')
-                    driver.quit()
-
-                    title_dict['bhphotovideo'] = soup.find('h1', {'data-selenium': 'productTitle'}).text.strip()
-                    print('bhphotovideo', title_dict['bhphotovideo'])
-
-                else:
-                    continue
-                
-            df = df.append(pd.DataFrame([list(title_dict.values())], columns=column_names))
+            df = df.append(pd.DataFrame([list(title_dict.values())], columns=retailer_names))
+            break
 
     except (Exception, KeyboardInterrupt) as e:
         print(str(e))
-        df.to_csv('data/train/{}.csv'.format(csv_name))
 
+    print('here')
     df.to_csv('data/train/{}.csv'.format(csv_name))
     link_file.close()
 
