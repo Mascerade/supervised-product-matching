@@ -97,7 +97,7 @@ def get_pos_data():
     file_name = input('What file do you want to open? ')
     csv_name = input('What would you like the finished CSV to be? ')
     link_file = open('data/pcpartpicker_misc/{}.txt'.format(file_name), 'r')
-    retailer_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo', 'adorama']
+    retailer_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo']
     df = pd.DataFrame(columns=retailer_names)
 
     try:
@@ -118,13 +118,14 @@ def get_pos_data():
                 for name in retailer_names:
                     if name in link:
                         if name == 'adorama':
-                            switchIP()
-                            with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
-                                driver.get(link)
-                                time.sleep(15)
-                                soup = BeautifulSoup(driver.page_source, 'lxml')
-                            #soup = BeautifulSoup(driver.page_source, 'lxml')
-                            driver.quit()
+                            # switchIP()
+                            # with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
+                            #     driver.get(link)
+                            #     time.sleep(10)
+                            #     soup = BeautifulSoup(driver.page_source, 'lxml')
+                            # #soup = BeautifulSoup(driver.page_source, 'lxml')
+                            # driver.quit()
+                            pass
 
                         else:
                             driver = webdriver.Chrome()
@@ -157,9 +158,9 @@ def get_pos_data():
                                 title_dict['bhphotovideo'] = soup.find('h1', {'data-selenium': 'productTitle'}).text.strip()
                                 print('bhphotovideo', title_dict['bhphotovideo'])
 
-                            elif 'adorama' in link:
-                                title_dict['adorama'] = soup.find('div', attrs={'class': 'primary-info cf clear'}).find('h1').find('span').text.strip()
-                                print('adorama', title_dict['adorama'])
+                            # elif 'adorama' in link:
+                            #     title_dict['adorama'] = soup.find('div', attrs={'class': 'primary-info cf clear'}).find('h1').find('span').text.strip()
+                            #     print('adorama', title_dict['adorama'])
 
                             else:
                                 continue
@@ -168,13 +169,12 @@ def get_pos_data():
                             pass
                 
             df = df.append(pd.DataFrame([list(title_dict.values())], columns=retailer_names))
-            break
 
     except (Exception, KeyboardInterrupt) as e:
         print(str(e))
 
     print('here')
-    df.to_csv('data/train/{}.csv'.format(csv_name))
+    df.to_csv('/home/jason/Documents/Supervised-Product-Similarity/data/train/{}.csv'.format(csv_name))
     link_file.close()
 
 get_pos_data()
