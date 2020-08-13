@@ -99,9 +99,11 @@ def get_pos_data():
     link_file = open('data/pcpartpicker_misc/{}.txt'.format(file_name), 'r')
     retailer_names = ['amazon', 'bestbuy', 'newegg', 'walmart', 'memoryc', 'bhphotovideo']
     df = pd.DataFrame(columns=retailer_names)
+    links = list(link_file)
 
     try:
-        for link in link_file:
+        for link in links[51:]:
+            link = link.strip()
             # Change the IP that Tor gives us
             switchIP()
             soup = None
