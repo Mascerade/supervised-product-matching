@@ -9,3 +9,5 @@ data/pcpartpicker_misc/*
 !data/pcpartpicker_misc/.gitkeep
 models/*
 !models/.gitkeep
+geckodriver.log
+debug.log
