@@ -17,3 +17,5 @@
 
 * Update 8/5/2020: Huge update! Over the past couple weeks, I have been doing a lot of data-gathering. So far, I found a source for laptop data and I trained a model using that data, but it ended up being horrible. Essentially, I think the problem was the fact that I used such a robotic way of just replacing certain tokens to create new positive and negative data. Now, the data is more random and it is no longer ordered, it is just a jumbled mess, so the model will really have to learn how to identify different attributes. 
 Additionally, I currently am scraping data off of PCPartPicker in order to create training examples for different PC parts. My hope is this will aid in the algorithm being able to discern different specs for laptops.
+
+* Update 8/24/2020: Finished training another model yesterday and it acheived an accuracy of ~87% with batch size 128 and 80 epochs. Will write proper analysis in the release notes.

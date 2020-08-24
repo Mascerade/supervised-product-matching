@@ -54,4 +54,5 @@ The `data_scrapers` directory contains scripts to scrape data for creating train
 * The data can be found at https://www.kaggle.com/ionaskel/laptop-prices
 
 * I normalize the data and then substitute different key attributes (CPU, Graphics, Size, etc.) in order to create negative data and remove certain attributes (Screentype, brand, laptop type, etc.) and add in random words manufacturers like to use, like "premium", "NEW", etc. in order to to create the positive data
-   * *You can see all the code for that in `TestingGrounds` (it has not been implemented for a release yet)
+
+* I also randomize the order of tokens so that the does not overfit to certain positions of tokens
