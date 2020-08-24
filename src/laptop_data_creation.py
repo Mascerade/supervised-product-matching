@@ -1,7 +1,8 @@
 import pandas as pd
-from preprocessing import remove_stop_words
-from common import create_final_data
+from src.preprocessing import remove_stop_words
+from src.common import create_final_data
 import random
+from tqdm import tqdm
 
 # This class will be used in order to exchange the different attributes
 # to create negative examples
@@ -92,7 +93,7 @@ def concatenate_row(row):
 def create_neg_laptop_data(laptop_df, attributes):
     new_column_names = ['title_one', 'title_two', 'label']
     negative_df = pd.DataFrame(columns = new_column_names)
-    for row in range(len(laptop_df)):
+    for row in tqdm(range(len(laptop_df))):
         # Create a copy of the row for the negative example
         neg_row = laptop_df.iloc[row]
         for attribute_class in attributes:
@@ -127,7 +128,7 @@ def create_neg_laptop_data(laptop_df, attributes):
 def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
     new_column_names = ['title_one', 'title_two', 'label']
     pos_df = pd.DataFrame(columns = new_column_names)
-    for row in range(len(laptop_df)):
+    for row in tqdm(range(len(laptop_df))):
         # Remove the attribute from the new title
         for attr_list in rm_attrs:
             # Create a copy of the row for the negative example

@@ -14,33 +14,30 @@ from src.common import Common, get_max_len
 from src.laptop_data_creation import create_laptop_data
 from src.pcpartpicker_data_creation import create_pcpartpicker_data
 
-# If the computer data has not been made yet, make it
-computer_data_path = 'data/train/computers_train_bal_shuffle.csv'
-if not os.path.exists(computer_data_path):
-    computer_df = pd.read_json('data/train/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)
-    create_training_data(computer_df, computer_data_path)
-
-# Create and save the dataframe with equal numbers of positive and negative examples
-# and is shuffled
-if not os.path.exists('data/computers_train/computers_train_bal_shuffle.csv'):
-    # Load the normal simplified data to create the balanced and shuffled data
-    computer_df = pd.read_csv('data/computers_train/computers_train_xlarge_norm_simple.csv')
-    create_train_df(computer_df).to_csv('data/computers_train/computers_train_bal_shuffle.csv', index=False)
-
 if not os.path.exists('data/numpy_data/all_embeddings.npy'):
+    # If the computer data has not been made yet, make it
+    computer_data_path = 'data/train/computers_train_bal_shuffle.csv'
+    if not os.path.exists(computer_data_path):
+        print('Creating computer data...')
+        computer_df = pd.read_json('data/train/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)
+        create_training_data(computer_df, computer_data_path)
+
     # Load the computer data
     final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv')
 
     # Create and get the laptop data
+    print('Creating laptop data...')
     final_laptop_df = create_laptop_data()
 
     # Create and get the PCPartPicker data
+    print('Creating PCPartPicker data')
     final_cpu_df, final_ram_df, final_hard_drive_df = create_pcpartpicker_data()
 
     # Concatenate everything
     total_data = pd.concat([final_computer_df, final_laptop_df, final_cpu_df, final_ram_df, final_hard_drive_df])
     total_data = total_data.sample(frac=1)
     Common.MAX_LEN = get_max_len(total_data)
+    print('Creating and saving the embeddings and labels...')
     save_embeddings(total_data, 'all_embeddings', 'all_labels')
 
 print('Loading the embeddings and labels...')

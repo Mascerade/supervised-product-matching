@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 from nltk.corpus import stopwords
+from tqdm import tqdm
 
 # Have to download the stopwords
 # nltk.download('stopwords')
@@ -44,7 +45,7 @@ def preprocessing(orig_data):
     norm_data = pd.DataFrame(columns = column_names)
     # Iterate over the original dataframe (I know it is slow and there are probably better ways to do it)
     iloc_data = orig_data.iloc
-    for idx in range(len(orig_data)):
+    for idx in tqdm(range(len(orig_data))):
         row = iloc_data[idx]
         title_left = remove_stop_words(row.title_left)
         title_right = remove_stop_words(row.title_right)

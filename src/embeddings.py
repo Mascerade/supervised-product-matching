@@ -2,7 +2,8 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-from common import Common
+from tqdm import tqdm
+from src.common import Common
 
 """
 Create the numpy files of all the training embedddings
@@ -18,7 +19,7 @@ def create_embeddings(df):
     
     # I know this is a terrible way of doing this, but iterate over the dataframe
     # and generate the embeddings to add to the numpy array
-    for idx, row in enumerate(df.itertuples()):
+    for idx, row in enumerate(tqdm(df.itertuples())):
         for word_idx, word in enumerate(row.title_one.split()):
             total_embeddings[idx, 0, word_idx] = Common.fasttext_model[word]
             

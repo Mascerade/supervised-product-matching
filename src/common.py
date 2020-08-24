@@ -9,7 +9,7 @@ class Common():
     fasttext_model = fasttext.load_model('models/crawl-300d-2M-subword.bin')
 
     # Max length of a title to be fed into the model
-    MAX_LEN = 42
+    MAX_LEN = 43
 
     # The how many values are in each embedding vector
     EMBEDDING_SHAPE = (300,)
