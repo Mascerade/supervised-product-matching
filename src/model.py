@@ -33,11 +33,11 @@ def siamese_network(input_shape):
     model.add(LSTM(units=128, return_sequences=True, name='lstm_2'))
     model.add(Dropout(rate=0.5))
     model.add(LSTM(units=128, name='lstm_3'))
-    model.add(Dropout(rate=0.5))
+    model.add(Dropout(rate=0.6))
     
     # The dense layers
     model.add(Dense(units=1024, activation='elu', name='dense_1'))
-    model.add(Dropout(rate=0.5))
+    model.add(Dropout(rate=0.6))
     model.add(Dense(units=512, activation='elu', name='dense_2'))
     
     # Forward propagate through the model to generate the encodings
@@ -48,7 +48,6 @@ def siamese_network(input_shape):
     distance = SquareDistanceLayer([encoded_left_title, encoded_right_title])
     
     prediction = Dense(units=2, activation='softmax')(distance)
-
     # Create and return the network
     siamese_net = tf.keras.Model(inputs=[left_title, right_title], outputs=prediction, name='siamese_network')
     return siamese_net
