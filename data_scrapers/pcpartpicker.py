@@ -99,6 +99,39 @@ def hard_drive_collector():
         
     df.to_csv('/home/jason/Documents/Supervised-Product-Similarity/' + file_path)
 
+
+def video_card_collector():
+    column_names = ['name', 'chipset', 'memory', 'core-clock']
+    file_path = 'data/train/video-cards-data.csv'
+    pages = 25
+    if not os.path.exists(file_path):
+        df = pd.DataFrame(columns=column_names)
+    
+    else:
+        df = pd.read_csv(file_path)
+    
+    for page in range(int(pages)):
+        soup = None
+        switchIP()
+        with TorBrowserDriver('/home/jason/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/') as driver:
+            driver.get('https://pcpartpicker.com/products/video-card/#page={}'.format(str(page + 1)))
+            time.sleep(random.randint(13, 20))
+            soup = BeautifulSoup(driver.page_source, 'lxml')
+    
+        for product in soup.find_all('tr', attrs={'class': 'tr__product'}):
+            try:
+                name = product.find('div', attrs={'class': 'td__nameWrapper'}).find('p').text
+                chipset = product.find('td', attrs={'class': 'td__spec td__spec--1'}).text.replace('Chipset', '')
+                memory = product.find('td', attrs={'class': 'td__spec td__spec--2'}).text.replace('Memory', '')
+                core_clock = product.find('td', attrs={'class': 'td__spec td__spec--3'}).text.replace('Core Clock', '')
+                print('Name: ', name, '| Chipset: ', chipset, '| Memory: ', memory, '| Core Clock: ', core_clock)
+                df = df.append(pd.DataFrame([[name, chipset, memory, core_clock]], columns=column_names))
+
+            except AttributeError as e:
+                print(str(e))
+        
+    df.to_csv('/home/jason/Documents/Supervised-Product-Similarity/' + file_path)
+
 def get_links():
     part_type = input('What part type do you want (CPU, CPU cooler,  memory, internal hard drive, motherboard, video card, power supply, case)? ')
     pages = input('How many pages are there? ')
@@ -211,4 +244,4 @@ def get_pos_data():
     df.to_csv('/home/jason/Documents/Supervised-Product-Similarity/data/train/{}.csv'.format(csv_name))
     link_file.close()
 
-hard_drive_collector()
+video_card_collector()
