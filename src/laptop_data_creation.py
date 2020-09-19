@@ -1,9 +1,9 @@
 import pandas as pd
 import random
 from tqdm import tqdm
-from preprocessing import remove_stop_words
-from common import create_final_data, create_final_data
-from common.Common import modifiers, add_ins, COLUMN_NAMES
+from src.preprocessing import remove_stop_words
+from src.common import create_final_data, create_final_data
+from src.common.Common import modifiers, add_ins, COLUMN_NAMES
 
 # This class will be used in order to exchange the different attributes
 # to create negative examples

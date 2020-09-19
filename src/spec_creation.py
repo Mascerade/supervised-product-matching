@@ -3,9 +3,9 @@ import numpy as np
 import random
 from tqdm import tqdm
 from laptop_data_creation import LaptopAttributes
-from preprocessing import remove_stop_words
-from common import create_final_data, create_final_data
-from common.Common import modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
+from src.preprocessing import remove_stop_words
+from src.common import create_final_data, create_final_data
+from src.common.Common import modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
 
 class SpecAttributes():
     """
