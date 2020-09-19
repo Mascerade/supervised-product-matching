@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-import fasttext
 import pandas as pd
 import numpy as np
 import nltk

@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import numpy as np
 import random
 from tqdm import tqdm
@@ -92,7 +93,7 @@ def concatenate_spec_data(row):
 def create_neg_spec_laptop(df, attributes):
     df_iloc = df.iloc()
     temp = []
-    for row in tqdm(range(int(len(df) * 0.05))):
+    for row in tqdm(range(int(len(df) * 0.007))):
         # Create a copy of the row for the negative example
         for attribute_class in attributes:
             neg_row = df_iloc[row]
@@ -199,7 +200,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     temp = []
     df_iloc = df.iloc()
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
-    for row in tqdm(range(int(len(df) * 0.1))):
+    for row in tqdm(range(int(len(df) * 0.006))):
         # Set the new row to the same as the original to begin changing it
         new_row = df_iloc[row]
 
@@ -246,10 +247,36 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     
     return pd.DataFrame([[title_one, title_two, 1]], columns=COLUMN_NAMES)
 
+def populate_spec():
+    # Getting the CPU data into SpecAttrbutes
+    temp_iloc = cpu_df.iloc()
+    for idx in range(len(cpu_df)):
+        row = temp_iloc[idx]
+        SpecAttributes.cpu[row['name']] = [row['cores'], row['core_clock']]
+
+
+    # Getting the video card data into SpecAttributes
+    temp_iloc = video_card_df.iloc()
+    for idx in range(len(video_card_df)):
+        row = temp_iloc[idx]
+        SpecAttributes.video_card.update([row['chipset']])
+
+def gen_spec_combos():
+    # Generates combinations of the spec data (WARNING: THIS TAKES A VERY LONG TIME AND YOU MUST HAVE AT LEAST 16GB RAM TO DO THIS)
+    combos = np.meshgrid(*[SpecAttributes.laptop_brands, list(SpecAttributes.cpu.keys()), SpecAttributes.hard_drive, SpecAttributes.ram])
+    combos = np.array(combos).T.reshape(-1, 4)
+    np.random.shuffle(combos)
+    df = pd.DataFrame(data=combos, columns=['brand', 'cpu', 'hard_drive', 'ram'])
+    df.to_csv('data/train/spec_data.csv')
 
 def generate_spec_laptop_data():
-    spec_df = pd.read_csv('data/train/spec_train_data.csv')
-    pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product'], ['screen'], ['product', 'screen'], ['company', 'screen']], add_attrs = [])
-    neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches', 'screen'])
-    final_spec_df = create_final_data(pos_df, neg_df)
-    final_spec_df.to_csv('data/train/spec_train_data.csv')
+    file_path = 'data/train/spec_train_data.csv'
+    if not os.path.exists(file_path):
+        populate_spec()
+        if not os.path.exists('data/train/spec_data.csv'):
+            gen_spec_combos()
+        spec_df = pd.read_csv('data/train/spec_data.csv')
+        pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product'], ['screen'], ['product', 'screen'], ['company', 'screen']], add_attrs = [])
+        neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches', 'screen'])
+        final_spec_df = create_final_data(pos_df, neg_df)
+        final_spec_df.to_csv('data/train/spec_train_data.csv')

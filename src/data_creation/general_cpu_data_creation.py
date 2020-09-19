@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from tqdm import tqdm
 import random
 from itertools import combinations
@@ -82,10 +83,12 @@ def generate_neg_cpu_data():
     return pd.DataFrame(neg_df, columns=['title_one', 'title_two', 'label'])
 
 def create_general_cpu_data():
-    # Create the positive and negative examples
-    pos_df = generate_neg_cpu_data()
-    neg_df = generate_neg_cpu_data()
+    file_path = 'data/train/more_cpu_data.csv'
+    if not os.path.exists(file_path):
+        # Create the positive and negative examples
+        pos_df = generate_neg_cpu_data()
+        neg_df = generate_neg_cpu_data()
 
-    # Concatenate the data and save it
-    final_cpu_df = create_final_data(pos_df, neg_df)
-    final_cpu_df.to_csv('data/train/more_cpu_data.csv')
+        # Concatenate the data and save it
+        final_cpu_df = create_final_data(pos_df, neg_df)
+        final_cpu_df.to_csv(file_path)

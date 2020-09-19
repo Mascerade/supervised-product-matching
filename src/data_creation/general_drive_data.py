@@ -1,10 +1,11 @@
 import pandas as pd
 from tqdm import tqdm
+import os
 import random
 from itertools import combinations
 from src.preprocessing import create_train_df, remove_misc, remove_stop_words
 from src.common import create_final_data
-from src.common.Common import hard_drive_types, ssd_types
+from src.common.Common import hard_drive_types, ssd_types, COLUMN_NAMES
 
 def generate_pos_hard_drive_data():
     pos_df = []
@@ -20,7 +21,7 @@ def generate_pos_hard_drive_data():
                        remove_stop_words('{} {}'.format(drive, random.choice(ssd_types))),
                        1])
     
-    return pd.DataFrame(pos_df, columns=['title_one', 'title_two', 'label'])
+    return pd.DataFrame(pos_df, columns=COLUMN_NAMES)
 
 def generate_neg_hard_drive_data():
     neg_df = []
@@ -50,13 +51,15 @@ def generate_neg_hard_drive_data():
                 neg_df.append([remove_stop_words(old), remove_stop_words(new), 0])
         
         
-    return pd.DataFrame(neg_df, columns=['title_one', 'title_two', 'label'])
+    return pd.DataFrame(neg_df, columns=COLUMN_NAMES)
 
 def create_final_drive_data():
-    # Generate the data
-    pos_df = generate_pos_hard_drive_data()
-    neg_df = generate_neg_hard_drive_data()
+    file_path = 'data/train/more_drive_data.csv'
+    if not os.path.exists(file_path):
+        # Generate the data
+        pos_df = generate_pos_hard_drive_data()
+        neg_df = generate_neg_hard_drive_data()
 
-    # Concatenate the data and save it
-    final_df = create_final_data(pos_df, neg_df)
-    final_df.to_csv('data/train/more_drive_data.csv')
+        # Concatenate the data and save it
+        final_df = create_final_data(pos_df, neg_df)
+        final_df.to_csv(file_path)

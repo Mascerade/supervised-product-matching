@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import random
 from itertools import combinations
 from tqdm import tqdm
@@ -48,27 +49,29 @@ def generate_neg_pcpartpicker_data(df):
     return neg_df
 
 def create_pcpartpicker_data():
-    ram_df = remove_misc(pd.read_csv('data/train/pos_ram_titles.csv'))
-    cpu_df = remove_misc(pd.read_csv('data/train/pos_cpu_titles.csv'))
-    hard_drive_df = remove_misc(pd.read_csv('data/train/pos_hard_drive_titles.csv'))
+    file_path = 'data/train/final_pcpartpicker_data.csv'
+    if not os.path.exists(file_path):
+        ram_df = remove_misc(pd.read_csv('data/train/pos_ram_titles.csv'))
+        cpu_df = remove_misc(pd.read_csv('data/train/pos_cpu_titles.csv'))
+        hard_drive_df = remove_misc(pd.read_csv('data/train/pos_hard_drive_titles.csv'))
 
-    # Generate all the positive data for the categories
-    pos_ram_data = generate_pos_pcpartpicker_data(ram_df)
-    pos_cpu_data = generate_pos_pcpartpicker_data(cpu_df)
-    pos_hard_drive_data = generate_pos_pcpartpicker_data(hard_drive_df)
+        # Generate all the positive data for the categories
+        pos_ram_data = generate_pos_pcpartpicker_data(ram_df)
+        pos_cpu_data = generate_pos_pcpartpicker_data(cpu_df)
+        pos_hard_drive_data = generate_pos_pcpartpicker_data(hard_drive_df)
 
-    # Generate all the negative data for the categories
-    neg_ram_data = generate_neg_pcpartpicker_data(ram_df)
-    neg_cpu_data = generate_neg_pcpartpicker_data(cpu_df)
-    neg_hard_drive_data = generate_neg_pcpartpicker_data(hard_drive_df)
+        # Generate all the negative data for the categories
+        neg_ram_data = generate_neg_pcpartpicker_data(ram_df)
+        neg_cpu_data = generate_neg_pcpartpicker_data(cpu_df)
+        neg_hard_drive_data = generate_neg_pcpartpicker_data(hard_drive_df)
 
-    # Generate the final data
-    final_ram_data = create_final_data(pos_ram_data, neg_ram_data)
-    final_cpu_data = create_final_data(pos_cpu_data, neg_cpu_data)
-    final_hard_drive_data = create_final_data(pos_hard_drive_data, neg_hard_drive_data)
+        # Generate the final data
+        final_ram_data = create_final_data(pos_ram_data, neg_ram_data)
+        final_cpu_data = create_final_data(pos_cpu_data, neg_cpu_data)
+        final_hard_drive_data = create_final_data(pos_hard_drive_data, neg_hard_drive_data)
 
-    print('Amount of data for the CPU data, RAM data and hard drive data', len(final_cpu_data), len(final_ram_data), len(final_hard_drive_data))
-    
-    # Concatenate the data and save it
-    final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])
-    final_pcpartpicker_df.to_csv('data/train/final_pcpartpicker_data.csv')
+        print('Amount of data for the CPU data, RAM data and hard drive data', len(final_cpu_data), len(final_ram_data), len(final_hard_drive_data))
+        
+        # Concatenate the data and save it
+        final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])
+        final_pcpartpicker_df.to_csv(file_path)
