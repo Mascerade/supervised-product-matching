@@ -41,19 +41,24 @@ def preprocessing(orig_data):
     
     # The new names of the columns
     column_names = ['title_one', 'title_two', 'label']
-    # A new dataframe for the data we are going to be creating
-    norm_data = pd.DataFrame(columns = column_names)
+
     # Iterate over the original dataframe (I know it is slow and there are probably better ways to do it)
     iloc_data = orig_data.iloc
+    
+    # Will temporarily store the title data before it gets put into a DataFrame
+    temp = []
+    
+    # Iterate over the data
     for idx in tqdm(range(len(orig_data))):
         row = iloc_data[idx]
         title_left = remove_stop_words(row.title_left)
         title_right = remove_stop_words(row.title_right)
+
+        # Append the newly created row (title_left, title_right, label) to the the temporary list
+        temp.append([title_left, title_right, row.label])
         
-        # Append the newly created row (title_left, title_right, label) to the new dataframe
-        norm_data = norm_data.append(pd.DataFrame([[title_left, title_right, row.label]], columns=column_names))
-    
-    return norm_data
+    # Return DataFrame of the title data, simplified
+    return pd.DataFrame(temp, columns=column_names)
 
 def create_train_df(df):
     """

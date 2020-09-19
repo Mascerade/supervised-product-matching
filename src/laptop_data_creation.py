@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 # This class will be used in order to exchange the different attributes
 # to create negative examples
-class Attributes():
+class LaptopAttributes():
     company = {'Apple'}
     product = {'MacBook Pro'}
     inches = {'13.3'}
@@ -16,29 +16,28 @@ class Attributes():
     gpu = {'Intel HD Graphics 520'}
     screen = {'1440x900'}
     
-    @staticmethod
     def get_all_data():
         return {
-            'company': Attributes.company,
-            'product': Attributes.product,
-            'inches': Attributes.inches,
-            'cpu': Attributes.cpu,
-            'ram': Attributes.ram,
-            'memory': Attributes.memory,
-            'gpu': Attributes.gpu,
-            'screen': Attributes.screen
+            'company': LaptopAttributes.company,
+            'product': LaptopAttributes.product,
+            'inches': LaptopAttributes.inches,
+            'cpu': LaptopAttributes.cpu,
+            'ram': LaptopAttributes.ram,
+            'memory': LaptopAttributes.memory,
+            'gpu': LaptopAttributes.gpu,
+            'screen': LaptopAttributes.screen
         }
 
 # Create attribute sets
 def create_attribute_sets(df):
-    Attributes.company.update([row.Company for row in df[['Company']].itertuples()])
-    Attributes.product.update([row.Product for row in df[['Product']].itertuples()])
-    Attributes.inches.update([str(row.Inches) for row in df[['Inches']].itertuples()])
-    Attributes.cpu.update([row.Cpu for row in df[['Cpu']].itertuples()])
-    Attributes.ram.update([row.Ram for row in df[['Ram']].itertuples()])
-    Attributes.memory.update([row.Memory for row in df[['Memory']].itertuples()])
-    Attributes.gpu.update([row.Gpu for row in df[['Gpu']].itertuples()])
-    Attributes.screen.update([row.ScreenResolution for row in df[['ScreenResolution']].itertuples()])
+    LaptopAttributes.company.update([row.Company for row in df[['Company']].itertuples()])
+    LaptopAttributes.product.update([row.Product for row in df[['Product']].itertuples()])
+    LaptopAttributes.inches.update([str(row.Inches) for row in df[['Inches']].itertuples()])
+    LaptopAttributes.cpu.update([row.Cpu for row in df[['Cpu']].itertuples()])
+    LaptopAttributes.ram.update([row.Ram for row in df[['Ram']].itertuples()])
+    LaptopAttributes.memory.update([row.Memory for row in df[['Memory']].itertuples()])
+    LaptopAttributes.gpu.update([row.Gpu for row in df[['Gpu']].itertuples()])
+    LaptopAttributes.screen.update([row.ScreenResolution for row in df[['ScreenResolution']].itertuples()])
 
 def concatenate_row(row):
     # Note: got rid of everything after the '(' because it has info about the actual specs of the laptop
@@ -92,7 +91,7 @@ def concatenate_row(row):
 # and the attributes are the attributes to swap for the new data
 def create_neg_laptop_data(laptop_df, attributes):
     new_column_names = ['title_one', 'title_two', 'label']
-    negative_df = pd.DataFrame(columns = new_column_names)
+    temp = []
     for row in tqdm(range(len(laptop_df))):
         # Create a copy of the row for the negative example
         neg_row = laptop_df.iloc[row]
@@ -108,7 +107,7 @@ def create_neg_laptop_data(laptop_df, attributes):
             
             # Make sure we really get a new attribute
             while new_val == attribute_val:
-                new_val = random.sample(Attributes.get_all_data()[attribute_class.lower()], 1)[0]
+                new_val = random.sample(LaptopAttributes.get_all_data()[attribute_class.lower()], 1)[0]
             
             # Change the value in the neg_row to the new value
             neg_row[attribute_class] = new_val
@@ -118,16 +117,16 @@ def create_neg_laptop_data(laptop_df, attributes):
             title_two = remove_stop_words(concatenate_row(neg_row).lower())
             
             # Append the data to the new df
-            negative_df = negative_df.append(pd.DataFrame([[title_one, title_two, 0]], columns=new_column_names))
-    
-    return negative_df
+            temp.append([title_one, title_two, 0])
+
+    return pd.DataFrame(temp, columns=new_column_names)
 
 # Creates the postive examples for the laptop data
 # The laptop_df is the original data, the new_df is the dataframe to append the new data to
 # and the attributes are the attributes to swap or delete for the new data
 def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
     new_column_names = ['title_one', 'title_two', 'label']
-    pos_df = pd.DataFrame(columns = new_column_names)
+    temp = []
     for row in tqdm(range(len(laptop_df))):
         # Remove the attribute from the new title
         for attr_list in rm_attrs:
@@ -139,10 +138,10 @@ def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
         
             title_one = remove_stop_words(concatenate_row(orig_row).lower())
             title_two = remove_stop_words(concatenate_row(new_row).lower())
-
-            pos_df = pos_df.append(pd.DataFrame([[title_one, title_two, 1]], columns=new_column_names))
-
-    return pos_df
+            
+            temp.append([title_one, title_two, 1])
+    
+    return pd.DataFrame(temp, columns=new_column_names)
 
 def create_laptop_data():
     # Load the laptop data

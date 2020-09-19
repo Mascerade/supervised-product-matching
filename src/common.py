@@ -17,6 +17,16 @@ class Common():
     # Number of training examples
     m = 19380
 
+    # These are words that commonly come up with laptops
+    modifiers = ['premium', 'new', 'fast', 'latest model']
+    add_ins = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
+               'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
+               'DVD', 'Windows 10']
+    
+    # The column names for all the DataFrames
+    COLUMN_NAMES = ['title_one', 'title_two', 'label']
+    
+
 def create_final_data(pos_df, neg_df):
     pos_df.sample(frac=1)
     neg_df.sample(frac=1)
