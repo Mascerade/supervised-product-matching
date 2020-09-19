@@ -90,3 +90,11 @@ def create_training_data(df, path):
     
     # Save the new normalized and simplified data to a CSV file to load later
     norm_bal_data.to_csv(path, index=False)
+
+# Drop the Unnamed: 0 column and drop any row where it is all NaN
+def remove_misc(df):
+    columns = list(df.columns)[1:]
+    df = df.drop(columns=['Unnamed: 0'])
+    df = df.dropna(how='all')
+    return df
+

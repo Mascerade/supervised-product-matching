@@ -1,8 +1,9 @@
 import pandas as pd
-from src.preprocessing import remove_stop_words
-from src.common import create_final_data
 import random
 from tqdm import tqdm
+from preprocessing import remove_stop_words
+from common import create_final_data, create_final_data
+from common.Common import modifiers, add_ins, COLUMN_NAMES
 
 # This class will be used in order to exchange the different attributes
 # to create negative examples
@@ -16,6 +17,7 @@ class LaptopAttributes():
     gpu = {'Intel HD Graphics 520'}
     screen = {'1440x900'}
     
+    @staticmethod
     def get_all_data():
         return {
             'company': LaptopAttributes.company,
@@ -46,11 +48,6 @@ def concatenate_row(row):
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
     inch_attr = str(row['Inches']) + random.choice([' inch', '', '"'])
     ram_attr = row['Ram'] + random.choice([' ram', ' memory', ''])
-    
-    # These are words that commonly come up with laptops
-    modifiers = ['premium', 'new', 'fast', 'latest model']
-    add_ins = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
-               'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW', 'DVD', 'Windows 10']
     
     cpu_attr = row['Cpu']
     if random.choice([0, 1]):
@@ -146,10 +143,15 @@ def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
 def create_laptop_data():
     # Load the laptop data
     laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
+
+    # Create the attribute sets for the LaptopAttributes
     create_attribute_sets(laptop_df)
 
+    # Create the negative and positive dataframes 
     neg_df = create_neg_laptop_data(laptop_df, attributes=['Cpu', 'Memory', 'Ram', 'Inches', 'Product'])
     pos_df = create_pos_laptop_data(laptop_df, rm_attrs = [['Company'], ['TypeName'], ['ScreenResolution'], ['Product'], ['TypeName', 'ScreenResolution']], add_attrs = [])
+    
+    # Concatenate the data and save it
     final_laptop_df = create_final_data(pos_df, neg_df)
     final_laptop_df = final_laptop_df.sample(frac=1)
-    return final_laptop_df
+    final_laptop_df.to_csv('data/train/final_laptop_data.csv')

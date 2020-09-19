@@ -23,17 +23,13 @@ class Common():
                'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
                'DVD', 'Windows 10']
     
+    # For creating laptop data
+    hard_drive_types = ['HDD', 'Hard Drive', 'Internal Hard Drive']
+    ssd_types = ['SSD', 'Solid State Drive', 'M.2 SSD', 'SATA SSD']
+
     # The column names for all the DataFrames
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
     
-
-def create_final_data(pos_df, neg_df):
-    pos_df.sample(frac=1)
-    neg_df.sample(frac=1)
-    final_df = pd.concat([pos_df[:min(len(pos_df), len(neg_df))], neg_df[:min(len(pos_df), len(neg_df))]])
-    final_df = final_df.sample(frac=1)
-    return final_df
-
 def get_max_len(df):
     max_len = 0
     for row in df.itertuples():
@@ -42,10 +38,17 @@ def get_max_len(df):
             
         if len(row.title_two.split(' ')) > max_len:
             max_len = len(row.title_two.split(' '))
-
+    
     return max_len
 
 def print_dataframe(df):
     for idx in range(len(df)):
         print(df.iloc[idx].title_one + '\n' + df.iloc[idx].title_two)
         print('________________________________________________________________')
+
+def create_final_data(pos_df, neg_df):
+    pos_df = pos_df.sample(frac=1)
+    neg_df = neg_df.sample(frac=1)
+    final_df = pd.concat([pos_df[:min(len(pos_df), len(neg_df))], neg_df[:min(len(pos_df), len(neg_df))]])
+    final_df = final_df.sample(frac=1)
+    return final_df

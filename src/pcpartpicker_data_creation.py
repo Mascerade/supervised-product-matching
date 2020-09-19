@@ -68,4 +68,7 @@ def create_pcpartpicker_data():
     final_hard_drive_data = create_final_data(pos_hard_drive_data, neg_hard_drive_data)
 
     print('Amount of data for the CPU data, RAM data and hard drive data', len(final_cpu_data), len(final_ram_data), len(final_hard_drive_data))
-    return final_cpu_data, final_ram_data, final_hard_drive_data
+    
+    # Concatenate the data and save it
+    final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])
+    final_pcpartpicker_df.to_csv('data/train/final_pcpartpicker_data.csv')
