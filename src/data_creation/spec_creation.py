@@ -249,13 +249,14 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
 
 def populate_spec():
     # Getting the CPU data into SpecAttrbutes
+    cpu_df = pd.read_csv('data/train/cpu_data.csv')
     temp_iloc = cpu_df.iloc()
     for idx in range(len(cpu_df)):
         row = temp_iloc[idx]
         SpecAttributes.cpu[row['name']] = [row['cores'], row['core_clock']]
 
-
     # Getting the video card data into SpecAttributes
+    video_card_df = pd.read_csv('data/train/video-cards-data.csv')
     temp_iloc = video_card_df.iloc()
     for idx in range(len(video_card_df)):
         row = temp_iloc[idx]
@@ -269,7 +270,7 @@ def gen_spec_combos():
     df = pd.DataFrame(data=combos, columns=['brand', 'cpu', 'hard_drive', 'ram'])
     df.to_csv('data/train/spec_data.csv')
 
-def generate_spec_laptop_data():
+def create_spec_laptop_data():
     file_path = 'data/train/spec_train_data.csv'
     if not os.path.exists(file_path):
         populate_spec()
@@ -279,4 +280,4 @@ def generate_spec_laptop_data():
         pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product'], ['screen'], ['product', 'screen'], ['company', 'screen']], add_attrs = [])
         neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches', 'screen'])
         final_spec_df = create_final_data(pos_df, neg_df)
-        final_spec_df.to_csv('data/train/spec_train_data.csv')
+        final_spec_df.to_csv(file_path)
