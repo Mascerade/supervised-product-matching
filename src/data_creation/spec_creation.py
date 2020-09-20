@@ -3,10 +3,9 @@ import os
 import numpy as np
 import random
 from tqdm import tqdm
-from laptop_data_creation import LaptopAttributes
+from src.data_creation.laptop_data_creation import LaptopAttributes
 from src.preprocessing import remove_stop_words
-from src.common import create_final_data, create_final_data
-from src.common.Common import modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
+from src.common import create_final_data, modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
 
 class SpecAttributes():
     """
@@ -273,11 +272,16 @@ def gen_spec_combos():
 def create_spec_laptop_data():
     file_path = 'data/train/spec_train_data.csv'
     if not os.path.exists(file_path):
+        print('Generating general spec data for laptops . . . ')
         populate_spec()
         if not os.path.exists('data/train/spec_data.csv'):
+            print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
             gen_spec_combos()
         spec_df = pd.read_csv('data/train/spec_data.csv')
         pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product'], ['screen'], ['product', 'screen'], ['company', 'screen']], add_attrs = [])
         neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches', 'screen'])
         final_spec_df = create_final_data(pos_df, neg_df)
         final_spec_df.to_csv(file_path)
+
+    else:
+        print('Already have spec data. Moving on . . .')

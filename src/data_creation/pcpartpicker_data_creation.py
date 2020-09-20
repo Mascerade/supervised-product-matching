@@ -51,6 +51,7 @@ def generate_neg_pcpartpicker_data(df):
 def create_pcpartpicker_data():
     file_path = 'data/train/final_pcpartpicker_data.csv'
     if not os.path.exists(file_path):
+        print('Generating PCPartPicker data . . .')
         ram_df = remove_misc(pd.read_csv('data/train/pos_ram_titles.csv'))
         cpu_df = remove_misc(pd.read_csv('data/train/pos_cpu_titles.csv'))
         hard_drive_df = remove_misc(pd.read_csv('data/train/pos_hard_drive_titles.csv'))
@@ -75,3 +76,6 @@ def create_pcpartpicker_data():
         # Concatenate the data and save it
         final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])
         final_pcpartpicker_df.to_csv(file_path)
+
+    else:
+        print('Already have PCPartPicker data. Moving on . . .')

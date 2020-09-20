@@ -3,8 +3,7 @@ import os
 import random
 from tqdm import tqdm
 from src.preprocessing import remove_stop_words
-from src.common import create_final_data, create_final_data
-from src.common.Common import modifiers, add_ins, COLUMN_NAMES
+from src.common import create_final_data, modifiers, add_ins, COLUMN_NAMES
 
 # This class will be used in order to exchange the different attributes
 # to create negative examples
@@ -144,6 +143,7 @@ def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
 def create_laptop_data():
     file_path = 'data/train/final_laptop_data.csv'
     if not os.path.exists(file_path):
+        print('Generating laptop data . . . ')
         # Load the laptop data
         laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
 
@@ -158,3 +158,6 @@ def create_laptop_data():
         final_laptop_df = create_final_data(pos_df, neg_df)
         final_laptop_df = final_laptop_df.sample(frac=1)
         final_laptop_df.to_csv(file_path)
+
+    else:
+        print('Already have laptop data. Moving on . . . ')

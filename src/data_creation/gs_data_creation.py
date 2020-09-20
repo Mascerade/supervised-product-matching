@@ -1,8 +1,8 @@
 import pandas as pd
 import os
 from tqdm import tqdm
-from src.common import create_final_data, remove_stop_words
-from src.common.Common import COLUMN_NAMES
+from src.common import create_final_data, COLUMN_NAMES
+from src.preprocessing import remove_stop_words
 
 """
 Essentially, we want to only have three attributes for each training example: title_one, title_two, label
@@ -31,12 +31,33 @@ def preprocessing(orig_data):
     # Return DataFrame of the title data, simplified
     return pd.DataFrame(temp, columns=COLUMN_NAMES)
 
+def create_train_df(df):
+    """
+    Returns a shuffled dataframe with an equal amount of positive and negative examples
+    """
+    # Get the positive and negative examples
+    pos_df = df.loc[df['label'] == 1]
+    neg_df = df.loc[df['label'] == 0]
+    
+    # Shuffle the data
+    pos_df = pos_df.sample(frac=1)
+    neg_df = neg_df.sample(frac=1)
+    
+    # Concatenate the positive and negative examples and 
+    # make sure there are only as many negative examples as positive examples
+    final_df = pd.concat([pos_df[:min(len(pos_df), len(neg_df))], neg_df[:min(len(pos_df), len(neg_df))]])
+    
+    # Shuffle the final data once again
+    final_df.sample(frac=1)
+    
+    return final_df
+
 def create_training_data(df, path):
     """
     Creates and saves a simpler version of the original data that only contains the the two titles and the label.
     """
     
-    norm_bal_data = create_final_data(preprocessing(df))
+    norm_bal_data = create_train_df(preprocessing(df))
     
     # Save the new normalized and simplified data to a CSV file to load later
     norm_bal_data.to_csv(path, index=False)
@@ -45,8 +66,12 @@ def create_training_data(df, path):
 def create_computer_data():
     computer_data_path = 'data/train/computers_train_bal_shuffle.csv'
     if not os.path.exists(computer_data_path):
+        print('Generating simplifed Gold Standard computer data . . . ')
         # Load the data
         computer_df = pd.read_json('data/train/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)    
 
         # Create and save the data if the simple and normalized data does not exist
         create_training_data(computer_df, computer_data_path)
+
+    else: 
+        print('Already have Gold Standard computer data. Moving on . . . ')

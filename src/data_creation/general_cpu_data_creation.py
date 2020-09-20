@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 import random
 from itertools import combinations
-from src.preprocessing import create_train_df, remove_misc, remove_stop_words
+from src.preprocessing import remove_misc, remove_stop_words
 from src.common import create_final_data
 
 def cpu_variations(cpu):
@@ -85,6 +85,7 @@ def generate_neg_cpu_data():
 def create_general_cpu_data():
     file_path = 'data/train/more_cpu_data.csv'
     if not os.path.exists(file_path):
+        print('Generating general cpu data . . . ')
         # Create the positive and negative examples
         pos_df = generate_neg_cpu_data()
         neg_df = generate_neg_cpu_data()
@@ -92,3 +93,6 @@ def create_general_cpu_data():
         # Concatenate the data and save it
         final_cpu_df = create_final_data(pos_df, neg_df)
         final_cpu_df.to_csv(file_path)
+
+    else:
+        print('Already have general cpu data data. Moving on . . .')

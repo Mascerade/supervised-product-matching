@@ -17,18 +17,18 @@ class Common():
     # Number of training examples
     m = 19380
 
-    # These are words that commonly come up with laptops
-    modifiers = ['premium', 'new', 'fast', 'latest model']
-    add_ins = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
-               'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
-               'DVD', 'Windows 10']
-    
-    # For creating laptop data
-    hard_drive_types = ['HDD', 'Hard Drive', 'Internal Hard Drive']
-    ssd_types = ['SSD', 'Solid State Drive', 'M.2 SSD', 'SATA SSD']
+# These are words that commonly come up with laptops
+modifiers = ['premium', 'new', 'fast', 'latest model']
+add_ins = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
+            'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
+            'DVD', 'Windows 10']
 
-    # The column names for all the DataFrames
-    COLUMN_NAMES = ['title_one', 'title_two', 'label']
+# For creating laptop data
+hard_drive_types = ['HDD', 'Hard Drive', 'Internal Hard Drive']
+ssd_types = ['SSD', 'Solid State Drive', 'M.2 SSD', 'SATA SSD']
+
+# The column names for all the DataFrames
+COLUMN_NAMES = ['title_one', 'title_two', 'label']
     
 def get_max_len(df):
     max_len = 0

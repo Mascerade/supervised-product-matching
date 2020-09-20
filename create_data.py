@@ -11,9 +11,9 @@ from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_dat
 from src.data_creation.spec_creation import create_spec_laptop_data
 
 # Run the functions
+create_computer_data()
+create_pcpartpicker_data()
 create_general_cpu_data()
 create_final_drive_data()
-create_computer_data()
 create_laptop_data()
-create_pcpartpicker_data()
 create_spec_laptop_data()

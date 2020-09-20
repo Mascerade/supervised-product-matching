@@ -3,9 +3,8 @@ from tqdm import tqdm
 import os
 import random
 from itertools import combinations
-from src.preprocessing import create_train_df, remove_misc, remove_stop_words
-from src.common import create_final_data
-from src.common.Common import hard_drive_types, ssd_types, COLUMN_NAMES
+from src.preprocessing import remove_misc, remove_stop_words
+from src.common import create_final_data, hard_drive_types, ssd_types, COLUMN_NAMES
 
 def generate_pos_hard_drive_data():
     pos_df = []
@@ -56,6 +55,7 @@ def generate_neg_hard_drive_data():
 def create_final_drive_data():
     file_path = 'data/train/more_drive_data.csv'
     if not os.path.exists(file_path):
+        print('Generating general drive data . . . ')
         # Generate the data
         pos_df = generate_pos_hard_drive_data()
         neg_df = generate_neg_hard_drive_data()
@@ -63,3 +63,6 @@ def create_final_drive_data():
         # Concatenate the data and save it
         final_df = create_final_data(pos_df, neg_df)
         final_df.to_csv(file_path)
+
+    else:
+        print('Already have general drive data. Moving on . . .')
