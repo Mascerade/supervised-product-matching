@@ -142,14 +142,14 @@ def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
 
 def create_laptop_data():
     file_path = 'data/train/final_laptop_data.csv'
+    # Load the laptop data
+    laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
+    
+    # Create the attribute sets for the LaptopAttributes
+    create_attribute_sets(laptop_df)
+    
     if not os.path.exists(file_path):
         print('Generating laptop data . . . ')
-        # Load the laptop data
-        laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
-
-        # Create the attribute sets for the LaptopAttributes
-        create_attribute_sets(laptop_df)
-
         # Create the negative and positive dataframes 
         neg_df = create_neg_laptop_data(laptop_df, attributes=['Cpu', 'Memory', 'Ram', 'Inches', 'Product'])
         pos_df = create_pos_laptop_data(laptop_df, rm_attrs = [['Company'], ['TypeName'], ['ScreenResolution'], ['Product'], ['TypeName', 'ScreenResolution']], add_attrs = [])

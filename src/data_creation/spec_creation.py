@@ -92,7 +92,7 @@ def concatenate_spec_data(row):
 def create_neg_spec_laptop(df, attributes):
     df_iloc = df.iloc()
     temp = []
-    for row in tqdm(range(int(len(df) * 0.007))):
+    for row in tqdm(range(int(len(df) * 1.91e-4))):
         # Create a copy of the row for the negative example
         for attribute_class in attributes:
             neg_row = df_iloc[row]
@@ -199,7 +199,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     temp = []
     df_iloc = df.iloc()
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
-    for row in tqdm(range(int(len(df) * 0.006))):
+    for row in tqdm(range(int(len(df) * 2.3e-4))):
         # Set the new row to the same as the original to begin changing it
         new_row = df_iloc[row]
 
@@ -244,7 +244,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     
             temp.append([title_one, title_two, 1])
     
-    return pd.DataFrame([[title_one, title_two, 1]], columns=COLUMN_NAMES)
+    return pd.DataFrame(temp, columns=COLUMN_NAMES)
 
 def populate_spec():
     # Getting the CPU data into SpecAttrbutes

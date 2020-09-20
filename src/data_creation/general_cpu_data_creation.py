@@ -87,7 +87,7 @@ def create_general_cpu_data():
     if not os.path.exists(file_path):
         print('Generating general cpu data . . . ')
         # Create the positive and negative examples
-        pos_df = generate_neg_cpu_data()
+        pos_df = generate_pos_cpu_data()
         neg_df = generate_neg_cpu_data()
 
         # Concatenate the data and save it
