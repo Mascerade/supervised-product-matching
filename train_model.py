@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import nltk
 import os
+import sys
 import tensorflow as tf
 
 """ LOCAL IMPORTS """
@@ -12,6 +13,21 @@ from src.common import Common, get_max_len
 from src.laptop_data_creation import create_laptop_data
 from src.pcpartpicker_data_creation import create_pcpartpicker_data
 from create_data import create_data
+
+MODELS = ['distance sigmoid', 'exp distance', 'manhattan distance sigmoid', 'exp distance softmax']
+model = None
+
+if len(sys.argv) > 0:
+    if sys.argv[0] in MODELS:
+        model = sys.argv
+    
+    else:
+        model = 'exp distance'
+        print('Using the default model (exp distance).')
+
+else :
+    print('Using the default model (exp distance).')
+    model = 'exp distance'
 
 create_data()
 
