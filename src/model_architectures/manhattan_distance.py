@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import LSTM, Bidirectional, Dense, Input, Dropout, Lambda 
 from tensorflow.keras.regularizers import l2
 from src.common import Common
-from src.model_architectures.model_function import create_embeddings, manhattan_distance
+from src.model_architectures.model_functions import create_embeddings, manhattan_distance
 
 def siamese_network(input_shape):
     # Defines our inputs
@@ -56,7 +56,6 @@ def siamese_network(input_shape):
     # Take the Manhattan distance and send it to a sigmoid classifier
     Distance = Lambda(manhattan_distance)
     distance = Distance([encoded_left_title, encoded_right_title])
-    prediction = Dense(units=1, activation='sigmoid', kernel_regularizer=l2(0.0001))(distance)
     
     # Create and return the network
     siamese_net = tf.keras.Model(inputs=[left_title, right_title], outputs=distance, name='siamese_network')

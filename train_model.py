@@ -8,32 +8,42 @@ import tensorflow as tf
 """ LOCAL IMPORTS """
 from src.preprocessing import remove_misc
 from src.embeddings import load_embeddings_and_labels, save_embeddings, create_embeddings
-from src.model import siamese_network, save_model
 from src.common import Common, get_max_len
-from src.laptop_data_creation import create_laptop_data
-from src.pcpartpicker_data_creation import create_pcpartpicker_data
 from create_data import create_data
+from src.model_architectures.model_functions import save_model
 
-MODELS = ['distance sigmoid', 'exp distance', 'manhattan distance sigmoid', 'exp distance softmax']
-model = None
-
-if len(sys.argv) > 0:
-    if sys.argv[0] in MODELS:
-        model = sys.argv
+MODELS = ['distance-sigmoid', 'exp-distance-sigmoid', 'manhattan-distance', 'exp-distance-softmax']
+model_choice = None
+model_name = None
+print(sys.argv)
+if len(sys.argv) >= 3:
+    if sys.argv[1] in MODELS:
+        model_choice = sys.argv[1]
     
     else:
-        model = 'exp distance'
-        print('Using the default model (exp distance).')
+        print('Model not found . . . ')
+        sys.exit()
+    
+    model_name = sys.argv[2]
 
 else :
-    print('Using the default model (exp distance).')
-    model = 'exp distance'
+    print('Provide a MODEL ARCHITECTURE and NAME for the model . . . ')
+    sys.exit()
 
+print(model_choice, model_name)
 create_data()
+
+# Convert floats to one-hot arrays
+def convert_to_one_hot(Y, C):
+    """
+    Function to create the 
+    """
+    Y = np.eye(C)[Y.reshape(-1)]
+    return Y
 
 # Get the data from the file
 total_data = pd.read_csv('data/train/total_data_NEW.csv')
-MAX_LEN = get_max_len(total_data)
+Common.MAX_LEN = get_max_len(total_data)
 
 # Drop the Unnamed column
 total_data = remove_misc(total_data)
@@ -44,8 +54,8 @@ train_data2 = []
 labels = []
 total_iloc = total_data.iloc()
 for idx in range(len(total_data)):
-    title_one_base = [' '] * MAX_LEN
-    title_two_base = [' '] * MAX_LEN
+    title_one_base = [' '] * Common.MAX_LEN
+    title_two_base = [' '] * Common.MAX_LEN
     row = total_iloc[idx]
     
     for row_idx, x in enumerate(row.title_one.split(' ')):
@@ -62,6 +72,7 @@ train_data1 = np.asarray(train_data1)
 train_data2 = np.asarray(train_data2)
 labels = np.asarray(labels).astype(np.float32)
 
+# The split between training and test/validation 
 split_size = 10000
 X_train1 = train_data1[:len(labels) - split_size]
 X_train2 = train_data2[:len(labels) - split_size]
@@ -88,35 +99,47 @@ print('Val shape:', str(Y_val.shape))
 Y_test = labels[len(labels) - (split_size//2):]
 print('Test shape:', str(Y_test.shape))
 
-def convert_to_one_hot(Y, C):
-    """
-    Function to create the 
-    """
-    Y = np.eye(C)[Y.reshape(-1)]
-    return Y
+# Only convert to one-hot if we are using a softmax model
+if 'softmax' in model_choice:
+    Y_train = convert_to_one_hot(Y_train.astype(np.int32), 2)
+    Y_val = convert_to_one_hot(Y_val.astype(np.int32), 2)
+    Y_test = convert_to_one_hot(Y_test.astype(np.int32), 2)
 
-Y_train = convert_to_one_hot(Y_train.astype(np.int32), 2)
-Y_val = convert_to_one_hot(Y_val.astype(np.int32), 2)
-Y_test = convert_to_one_hot(Y_test.astype(np.int32), 2)
+
+# Choosing the architecture based on the argument
+model = None
+if model_choice == 'distance-sigmoid':
+    from src.model_architectures.distance_sigmoid import siamese_network
+    model = siamese_network((Common.MAX_LEN))
+
+elif model_choice == 'exp-distance-sigmoid':
+    from src.model_architectures.exp_distance_sigmoid import siamese_network
+    model = siamese_network((Common.MAX_LEN))
+
+elif model_choice == 'manhattan-distance':
+    print('here in man dist')
+    from src.model_architectures.manhattan_distance import siamese_network
+    model = siamese_network((Common.MAX_LEN))
+
+else:
+    print('here in .... nasty softmax land')
+    from src.model_architectures.exp_distance_softmax import siamese_network
+    model = siamese_network((Common.MAX_LEN))
 
 print('Creating the model graph . . . ')
-model = siamese_network((Common.MAX_LEN, Common.EMBEDDING_SHAPE[0],))
 model.summary()
 
-print('Compiling the model...')
 # Compile the model
-lr = 0.001
-opt = tf.keras.optimizers.Adam(learning_rate=lr)
+print('Compiling the model...')
 model.compile(loss='categorical_crossentropy', optimizer='RMSprop', metrics=['accuracy'])
 
-print('About to train...')
 # Train the model
-model.fit(x=[X_train1, X_train2], y=Y_train, batch_size=64, epochs=50, validation_data=([X_val[0], X_val[1]], Y_val))
+print('About to train...')
+model.fit(x=[X_train1, X_train2], y=Y_train, batch_size=128, epochs=50, validation_data=([X_val[0], X_val[1]], Y_val))
 
 # Test the model
 results = model.evaluate([X_test1, X_test2], Y_test, batch_size=16)
-print('test loss, test acc: ', results)
+print('test loss, test accuracy: ', results)
 
 # Save the model
-model_name = 'Softmax-LSTM-_epochs_loss'
-save_model(model, model_name)
+save_model(model_choice, model_name)

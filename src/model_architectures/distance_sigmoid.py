@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import LSTM, Bidirectional, Dense, Input, Dropout, Lambda
 from tensorflow.keras.regularizers import l2
 from src.common import Common
-from src.model_architectures.model_function import create_embeddings, l1_distance
+from src.model_architectures.model_functions import create_embeddings, l1_distance
 
 def siamese_network(input_shape):
     # Defines our inputs
