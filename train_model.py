@@ -109,20 +109,22 @@ if 'softmax' in model_choice:
 # Choosing the architecture based on the argument
 model = None
 if model_choice == 'distance-sigmoid':
+    print("Using the distance sigmoid model.")
     from src.model_architectures.distance_sigmoid import siamese_network
     model = siamese_network((Common.MAX_LEN))
 
 elif model_choice == 'exp-distance-sigmoid':
+    print("Using the exponential distance sigmoid model.")
     from src.model_architectures.exp_distance_sigmoid import siamese_network
     model = siamese_network((Common.MAX_LEN))
 
 elif model_choice == 'manhattan-distance':
-    print('here in man dist')
+    print("Using the manhattan distance model.")
     from src.model_architectures.manhattan_distance import siamese_network
     model = siamese_network((Common.MAX_LEN))
 
 else:
-    print('here in .... nasty softmax land')
+    print("Using the exponential distance softmax.")
     from src.model_architectures.exp_distance_softmax import siamese_network
     model = siamese_network((Common.MAX_LEN))
 
