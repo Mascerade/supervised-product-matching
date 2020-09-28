@@ -12,3 +12,6 @@ models/*
 geckodriver.log
 debug.log
 TestingGrounds-OLD.ipynb
+AnotherTestingGrounds.ipynb
+DistanceSigmoidTestingGrounds.ipynb
+ExpSoftmax.ipynb
