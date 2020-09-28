@@ -7,7 +7,7 @@ from src.preprocessing import remove_stop_words
 ###################################################################################
 
 
-# Using Manhattan distance by default
+# Using distance sigmoid by default
 model_choice = 'distance-sigmoid'
 MAX_LEN = 44
 
