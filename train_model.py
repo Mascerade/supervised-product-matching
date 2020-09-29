@@ -31,7 +31,10 @@ else :
     sys.exit()
 
 print(model_choice, model_name)
-create_data()
+
+# Create the data if it doesn't exist
+if not os.path.exists('data/train/total_data.csv'):
+    create_data()
 
 # Convert floats to one-hot arrays
 def convert_to_one_hot(Y, C):
@@ -42,7 +45,7 @@ def convert_to_one_hot(Y, C):
     return Y
 
 # Get the data from the file
-total_data = pd.read_csv('data/train/total_data_NEW.csv')
+total_data = pd.read_csv('data/train/total_data.csv')
 Common.MAX_LEN = get_max_len(total_data)
 
 # Drop the Unnamed column
