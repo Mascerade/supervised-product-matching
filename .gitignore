@@ -1,6 +1,7 @@
 .vscode/
 __pycache__/
 .ipynb_checkpoints/
+models/bert_model.pt
 data/numpy_data/*
 !data/numpy_data/.gitkeep
 data/train/*
