@@ -46,8 +46,8 @@ def concatenate_row(row):
     # so if we change the specs, we need to fix that too
     
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
-    inch_attr = str(row['Inches']) + random.choice([' inch', '', '"'])
-    ram_attr = row['Ram'] + random.choice([' ram', ' memory', ''])
+    inch_attr = str(row['Inches']) + random.choice([' inch', '"'])
+    ram_attr = row['Ram'] + random.choice([' ram', ' memory'])
     
     cpu_attr = row['Cpu']
     if random.choice([0, 1]):
@@ -65,21 +65,25 @@ def concatenate_row(row):
         cpu_attr = ' '.join(cpu_attr)
 
     # Create a list for all the product attributes
-    order_attrs = [random.choice(modifiers),
-                   row['Company'],
-                   row['Product'].split('(')[0],
-                   row['TypeName'],
-                   inch_attr,
-                   row['ScreenResolution'],
+    order_attrs = [ row['Company'],
+                    row['Product'].split('(')[0],
+                  ]
+    
+    more_type_attrs = [ row['TypeName'],
+                        inch_attr
+                      ]
+    
+    spec_attrs = [ # row['ScreenResolution'],
                    cpu_attr,
                    ram_attr,
-                   row['Memory'],
-                   row['Gpu']]
+                   row['Memory']
+                 ]
     
-    order_attrs = order_attrs + random.sample(add_ins, random.choice([1, 2, 3, 4]))
+    # Shuffle only the spec attributes
+    random.shuffle(more_type_attrs)
+    random.shuffle(spec_attrs)
     
-    # Shuffle the data because in real data, it does not really matter what order the attributes are in
-    random.shuffle(order_attrs)
+    order_attrs = order_attrs + more_type_attrs + spec_attrs
     
     return ' '.join(order_attrs)
 
@@ -152,7 +156,7 @@ def create_laptop_data():
         print('Generating laptop data . . . ')
         # Create the negative and positive dataframes 
         neg_df = create_neg_laptop_data(laptop_df, attributes=['Cpu', 'Memory', 'Ram', 'Inches', 'Product'])
-        pos_df = create_pos_laptop_data(laptop_df, rm_attrs = [['Company'], ['TypeName'], ['ScreenResolution'], ['Product'], ['TypeName', 'ScreenResolution']], add_attrs = [])
+        pos_df = create_pos_laptop_data(laptop_df, rm_attrs = [['Company'], ['TypeName'], ['Product']], add_attrs = [])
         
         # Concatenate the data and save it
         final_laptop_df = create_final_data(pos_df, neg_df)

@@ -30,15 +30,11 @@ class SpecAttributes():
 
 def concatenate_spec_data(row):
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
-    inch_attr = str(row['inches']) + random.choice([' inch', '', '"'])
-    ram_attr = row['ram'] + random.choice([' ram', ' memory', ''])
-    
-    # These are words that commonly come up with laptops
-    modifiers = ['premium', 'new', 'fast', 'latest model']
-    add_ins = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
-               'HDMI', '802.11ac', '802.11 ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
-               'DVD', 'Windows 10']
+    inch_attr = str(row['inches']) + random.choice([' inch', '"'])
+    ram_attr = row['ram'] + random.choice([' ram', ' memory'])
 
+    # This modifies the CPU attribute to sometimes have different types of elements to add some difference
+    # Ex: Intel Core i7 7700k vs Core i7 7700k 4 Core 4.2 GHz CPU (Something like that)
     cpu_attr = row['cpu']
     cores = SpecAttributes.cpu[cpu_attr][0]
     ghz = SpecAttributes.cpu[cpu_attr][1]
@@ -69,20 +65,20 @@ def concatenate_spec_data(row):
         cpu_attr = '{} {}'.format(cpu_attr, 'CPU')
     
     # Create a list for all the product attributes
-    order_attrs = [random.choice(modifiers),
-                   row['company'],
+    order_attrs = [row['company'],
                    row['product'],
-                   row['hard_drive'],
-                   row['screen'],
                    inch_attr,
-                   cpu_attr,
-                   ram_attr
                   ]
     
-    order_attrs = order_attrs + random.sample(add_ins, random.choice([1, 2, 3, 4]))
+    spec_attrs = [row['hard_drive'],
+                  # row['screen'],
+                   cpu_attr,
+                   ram_attr
+                 ]
     
-    # Shuffle the data because in real data, it does not really matter what order the attributes are in
-    random.shuffle(order_attrs)
+    # Shuffle only the attributte
+    random.shuffle(spec_attrs)
+    order_attrs = order_attrs + spec_attrs
     
     return ' '.join(order_attrs)
 
@@ -109,13 +105,13 @@ def create_neg_spec_laptop(df, attributes):
             inch_attr = random.choice(list(LaptopAttributes.inches))
             
             # Get random screen attribute
-            screen_attr = random.choice(list(LaptopAttributes.screen))
+            # screen_attr = random.choice(list(LaptopAttributes.screen))
             
             # Set the attributes
             orig_row['inches'] = inch_attr
             neg_row['inches'] = inch_attr
-            orig_row['screen'] = screen_attr
-            neg_row['screen'] = screen_attr
+            # orig_row['screen'] = screen_attr
+            # neg_row['screen'] = screen_attr
             
             if attribute_class == 'inches':
                 # New inch attribute
@@ -199,7 +195,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     temp = []
     df_iloc = df.iloc()
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
-    for row in tqdm(range(int(len(df) * 2.3e-4))):
+    for row in tqdm(range(int(len(df) * 2.8e-4))):
         # Set the new row to the same as the original to begin changing it
         new_row = df_iloc[row]
 
@@ -216,7 +212,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
         inch_attr = random.choice(list(LaptopAttributes.inches))
 
         # Get random screen attribute
-        screen_attr = random.choice(list(LaptopAttributes.screen))
+        # screen_attr = random.choice(list(LaptopAttributes.screen))
 
         # Get random hard drive attribute and type
         hard_drive_attr = random.choice(list(SpecAttributes.hard_drive))
@@ -226,10 +222,11 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
 
         # Set the attributes
         orig_row['inches'] = inch_attr
-        orig_row['screen'] = screen_attr
+        # orig_row['screen'] = screen_attr
+
         orig_row['hard_drive'] = '{} {}'.format(hard_drive_attr, random.choice(drive_type))
         new_row['inches'] = inch_attr
-        new_row['screen'] = screen_attr
+        # new_row['screen'] = screen_attr
         new_row['hard_drive'] = '{} {}'.format(hard_drive_attr, random.choice(drive_type))
         
         for attr_list in rm_attrs:
@@ -278,9 +275,10 @@ def create_spec_laptop_data():
             print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
             gen_spec_combos()
         spec_df = pd.read_csv('data/train/spec_data.csv')
-        pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product'], ['screen'], ['product', 'screen'], ['company', 'screen']], add_attrs = [])
-        neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches', 'screen'])
+        pos_df = spec_pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product']], add_attrs = [])
+        neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches'])
         final_spec_df = create_final_data(pos_df, neg_df)
+        print(len(final_spec_df))
         final_spec_df.to_csv(file_path)
 
     else:

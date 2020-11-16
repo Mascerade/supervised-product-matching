@@ -1,13 +1,8 @@
 import sys
 import os
-import fasttext
 import pandas as pd
 
 class Common():
-    # Get the fasttext model (we are using the largest one they offer [600B tokens])
-    print('Loading the fastText embeddings...')
-    fasttext_model = fasttext.load_model('models/crawl-300d-2M-subword.bin')
-
     # Max length of a title to be fed into the model
     MAX_LEN = 44
 

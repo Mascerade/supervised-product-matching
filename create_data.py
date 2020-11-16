@@ -42,7 +42,7 @@ def create_data():
     create_laptop_data()
     create_spec_laptop_data()
 
-    print('Generating gigabyte data (as in just examples that use GB')
+    print('Generating gigabyte data (as in just examples that use GB)')
 
 
     final_gb_df = create_final_data(gen_gb_pos_data(), gen_neg_gb_data())
@@ -74,3 +74,7 @@ def create_data():
 
     # Save the data
     total_data.to_csv('data/train/total_data.csv')
+
+
+if __name__ == "__main__":
+    create_data()
