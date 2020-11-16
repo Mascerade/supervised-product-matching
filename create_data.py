@@ -34,6 +34,9 @@ def gen_neg_gb_data():
     return pd.DataFrame(neg, columns = COLUMN_NAMES)
 
 def create_data():
+    # Don't show the copy warnings
+    pd.set_option('mode.chained_assignment', None)
+
     # Run the functions
     create_computer_data()
     create_pcpartpicker_data()
@@ -52,7 +55,7 @@ def create_data():
     final_laptop_df = pd.read_csv('data/train/final_laptop_data.csv')
     final_spec_df = pd.read_csv('data/train/spec_train_data.csv')[:15000]
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
-    more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
+    more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')[:12500]
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
     all_data = [final_computer_df, final_laptop_df, final_spec_df, final_pcpartpicker_data, more_cpu_data, more_drive_data, final_gb_df]
 

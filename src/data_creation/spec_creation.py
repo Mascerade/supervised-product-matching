@@ -69,6 +69,10 @@ def concatenate_spec_data(row):
                    row['product'],
                    inch_attr,
                   ]
+
+    # Have a chance of adding "laptop" to the title
+    if random.random() > 0.45:
+        order_attrs.append('laptop')
     
     spec_attrs = [row['hard_drive'],
                   # row['screen'],
@@ -124,7 +128,7 @@ def create_neg_spec_laptop(df, attributes):
                 neg_row['inches'] = new_inch_attr
             
             elif attribute_class == 'screen':
-                # Have screen attr
+                # Optionally have a screen attribute (if it is part of the list of attributes to adjust)
                 orig_screen_attr = random.choice(list(LaptopAttributes.screen))
                 
                 # New screen attribute
