@@ -5,7 +5,7 @@ import random
 from tqdm import tqdm
 from src.data_creation.laptop_data_creation import LaptopAttributes
 from src.preprocessing import remove_stop_words
-from src.common import create_final_data, modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
+from src.common import create_final_data, Common
 
 class SpecAttributes():
     '''
@@ -167,8 +167,8 @@ def create_neg_spec_laptop(df, attributes):
                 while orig_row['hard_drive'] == new_drive_attr:
                     new_drive_attr = random.choice(SpecAttributes.hard_drive)
                 
-                neg_row['hard_drive'] = '{} {}'.format(new_drive_attr, random.choice([random.choice(hard_drive_types), random.choice(ssd_types)]))
-                orig_row['hard_drive'] = '{} {}'.format(orig_row['hard_drive'], random.choice([random.choice(hard_drive_types), random.choice(ssd_types)]))
+                neg_row['hard_drive'] = '{} {}'.format(new_drive_attr, random.choice([random.choice(Common.HARD_DRIVE_TYPES), random.choice(Common.SSD_TYPES)]))
+                orig_row['hard_drive'] = '{} {}'.format(orig_row['hard_drive'], random.choice([random.choice(Common.HARD_DRIVE_TYPES), random.choice(Common.SSD_TYPES)]))
             
             else:
                 # Get the attribute that we are trying to change
@@ -186,7 +186,7 @@ def create_neg_spec_laptop(df, attributes):
             
             # We still need to add the phrasing to the hard drive attribute if it is not the current attribute class
             if attribute_class != 'hard_drive':
-                drive_type = random.choice([random.choice(hard_drive_types), random.choice(ssd_types)])
+                drive_type = random.choice([random.choice(Common.HARD_DRIVE_TYPES), random.choice(Common.SSD_TYPES)])
                 neg_row['hard_drive'] = '{} {}'.format(neg_row['hard_drive'], drive_type)
                 orig_row['hard_drive'] = '{} {}'.format(orig_row['hard_drive'], drive_type)
             
@@ -198,7 +198,7 @@ def create_neg_spec_laptop(df, attributes):
             temp.append([title_one, title_two, 0])
 
     # Return the DataFrame created from temp
-    return pd.DataFrame(temp, columns=COLUMN_NAMES)
+    return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 
 def create_pos_spec_data(df, rm_attrs, add_attrs):
     '''
@@ -209,7 +209,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
 
     temp = []
     df_iloc = df.iloc()
-    COLUMN_NAMES = ['title_one', 'title_two', 'label']
+    Common.COLUMN_NAMES = ['title_one', 'title_two', 'label']
     for row in tqdm(range(int(len(df) * 2.8e-4))):
         # Set the new row to the same as the original to begin changing it
         new_row = df_iloc[row]
@@ -233,7 +233,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
         hard_drive_attr = random.choice(list(SpecAttributes.hard_drive))
         
         # Get whether it will be an ssd or a hard drive
-        drive_type = random.choice([hard_drive_types, ssd_types])
+        drive_type = random.choice([Common.HARD_DRIVE_TYPES, Common.SSD_TYPES])
 
         # Set the attributes
         orig_row['inches'] = inch_attr
@@ -256,7 +256,7 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     
             temp.append([title_one, title_two, 1])
     
-    return pd.DataFrame(temp, columns=COLUMN_NAMES)
+    return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 
 def populate_spec():
     '''

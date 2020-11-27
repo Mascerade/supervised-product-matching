@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from tqdm import tqdm
-from src.common import create_final_data, COLUMN_NAMES
+from src.common import Common, create_final_data
 from src.preprocessing import remove_stop_words
 
 def preprocessing(orig_data):
@@ -25,7 +25,7 @@ def preprocessing(orig_data):
         temp.append([title_left, title_right, row.label])
         
     # Return DataFrame of the title data, simplified
-    return pd.DataFrame(temp, columns=COLUMN_NAMES)
+    return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 
 def create_train_df(df):
     '''

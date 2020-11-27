@@ -5,7 +5,7 @@ import os
 """ LOCAL IMPORTS """
 from src.preprocessing import remove_misc
 from src.common import Common
-from src.common import get_max_len, COLUMN_NAMES, create_final_data
+from src.common import get_max_len, create_final_data
 from src.data_creation.general_cpu_data_creation import create_general_cpu_data
 from src.data_creation.general_drive_data import create_final_drive_data
 from src.data_creation.gs_data_creation import create_computer_data
@@ -23,7 +23,7 @@ def gen_gb_pos_data():
         attr = '{} {}'.format(x, 'gb')
         pos.append([attr, attr, 1])
 
-    return pd.DataFrame(pos, columns = COLUMN_NAMES)
+    return pd.DataFrame(pos, columns = Common.COLUMN_NAMES)
 
 def gen_neg_gb_data():
     '''
@@ -40,7 +40,7 @@ def gen_neg_gb_data():
             if x != y:
                 neg.append([x_attr, y_attr, 0])
 
-    return pd.DataFrame(neg, columns = COLUMN_NAMES)
+    return pd.DataFrame(neg, columns = Common.COLUMN_NAMES)
 
 def create_data():
     '''
@@ -84,6 +84,8 @@ def create_data():
     total_data = pd.concat(all_data)
     total_data = total_data.sample(frac=1)
     total_data = remove_misc(total_data)
+
+    # Get the max length of the data for padding in BERT
     Common.MAX_LEN = get_max_len(total_data)
 
     print('Total data size: {}'.format(len(total_data)))

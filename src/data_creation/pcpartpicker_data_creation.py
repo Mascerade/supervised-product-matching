@@ -4,15 +4,7 @@ import random
 from itertools import combinations
 from tqdm import tqdm
 from src.common import create_final_data
-
-def remove_misc(df):
-    '''
-    Drop the Unnamed: 0 column and drop any row where it is all NaN
-    '''
-
-    df = df.drop(columns=['Unnamed: 0'])
-    df = df.dropna(how='all')
-    return df
+from src.preprocessing import remove_misc
 
 def generate_pos_pcpartpicker_data(df):
     '''

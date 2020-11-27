@@ -4,7 +4,7 @@ import os
 import random
 from itertools import combinations
 from src.preprocessing import remove_misc, remove_stop_words
-from src.common import create_final_data, hard_drive_types, ssd_types, COLUMN_NAMES
+from src.common import create_final_data, Common
 
 def generate_pos_hard_drive_data():
     '''
@@ -16,16 +16,16 @@ def generate_pos_hard_drive_data():
     drives = ['{} GB'.format(x) for x in range(1, 3193)] + ['{} TB'.format(x) for x in range(1, 101)]
     for drive in drives:
         # For hard drives
-        pos_df.append([remove_stop_words('{} {}'.format(drive, random.choice(hard_drive_types))),
-                       remove_stop_words('{} {}'.format(drive, random.choice(hard_drive_types))),
+        pos_df.append([remove_stop_words('{} {}'.format(drive, random.choice(Common.HARD_DRIVE_TYPES))),
+                       remove_stop_words('{} {}'.format(drive, random.choice(Common.HARD_DRIVE_TYPES))),
                        1])
         
         # For SSDs
-        pos_df.append([remove_stop_words('{} {}'.format(drive, random.choice(ssd_types))),
-                       remove_stop_words('{} {}'.format(drive, random.choice(ssd_types))),
+        pos_df.append([remove_stop_words('{} {}'.format(drive, random.choice(Common.SSD_TYPES))),
+                       remove_stop_words('{} {}'.format(drive, random.choice(Common.SSD_TYPES))),
                        1])
     
-    return pd.DataFrame(pos_df, columns=COLUMN_NAMES)
+    return pd.DataFrame(pos_df, columns=Common.COLUMN_NAMES)
 
 def generate_neg_hard_drive_data():
     '''
@@ -46,12 +46,12 @@ def generate_neg_hard_drive_data():
         new_variations = []
         
         # For hard drive
-        for x in hard_drive_types:
+        for x in Common.HARD_DRIVE_TYPES:
             orig_variations.append('{} {}'.format(drive, x))
             new_variations.append('{} {}'.format(new_drive, x))
         
         # For ssd
-        for x in ssd_types:
+        for x in Common.SSD_TYPES:
             orig_variations.append('{} {}'.format(drive, x))
             new_variations.append('{} {}'.format(new_drive, x))
         
@@ -60,7 +60,7 @@ def generate_neg_hard_drive_data():
                 neg_df.append([remove_stop_words(old), remove_stop_words(new), 0])
         
         
-    return pd.DataFrame(neg_df, columns=COLUMN_NAMES)
+    return pd.DataFrame(neg_df, columns=Common.COLUMN_NAMES)
 
 def create_final_drive_data():
     '''

@@ -26,31 +26,29 @@ total_data = pd.read_csv('data/train/total_data.csv')
 # Drop the Unnamed column
 total_data = remove_misc(total_data)
 
-Common.MAX_LEN = get_max_len(total_data)
-
 # Convert the dataframe to numpy
 total_data = total_data.to_numpy()
-SIZE = total_data.shape[0]
+Common.M = total_data.shape[0]
 
 # The split between training and test/validation 
 split_size = 10000
 
-train_data = total_data[:SIZE - split_size][:, 0:2]
+train_data = total_data[:Common.M - split_size][:, 0:2]
 print('Training shape: ' + str(train_data.shape))
 
-val_data = total_data[SIZE - split_size: SIZE - (split_size//2)][:, 0:2]
+val_data = total_data[Common.M - split_size: Common.M - (split_size//2)][:, 0:2]
 print('Validation shape: ' + str(val_data.shape))
 
-test_data = total_data[SIZE - (split_size//2):][:, 0:2]
+test_data = total_data[Common.M - (split_size//2):][:, 0:2]
 print('Test shape: ' + str(test_data.shape))
 
-train_labels = total_data[:SIZE - split_size][:, 2].astype('float32')
+train_labels = total_data[:Common.M - split_size][:, 2].astype('float32')
 print('Training labels shape:', str(train_labels.shape))
 
-val_labels = total_data[SIZE - split_size: SIZE - (split_size//2)][:, 2].astype('float32')
+val_labels = total_data[Common.M - split_size: Common.M - (split_size//2)][:, 2].astype('float32')
 print('Val shape:', str(val_labels.shape))
 
-test_labels = total_data[SIZE - (split_size//2):][:, 2].astype('float32')
+test_labels = total_data[Common.M - (split_size//2):][:, 2].astype('float32')
 print('Test shape:', str(test_labels.shape))
 
 # Initialize the model

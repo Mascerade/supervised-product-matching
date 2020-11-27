@@ -14,6 +14,10 @@ from tqdm import tqdm
 # Organizing and normalizing the data
 
 def remove_stop_words(phrase):
+    '''
+    Removes the stop words from a string
+    '''
+
     # Creates the stopwords
     to_stop = stopwords.words('english')
     punctuation = "!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~ "
@@ -26,8 +30,11 @@ def remove_stop_words(phrase):
     
     return ' '.join((' '.join([x for x in phrase.split(' ') if x not in to_stop])).split())
 
-# Drop the Unnamed: 0 column and drop any row where it is all NaN
 def remove_misc(df):
+    '''
+    Drop the Unnamed: 0 column and drop any row where it is all NaN
+    '''
+
     df = df.drop(columns=['Unnamed: 0'])
     df = df.dropna(how='all')
     return df

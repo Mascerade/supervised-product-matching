@@ -3,8 +3,7 @@ import os
 import random
 from tqdm import tqdm
 from src.preprocessing import remove_stop_words
-from src.common import create_final_data, modifiers, add_ins, COLUMN_NAMES
-
+from src.common import create_final_data
 
 class LaptopAttributes():
     '''
