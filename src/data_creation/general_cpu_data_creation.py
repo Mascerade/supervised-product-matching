@@ -7,6 +7,12 @@ from src.preprocessing import remove_misc, remove_stop_words
 from src.common import create_final_data
 
 def cpu_variations(cpu):
+    '''
+    Creates different forms of a cpu title
+    Ex: amd ryzen 5 3600, amd ryzen 5 3600 6 core processor, 
+    amd ryzen 5 3600 3.6 ghz processor and ryzen 5 3600 6 core 3.6 ghz processor.
+    '''
+    
     temp = []
     
     # This would be something like 'amd ryzen 5 3600 6 cores 3.6 ghz processor'
@@ -23,8 +29,12 @@ def cpu_variations(cpu):
     
     return temp
 
-# Generate positive cpu data
 def generate_pos_cpu_data():
+    '''
+    Creates positive CPU data with different variations of the title that still 
+    represent the same underlying CPU using the cpu_variations function.
+    '''
+    
     cpu_df = pd.read_csv('data/train/cpu_data.csv')
     cpu_df_iloc = cpu_df.iloc()
     pos_df = []
@@ -45,6 +55,10 @@ def generate_pos_cpu_data():
     return pd.DataFrame(pos_df, columns=['title_one', 'title_two', 'label'])
 
 def generate_neg_cpu_data():
+    '''
+    Creates negative CPU data that uses two different CPUs to create a pair. 
+    '''
+
     cpu_df = pd.read_csv('data/train/cpu_data.csv')
     cpu_df_iloc = cpu_df.iloc()
     neg_df = []
@@ -83,6 +97,11 @@ def generate_neg_cpu_data():
     return pd.DataFrame(neg_df, columns=['title_one', 'title_two', 'label'])
 
 def create_general_cpu_data():
+    '''
+    Runs through generate_pos_cpu_data() and generate_neg_cpu_data() to create positive and negative data.
+    Saves the file to more_cpu_data.csv
+    '''
+    
     file_path = 'data/train/more_cpu_data.csv'
     if not os.path.exists(file_path):
         print('Generating general cpu data . . . ')

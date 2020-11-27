@@ -6,12 +6,19 @@ from tqdm import tqdm
 from src.common import create_final_data
 
 def remove_misc(df):
-    # Drop the Unnamed: 0 column and drop any row where it is all NaN
+    '''
+    Drop the Unnamed: 0 column and drop any row where it is all NaN
+    '''
+
     df = df.drop(columns=['Unnamed: 0'])
     df = df.dropna(how='all')
     return df
 
 def generate_pos_pcpartpicker_data(df):
+    '''
+    Creates positive data from any of the PCPartPicker datasets
+    '''
+
     columns = list(df.columns)
     pos_df = pd.DataFrame(columns=['title_one', 'title_two', 'label'])
     for idx in tqdm(range(len(df))):
@@ -29,6 +36,10 @@ def generate_pos_pcpartpicker_data(df):
     return pos_df
 
 def generate_neg_pcpartpicker_data(df):
+    '''
+    Creates negative data from any of the PCPartPicker datasets
+    '''
+
     columns = list(df.columns)
     neg_df = pd.DataFrame(columns=['title_one', 'title_two', 'label'])
     df_list = df.iloc()
@@ -49,6 +60,11 @@ def generate_neg_pcpartpicker_data(df):
     return neg_df
 
 def create_pcpartpicker_data():
+    '''
+    Creates data for CPU, RAM, and drive data.
+    Saves the data to final_pcpartpicker_data.csv
+    '''
+    
     file_path = 'data/train/final_pcpartpicker_data.csv'
     if not os.path.exists(file_path):
         print('Generating PCPartPicker data . . .')
@@ -71,7 +87,7 @@ def create_pcpartpicker_data():
         final_cpu_data = create_final_data(pos_cpu_data, neg_cpu_data)
         final_hard_drive_data = create_final_data(pos_hard_drive_data, neg_hard_drive_data)
 
-        print('Amount of data for the CPU data, RAM data and hard drive data', len(final_cpu_data), len(final_ram_data), len(final_hard_drive_data))
+        print('Amount of data for the CPU data, RAM data and drive data', len(final_cpu_data), len(final_ram_data), len(final_hard_drive_data))
         
         # Concatenate the data and save it
         final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])

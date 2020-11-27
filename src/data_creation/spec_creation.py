@@ -8,10 +8,11 @@ from src.preprocessing import remove_stop_words
 from src.common import create_final_data, modifiers, add_ins, hard_drive_types, ssd_types, COLUMN_NAMES
 
 class SpecAttributes():
-    """
+    '''
     Different from LaptopAttributes, this is specific for creating spec data.
     The spec data was gathered from PCPartPicker and is used to create more laptop data.
-    """
+    '''
+
     video_card = {'GeForce RTX 2070'}
     ram = [str(x) + ' GB' for x in range(2, 130, 2)]
     hard_drive = [str(x) + ' GB' for x in range(120, 513, 8)] + [str(x) + ' TB' for x in range(1, 8)]
@@ -29,6 +30,10 @@ class SpecAttributes():
         }
 
 def concatenate_spec_data(row):
+    '''
+    Creates a string out of the row of product attributes (so row is a Pandas DataFrame)
+    '''
+
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
     inch_attr = str(row['inches']) + random.choice([' inch', '"'])
     ram_attr = row['ram'] + random.choice([' ram', ' memory'])
@@ -86,10 +91,13 @@ def concatenate_spec_data(row):
     
     return ' '.join(order_attrs)
 
-# Creates the negative examples for the laptop data
-# The laptop_df is the original data, the new_df is the dataframe to append the new data to
-# and the attributes are the attributes to swap for the new data
 def create_neg_spec_laptop(df, attributes):
+    '''
+    Creates the negative examples for the laptop data
+    The laptop_df is the original data, the new_df is the dataframe to append the new data to
+    and the attributes are the attributes to swap for the new data
+    '''
+
     df_iloc = df.iloc()
     temp = []
     for row in tqdm(range(int(len(df) * 1.91e-4))):
@@ -192,10 +200,13 @@ def create_neg_spec_laptop(df, attributes):
     # Return the DataFrame created from temp
     return pd.DataFrame(temp, columns=COLUMN_NAMES)
 
-# Creates the postive examples for the laptop data
-# The laptop_df is the original data, the new_df is the dataframe to append the new data to
-# and the attributes are the attributes to swap or delete for the new data
 def create_pos_spec_data(df, rm_attrs, add_attrs):
+    '''
+    Creates the postive examples for the laptop data
+    The laptop_df is the original data, the new_df is the dataframe to append the new data to
+    and the attributes are the attributes to swap or delete for the new data
+    '''
+
     temp = []
     df_iloc = df.iloc()
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
@@ -248,6 +259,10 @@ def create_pos_spec_data(df, rm_attrs, add_attrs):
     return pd.DataFrame(temp, columns=COLUMN_NAMES)
 
 def populate_spec():
+    '''
+    Creates a string out of the row of product attributes (so row is a Pandas DataFrame).
+    '''
+
     # Getting the CPU data into SpecAttrbutes
     cpu_df = pd.read_csv('data/train/cpu_data.csv')
     temp_iloc = cpu_df.iloc()
@@ -263,7 +278,10 @@ def populate_spec():
         SpecAttributes.video_card.update([row['chipset']])
 
 def gen_spec_combos():
-    # Generates combinations of the spec data (WARNING: THIS TAKES A VERY LONG TIME AND YOU MUST HAVE AT LEAST 16GB RAM TO DO THIS)
+    '''
+    Generates combinations of the spec data (WARNING: THIS TAKES A VERY LONG TIME AND YOU MUST HAVE AT LEAST 16GB RAM TO DO THIS)
+    '''
+
     combos = np.meshgrid(*[SpecAttributes.laptop_brands, list(SpecAttributes.cpu.keys()), SpecAttributes.hard_drive, SpecAttributes.ram])
     combos = np.array(combos).T.reshape(-1, 4)
     np.random.shuffle(combos)
@@ -271,6 +289,12 @@ def gen_spec_combos():
     df.to_csv('data/train/spec_data.csv')
 
 def create_spec_laptop_data():
+    '''
+    If spec_data.csv has not been created, we create that first.
+    Afterwards, create the positive and negative spec data (just more laptop data) 
+    and save it to spec_train_data.csv
+    '''
+
     file_path = 'data/train/spec_train_data.csv'
     if not os.path.exists(file_path):
         print('Generating general spec data for laptops . . . ')
@@ -279,7 +303,7 @@ def create_spec_laptop_data():
             print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
             gen_spec_combos()
         spec_df = pd.read_csv('data/train/spec_data.csv')
-        pos_df = spec_pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product']], add_attrs = [])
+        pos_df = create_pos_spec_data(spec_df, rm_attrs = [['company'], ['product']], add_attrs = [])
         neg_df = create_neg_spec_laptop(spec_df, ['cpu', 'ram', 'hard_drive', 'product', 'inches'])
         final_spec_df = create_final_data(pos_df, neg_df)
         print(len(final_spec_df))

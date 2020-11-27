@@ -5,9 +5,13 @@ from tqdm import tqdm
 from src.preprocessing import remove_stop_words
 from src.common import create_final_data, modifiers, add_ins, COLUMN_NAMES
 
-# This class will be used in order to exchange the different attributes
-# to create negative examples
+
 class LaptopAttributes():
+    '''
+    This class will be used in order to exchange the different attributes
+    to create positive and negative examples
+    '''
+
     company = {'Apple'}
     product = {'MacBook Pro'}
     inches = {'13.3'}
@@ -30,8 +34,10 @@ class LaptopAttributes():
             'screen': LaptopAttributes.screen
         }
 
-# Create attribute sets
 def create_attribute_sets(df):
+    '''
+    Populate the sets in LaptopAttributes with the data from laptops.csv
+    '''
     LaptopAttributes.company.update([row.Company for row in df[['Company']].itertuples()])
     LaptopAttributes.product.update([row.Product for row in df[['Product']].itertuples()])
     LaptopAttributes.inches.update([str(row.Inches) for row in df[['Inches']].itertuples()])
@@ -42,9 +48,13 @@ def create_attribute_sets(df):
     LaptopAttributes.screen.update([row.ScreenResolution for row in df[['ScreenResolution']].itertuples()])
 
 def concatenate_row(row):
+    '''
+    Creates a string out of the row of product attributes (so row is a Pandas DataFrame).
+    '''
+
     # Note: got rid of everything after the '(' because it has info about the actual specs of the laptop
     # so if we change the specs, we need to fix that too
-    
+
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
     inch_attr = str(row['Inches']) + random.choice([' inch', '"'])
     ram_attr = row['Ram'] + random.choice([' ram', ' memory'])
@@ -87,10 +97,13 @@ def concatenate_row(row):
     
     return ' '.join(order_attrs)
 
-# Creates the negative examples for the laptop data
-# The laptop_df is the original data, the new_df is the dataframe to append the new data to
-# and the attributes are the attributes to swap for the new data
 def create_neg_laptop_data(laptop_df, attributes):
+    '''
+    Creates the negative examples for the laptop data
+    The laptop_df is the original data, the new_df is the dataframe to append the new data to
+    and the attributes are the attributes to swap for the new data
+    '''
+    
     new_column_names = ['title_one', 'title_two', 'label']
     temp = []
     for row in tqdm(range(len(laptop_df))):
@@ -122,10 +135,13 @@ def create_neg_laptop_data(laptop_df, attributes):
 
     return pd.DataFrame(temp, columns=new_column_names)
 
-# Creates the postive examples for the laptop data
-# The laptop_df is the original data, the new_df is the dataframe to append the new data to
-# and the attributes are the attributes to swap or delete for the new data
 def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
+    '''
+    Creates the postive examples for the laptop data
+    The laptop_df is the original data, the new_df is the dataframe to append the new data to
+    and the attributes are the attributes to swap or delete for the new data    
+    '''
+    
     new_column_names = ['title_one', 'title_two', 'label']
     temp = []
     for row in tqdm(range(len(laptop_df))):
@@ -145,7 +161,12 @@ def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
     return pd.DataFrame(temp, columns=new_column_names)
 
 def create_laptop_data():
+    '''
+    Creates positive and negative laptop data and saves it to final_laptop_data.csv
+    '''
+    
     file_path = 'data/train/final_laptop_data.csv'
+
     # Load the laptop data
     laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
     

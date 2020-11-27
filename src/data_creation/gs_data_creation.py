@@ -4,15 +4,11 @@ from tqdm import tqdm
 from src.common import create_final_data, COLUMN_NAMES
 from src.preprocessing import remove_stop_words
 
-"""
-Essentially, we want to only have three attributes for each training example: title_one, title_two, label
-For normalization, we are just going to use the nltk stopwords and punctuation
-"""
-
 def preprocessing(orig_data):
-    """
+    '''
     Normalizes the data by getting rid of stopwords and punctuation
-    """
+    '''
+
     # Iterate over the original dataframe (I know it is slow and there are probably better ways to do it)
     iloc_data = orig_data.iloc
     
@@ -32,9 +28,10 @@ def preprocessing(orig_data):
     return pd.DataFrame(temp, columns=COLUMN_NAMES)
 
 def create_train_df(df):
-    """
+    '''
     Returns a shuffled dataframe with an equal amount of positive and negative examples
-    """
+    '''
+
     # Get the positive and negative examples
     pos_df = df.loc[df['label'] == 1]
     neg_df = df.loc[df['label'] == 0]
@@ -53,9 +50,9 @@ def create_train_df(df):
     return final_df
 
 def create_training_data(df, path):
-    """
+    '''
     Creates and saves a simpler version of the original data that only contains the the two titles and the label.
-    """
+    '''
     
     norm_bal_data = create_train_df(preprocessing(df))
     
@@ -64,6 +61,10 @@ def create_training_data(df, path):
 
 
 def create_computer_data():
+    '''
+    Simplifies the Gold Standard comptuer data and saves it to computers_train_bal_shuffle.csv
+    '''
+    
     computer_data_path = 'data/train/computers_train_bal_shuffle.csv'
     if not os.path.exists(computer_data_path):
         print('Generating simplifed Gold Standard computer data . . . ')

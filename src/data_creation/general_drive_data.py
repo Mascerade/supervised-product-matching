@@ -7,6 +7,11 @@ from src.preprocessing import remove_misc, remove_stop_words
 from src.common import create_final_data, hard_drive_types, ssd_types, COLUMN_NAMES
 
 def generate_pos_hard_drive_data():
+    '''
+    Creates positive data with the same drive size, but different modifiers.
+    Ex: 10 gb internal hard drive vs  10 gb hdd.
+    '''
+    
     pos_df = []
     drives = ['{} GB'.format(x) for x in range(1, 3193)] + ['{} TB'.format(x) for x in range(1, 101)]
     for drive in drives:
@@ -23,6 +28,11 @@ def generate_pos_hard_drive_data():
     return pd.DataFrame(pos_df, columns=COLUMN_NAMES)
 
 def generate_neg_hard_drive_data():
+    '''
+    Creates negative data with different drives sizes.
+    Ex: 10 gb ssd vs 20 gb ssd.
+    '''
+    
     neg_df = []
     drives = ['{} GB'.format(x) for x in range(8, 1001, 8)] + ['{} TB'.format(x) for x in range(1, 20)]
     
@@ -53,6 +63,10 @@ def generate_neg_hard_drive_data():
     return pd.DataFrame(neg_df, columns=COLUMN_NAMES)
 
 def create_final_drive_data():
+    '''
+    Creates positive and negative drive data and saves it to more_drive_data.csv
+    '''
+    
     file_path = 'data/train/more_drive_data.csv'
     if not os.path.exists(file_path):
         print('Generating general drive data . . . ')

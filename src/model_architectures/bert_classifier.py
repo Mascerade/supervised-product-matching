@@ -6,11 +6,12 @@ from transformers import AutoTokenizer, AutoModel
 
 class SiameseNetwork(nn.Module):
     def __init__(self, max_length, h_size=768):
-        """
+        '''
+        Model that uses BERT to classify the titles.
         max_length: The max length a title could be for padding purposes
         h_size: The hidden layer size for the classification token (CLS) in BERT (Default: 768)
-        
-        """
+        '''
+
         super(SiameseNetwork, self).__init__()
         self.h_size = h_size
         self.max_length = max_length * 2
@@ -37,11 +38,12 @@ class SiameseNetwork(nn.Module):
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        """
+        '''
         x is going to be a numpy array of [sentenceA, sentenceB].
         Model using BERT to make a prediction of whether the two titles represent 
         the same entity.
-        """
+        '''
+
         # BERT for title similarity works having the two sentences (sentence1, sentence2)
         # and ordering them in both combinations that they could be (sentence1 + sentence2)
         # and (sentence2 + sentence1). That is why we do np.flip() on x (the input sentences)

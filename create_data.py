@@ -14,6 +14,10 @@ from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_dat
 from src.data_creation.spec_creation import create_spec_laptop_data
 
 def gen_gb_pos_data():
+    '''
+    Create positive gigabyte data (ex: 8 gb vs 8 gb) to essentially 
+    differentiate between numbers.
+    '''
     pos = []
     for x in range(2, 5000, 2):
         attr = '{} {}'.format(x, 'gb')
@@ -22,6 +26,11 @@ def gen_gb_pos_data():
     return pd.DataFrame(pos, columns = COLUMN_NAMES)
 
 def gen_neg_gb_data():
+    '''
+    Create negative gigabyte data (ex: 8 gb vs 10 gb) to essentially 
+    differentiate between numbers.
+    '''
+    
     neg = []
     for x in range(2, 1000, 2):
         for y in range(2, 1000, 2):
@@ -34,6 +43,10 @@ def gen_neg_gb_data():
     return pd.DataFrame(neg, columns = COLUMN_NAMES)
 
 def create_data():
+    '''
+    Runs the necessary functions to create the data for training.
+    '''
+    
     # Don't show the copy warnings
     pd.set_option('mode.chained_assignment', None)
 
@@ -47,7 +60,6 @@ def create_data():
 
     print('Generating gigabyte data (as in just examples that use GB)')
 
-
     final_gb_df = create_final_data(gen_gb_pos_data(), gen_neg_gb_data())
 
     # Load all the data
@@ -59,6 +71,7 @@ def create_data():
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
     all_data = [final_computer_df, final_laptop_df, final_spec_df, final_pcpartpicker_data, more_cpu_data, more_drive_data, final_gb_df]
 
+    # Print the sizes of the data
     print('Computer df size: {}'.format(len(final_computer_df)))
     print('Laptop df size: {}'.format(len(final_laptop_df)))
     print('Final spec df size: {}'.format(len(final_spec_df)))
