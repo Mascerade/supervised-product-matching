@@ -4,6 +4,7 @@ import pandas as pd
 
 class Common():
     '''
+    A class for commonly used variables
     '''
 
     # Max length of a title to be fed into the model

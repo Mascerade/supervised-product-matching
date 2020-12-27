@@ -12,6 +12,7 @@ from src.data_creation.gs_data_creation import create_computer_data
 from src.data_creation.laptop_data_creation import create_laptop_data
 from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_data
 from src.data_creation.spec_creation import create_spec_laptop_data
+from src.data_creation.retailer_test_creation import create_laptop_test_data
 
 def gen_gb_pos_data():
     '''
@@ -57,6 +58,7 @@ def create_data():
     create_final_drive_data()
     create_laptop_data()
     create_spec_laptop_data()
+    create_laptop_test_data()
 
     print('Generating gigabyte data (as in just examples that use GB)')
 
