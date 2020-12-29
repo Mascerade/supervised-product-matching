@@ -112,6 +112,8 @@ for epoch in range(10):
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
                 (epoch + 1, i + 1, loss, accuracy))
 
+    torch.save(net, 'models/0.2.0_BERT_epoch_' + str(epoch + 1))
+
     # Iterate through each validation batch
     net.eval()
     for i, position in enumerate(range(0, len(val_data), BATCH_SIZE)):
@@ -170,3 +172,4 @@ for epoch in range(10):
         # Print statistics every batch
         print('Test Laptop Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
                 (epoch + 1, i + 1, loss, accuracy))
+
