@@ -14,22 +14,23 @@ The `models` directory contains the different models trained so far and also the
 The `data_scrapers` directory contains scripts to scrape data for creating training data.
 
 
-#### For Old Models using FastText Embeddings
+### For Old Models using FastText Embeddings (Versions <0.2.0)
 * Download and unzip the [fastText model](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip) and put the `.bin` file into the `models` directory
    * <b>This is only if you want to use the old models</b>
    * Also must un-comment the loading of the fastText model in `src/common.py`
 
-## Notes About The Network
-
-### fastText Embeddings (OLD METHOD)
+#### fastText Embeddings (OLD METHOD)
 * I have just been experimenting with the fastText word embedding matrix
    * I got the largest one they had (600 billion tokens) and it works with n-grams so even if a word is not explicitly in the word embedding, it will stil find a similar word to it and get a word embedding based on that.
 
-### LSTM + fastText Model (OLD METHOD)
+#### LSTM + fastText Model (OLD METHOD)
 * There are many variations of this model that I use. The architectures can be found in  `src/model_architectures`
 
-### BERT (New)
-* For the latest models (>= 0.2.0), I use a pre-trained BERT model ([Google's paper](https://arxiv.org/pdf/1810.04805.pdf))
+## Notes About The Network
+
+### BERT
+* For the latest models (>= 0.2.0), I use a pre-trained BERT model from [PyTorch HuggingFace](https://huggingface.co/transformers/)
+   * ([Google's Paper On BERT](https://arxiv.org/pdf/1810.04805.pdf))
 * I simply fine-tune BERT on the new data (so the last couple layers of BERT) and add a classification head on top of it.
 * The architecture can be found in `src/model_architectures/bert_classifier.py`
 
@@ -42,7 +43,7 @@ The `data_scrapers` directory contains scripts to scrape data for creating train
    * Essentially, this means that we can just use the cluster_id to build the positive examples of matches and use random examples outside of the cluster to build our negative training examples
 
 * The way the dataset works is that for each entry in it, there is a title_right and a title_left. These are the two titles represented in a pair. There is a label that tells you whether the titles represent the same product or not. Using this, we already have built a dataset of positive and negative example pairs.
-   * I also have created a seperate CSV file that is a simpler version of teh original dataset. It ony containes the titles with a label (either 0 or 1)
+   * I also have created a seperate CSV file that is a simpler version of the original dataset. It ony containes the titles with a label (either 0 or 1)
 
 * The WDC Product Data researchers also did their own experiments, and they actually have a model that they trained using their own custom fastText encoding model
    * They got about 90% accuracy on their training set which included computers, cameras, watches and shoes
@@ -60,5 +61,5 @@ The `data_scrapers` directory contains scripts to scrape data for creating train
 
 * I also randomize the order of tokens so that the does not overfit to certain positions of tokens
 
-### More Custom Made Laptop Data (spec_data.csv)
-* Using 
+#### More Custom Made Laptop Data (`spec_data.csv`)
+* Using a custom-made `csv` file called `spec_data.csv`, I can essentially create all the fake-laptop data I want. Data size in no longer an issue for laptops, it is just the quality of data that has to be improved. Using this file, the data used to train is `spec_train_data.csv`
