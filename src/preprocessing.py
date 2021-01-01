@@ -28,7 +28,7 @@ def remove_stop_words(phrase):
     for punc in punctuation:
         phrase = phrase.replace(punc, ' ')
     
-    return ' '.join((' '.join([x for x in phrase.split(' ') if x not in to_stop])).split())
+    return ' '.join((' '.join([x for x in phrase.split(' ') if x not in to_stop])).split()).lower()
 
 def remove_misc(df):
     '''
