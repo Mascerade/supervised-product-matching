@@ -1,65 +1,101 @@
 import pandas as pd
 import os
+import numpy as np
 import random
 from tqdm import tqdm
 from src.preprocessing import remove_stop_words
-from src.common import create_final_data
+from src.common import create_final_data, Common
 
 class LaptopAttributes():
     '''
-    This class will be used in order to exchange the different attributes
-    to create positive and negative examples
+    Different from LaptopAttributes, this is specific for creating spec data.
+    The spec data was gathered from PCPartPicker and is used to create more laptop data.
     '''
 
-    company = {'Apple'}
-    product = {'MacBook Pro'}
-    inches = {'13.3'}
-    cpu = {'Intel Core i5 2.3GHz'}
-    ram = {'4GB'}
-    memory = {'256GB SSD'}
-    gpu = {'Intel HD Graphics 520'}
+    video_card = {'GeForce RTX 2070'}
+    ram = [str(x) + ' GB' for x in range(2, 130, 2)]
+    hard_drive = [str(x) + ' GB' for x in range(120, 513, 8)] + [str(x) + ' TB' for x in range(1, 8)]
+    cpu = {}
+    laptop_brands = ['Lenovo ThinkPad', 'Lenovo ThinkBook', 'Lenovo IdeaPad', 'Lenovo Yoga', 'Lenovo Legion', 'HP Envy', 'HP Chromebook', 'HP Spectre', 'HP ZBook', 'HP Probook', 'HP Elitebook', 'HP Pavilion', 'HP Omen', 'Dell Alienware', 'Dell Vostro', 'Dell Inspiron', 'Dell Latitude', 'Dell XPS', 'Dell G Series', 'Dell Precision', 'Apple Macbook', 'Apple Macbook Air', 'Apple Mac', 'Acer Aspire', 'Acer Swift', 'Acer Spin', 'Acer Switch', 'Acer Extensa', 'Acer Travelmate', 'Acer Nitro', 'Acer Enduro', 'Acer Predator', 'Asus ZenBook', 'Asus Vivobook', 'Asus Republic of Gamers', 'Asus ROG', 'Asus TUF GAMING']
     screen = {'1440x900'}
+    inches = {'13.3'}
     
     @staticmethod
     def get_all_data():
         return {
-            'company': LaptopAttributes.company,
-            'product': LaptopAttributes.product,
-            'inches': LaptopAttributes.inches,
-            'cpu': LaptopAttributes.cpu,
+            'cpu': LaptopAttributes.cpu.keys(),
             'ram': LaptopAttributes.ram,
-            'memory': LaptopAttributes.memory,
-            'gpu': LaptopAttributes.gpu,
-            'screen': LaptopAttributes.screen
+            'hard_drive': LaptopAttributes.hard_drive,
+            'video_card': LaptopAttributes.video_card,
+            'brand': LaptopAttributes.laptop_brands,
+            'screen': LaptopAttributes.screen,
+            'inches': LaptopAttributes.inches
         }
 
-def create_attribute_sets(df):
-    '''
-    Populate the sets in LaptopAttributes with the data from laptops.csv
-    '''
-    LaptopAttributes.company.update([row.Company for row in df[['Company']].itertuples()])
-    LaptopAttributes.product.update([row.Product for row in df[['Product']].itertuples()])
-    LaptopAttributes.inches.update([str(row.Inches) for row in df[['Inches']].itertuples()])
-    LaptopAttributes.cpu.update([row.Cpu for row in df[['Cpu']].itertuples()])
-    LaptopAttributes.ram.update([row.Ram for row in df[['Ram']].itertuples()])
-    LaptopAttributes.memory.update([row.Memory for row in df[['Memory']].itertuples()])
-    LaptopAttributes.gpu.update([row.Gpu for row in df[['Gpu']].itertuples()])
-    LaptopAttributes.screen.update([row.ScreenResolution for row in df[['ScreenResolution']].itertuples()])
-
-def concatenate_row(row):
+def populate_spec():
     '''
     Creates a string out of the row of product attributes (so row is a Pandas DataFrame).
     '''
 
-    # Note: got rid of everything after the '(' because it has info about the actual specs of the laptop
-    # so if we change the specs, we need to fix that too
+    # Getting the CPU data into LaptopAttrbutes
+    cpu_df = pd.read_csv('data/train/cpu_data.csv')
+    temp_iloc = cpu_df.iloc()
+    for idx in range(len(cpu_df)):
+        row = temp_iloc[idx]
+        LaptopAttributes.cpu[row['name']] = [row['cores'], row['core_clock']]
+
+    # Getting the video card data into LaptopAttributes
+    video_card_df = pd.read_csv('data/train/video-cards-data.csv')
+    temp_iloc = video_card_df.iloc()
+    for idx in range(len(video_card_df)):
+        row = temp_iloc[idx]
+        LaptopAttributes.video_card.update([row['chipset']])
+    
+    # Getting the inches, screen, video card, and CPU data from laptops.csv
+    laptops_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
+    LaptopAttributes.inches.update([str(row.Inches) for row in laptops_df[['Inches']].itertuples()])
+    LaptopAttributes.screen.update([row.ScreenResolution for row in laptops_df[['ScreenResolution']].itertuples()])
+    LaptopAttributes.video_card.update([row.Gpu for row in laptops_df[['Gpu']].itertuples()]) 
+    
+    for row in laptops_df.iloc:
+        if row.Company != 'Apple':
+            LaptopAttributes.cpu[' '.join(row.Cpu.split(' ')[:-1])] = [None, row.Cpu.split(' ')[-1]]
+
+def gen_spec_combos():
+    '''
+    Generates combinations of the spec data (WARNING: THIS TAKES A VERY LONG TIME AND YOU MUST HAVE AT LEAST 16GB RAM TO DO THIS)
+    '''
+
+    combos = np.meshgrid(*[list(LaptopAttributes.cpu.keys()), LaptopAttributes.hard_drive, LaptopAttributes.ram])
+    combos = np.array(combos).T.reshape(-1, 3)
+    np.random.shuffle(combos)
+    df = pd.DataFrame(data=combos, columns=['cpu', 'hard_drive', 'ram'])
+    df.to_csv('data/train/spec_data_no_brand.csv')
+
+    
+def concatenate_row(row):
+    '''
+    Creates a string out of the row of product attributes (so row is a Pandas DataFrame)
+    '''
+    
+    # Split the brand
+    row['company'] = row['brand'].split(' ')[0]
+    row['product'] = ' '.join(row['brand'].split(' ')[1:])
+    
+    # Create dictionary for drive types
+    drive_options = {'ssd': Common.SSD_TYPES, 'hdd': Common.HARD_DRIVE_TYPES}
 
     # Special tags at the end of the amount of inches of the laptop and the RAM to simulate real data
-    inch_attr = str(row['Inches']) + random.choice([' inch', '"'])
-    ram_attr = row['Ram'] + random.choice([' ram', ' memory'])
+    inch_attr = str(row['inches']) + random.choice([' inch', '"'])
+    ram_attr = row['ram'] + random.choice([' ram', ' memory'])
+
+    # This modifies the CPU attribute to sometimes have different types of elements to add some difference
+    # Ex: Intel Core i7 7700k vs Core i7 7700k 4 Core 4.2 GHz CPU (Something like that)
+    cpu_attr = row['cpu']
+    cores = LaptopAttributes.cpu[cpu_attr][0]
+    ghz = LaptopAttributes.cpu[cpu_attr][1]
     
-    cpu_attr = row['Cpu']
-    if random.choice([0, 1]):
+    if random.random() > 0.5:
         cpu_attr = cpu_attr.split(' ')
         if random.choice([0, 1]):
             if 'Intel' in cpu_attr:
@@ -72,116 +108,114 @@ def concatenate_row(row):
                 cpu_attr.remove('AMD')
     
         cpu_attr = ' '.join(cpu_attr)
-
+    
+    # Random chance of putting the cores in the CPU attribute
+    if cores != None:
+        if random.random() > 0.7:
+            cpu_attr = '{} {} {}'.format(cpu_attr, cores, 'Core')
+    
+    # Random chance of putting the GHz in the CPU attribute
+    if random.random() > 0.7:
+        cpu_attr = '{} {}'.format(cpu_attr, ghz)
+    
+    if random.random() > 0.55:
+        cpu_attr = '{} {}'.format(cpu_attr, 'CPU')
+    
+    # Have random chance of getting rid of company or product attribute
+    product_removed = False
+    if (random.random() > 0.5):
+        row['product'] = ''
+        product_removed = True
+    
+    if (random.random() > 0.5 and not product_removed):
+        row['company'] = ''
+    
+    
     # Create a list for all the product attributes
-    order_attrs = [ row['Company'],
-                    row['Product'].split('(')[0],
+    order_attrs = [row['company'],
+                   row['product'],
+                   inch_attr,
                   ]
+
+    # Have a chance of adding "laptop" to the title
+    if random.random() > 0.45:
+        order_attrs.append('laptop')
     
-    more_type_attrs = [ row['TypeName'],
-                        inch_attr
-                      ]
+    # Add the type of drive the hard drive attribute
+    row['hard_drive'] = row['hard_drive'] + ' ' + random.choice(drive_options[row['drive_type']])
     
-    spec_attrs = [ # row['ScreenResolution'],
+    spec_attrs = [row['hard_drive'],
+                  # row['screen'],
                    cpu_attr,
-                   ram_attr,
-                   row['Memory']
+                   ram_attr
                  ]
     
-    # Shuffle only the spec attributes
-    random.shuffle(more_type_attrs)
+    # Shuffle only the attributte
     random.shuffle(spec_attrs)
-    
-    order_attrs = order_attrs + more_type_attrs + spec_attrs
+    order_attrs = order_attrs + spec_attrs
     
     return ' '.join(order_attrs)
 
-def create_neg_laptop_data(laptop_df, attributes):
-    '''
-    Creates the negative examples for the laptop data
-    The laptop_df is the original data, the new_df is the dataframe to append the new data to
-    and the attributes are the attributes to swap for the new data
-    '''
-    
-    new_column_names = ['title_one', 'title_two', 'label']
-    temp = []
-    for row in tqdm(range(len(laptop_df))):
-        # Create a copy of the row for the negative example
-        neg_row = laptop_df.iloc[row]
-        for attribute_class in attributes:
-            # Get the row in the laptop_data
-            orig_row = laptop_df.iloc[row]
-            
-            # Get the attribute that we are trying to change
-            attribute_val = orig_row[attribute_class]
-            
-            # Temporarily value for the new value
-            new_val = attribute_val
-            
-            # Make sure we really get a new attribute
-            while new_val == attribute_val:
-                new_val = random.sample(LaptopAttributes.get_all_data()[attribute_class.lower()], 1)[0]
-            
-            # Change the value in the neg_row to the new value
-            neg_row[attribute_class] = new_val
-            
-            # Concatenate and normalize the data
-            title_one = remove_stop_words(concatenate_row(orig_row).lower())
-            title_two = remove_stop_words(concatenate_row(neg_row).lower())
-            
-            # Append the data to the new df
-            temp.append([title_one, title_two, 0])
+def format_laptop_row(row, brand, inches, screen, drive_type):
+    row['brand'] = brand
+    row['inches'] = inches
+    row['screen'] = screen
+    row['drive_type'] = drive_type
+    return row
 
-    return pd.DataFrame(temp, columns=new_column_names)
-
-def create_pos_laptop_data(laptop_df, rm_attrs, add_attrs):
-    '''
-    Creates the postive examples for the laptop data
-    The laptop_df is the original data, the new_df is the dataframe to append the new data to
-    and the attributes are the attributes to swap or delete for the new data    
-    '''
-    
-    new_column_names = ['title_one', 'title_two', 'label']
+def create_pos_neg_data(df, neg_attrs):
     temp = []
-    for row in tqdm(range(len(laptop_df))):
-        # Remove the attribute from the new title
-        for attr_list in rm_attrs:
-            # Create a copy of the row for the negative example
-            new_row = laptop_df.iloc[row]
-            orig_row = laptop_df.iloc[row]
-            for attr in attr_list:
-                new_row[attr] = ''
+    for idx in tqdm(range(0, int(len(df) * 0.04))):
+        # Must start off with two positive titles
+        first_row = df.iloc[idx]
+        neg_attr = neg_attrs[idx % len(neg_attrs)]
         
-            title_one = remove_stop_words(concatenate_row(orig_row).lower())
-            title_two = remove_stop_words(concatenate_row(new_row).lower())
-            
-            temp.append([title_one, title_two, 1])
+        # Randomly choose the attributes that are not already in the row
+        brand = random.choice(LaptopAttributes.laptop_brands)
+        inches = random.choice(list(LaptopAttributes.inches))
+        screen = random.choice(list(LaptopAttributes.screen))
+        drive_type = random.choice(['ssd', 'hdd'])
+        
+        pos = format_laptop_row(first_row.copy(), brand, inches, screen, drive_type)
+        
+        new_attr = pos[neg_attr]
+        
+        while new_attr == pos[neg_attr]:
+            new_attr = random.sample(LaptopAttributes.get_all_data()[neg_attr.lower()], 1)[0]
+        
+        neg = pos.copy()
+        neg[neg_attr] = new_attr
+        
+        pos_pair_1 = remove_stop_words(concatenate_row(pos.copy()))
+        pos_pair_2 = remove_stop_words(concatenate_row(pos.copy()))
+        neg_pair_1 = remove_stop_words(concatenate_row(neg.copy()))
+        #neg_pair_2 = remove_stop_words(concatenate_row(neg.copy()))
+        
+        temp.append([pos_pair_1, pos_pair_2, 1])
+        #temp.append([neg_pair_1, neg_pair_2, 1])
+        temp.append([pos_pair_1, neg_pair_1, 0])
+        #temp.append([pos_pair_2, neg_pair_2, 0])
     
-    return pd.DataFrame(temp, columns=new_column_names)
+    return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 
 def create_laptop_data():
     '''
-    Creates positive and negative laptop data and saves it to final_laptop_data.csv
+    If spec_data.csv has not been created, we create that first.
+    Afterwards, create the positive and negative spec data (just more laptop data) 
+    and save it to spec_train_data.csv
     '''
-    
-    file_path = 'data/train/final_laptop_data.csv'
 
-    # Load the laptop data
-    laptop_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
-    
-    # Create the attribute sets for the LaptopAttributes
-    create_attribute_sets(laptop_df)
-    
+    file_path = 'data/train/spec_train_data_new.csv'
     if not os.path.exists(file_path):
-        print('Generating laptop data . . . ')
-        # Create the negative and positive dataframes 
-        neg_df = create_neg_laptop_data(laptop_df, attributes=['Cpu', 'Memory', 'Ram', 'Inches', 'Product'])
-        pos_df = create_pos_laptop_data(laptop_df, rm_attrs = [['Company'], ['TypeName'], ['Product']], add_attrs = [])
-        
-        # Concatenate the data and save it
-        final_laptop_df = create_final_data(pos_df, neg_df)
-        final_laptop_df = final_laptop_df.sample(frac=1)
+        print('Generating data for laptops . . . ')
+        populate_spec()
+        if not os.path.exists('data/train/spec_data_no_brand.csv'):
+            print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
+            gen_spec_combos()
+        spec_df = pd.read_csv('data/train/spec_data_no_brand.csv')
+        final_laptop_df = create_pos_neg_data(spec_df, neg_attrs=['cpu', 'ram', 'inches', 'hard_drive'])
+        print(len(final_laptop_df))
         final_laptop_df.to_csv(file_path)
 
     else:
-        print('Already have laptop data. Moving on . . . ')
+        print('Already have spec data. Moving on . . .')

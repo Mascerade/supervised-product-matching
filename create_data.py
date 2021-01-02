@@ -11,7 +11,6 @@ from src.data_creation.general_drive_data import create_final_drive_data
 from src.data_creation.gs_data_creation import create_computer_data
 from src.data_creation.laptop_data_creation import create_laptop_data
 from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_data
-from src.data_creation.spec_creation import create_spec_laptop_data
 from src.data_creation.retailer_test_creation import create_laptop_test_data
 
 def gen_gb_pos_data():
@@ -57,7 +56,6 @@ def create_data():
     create_general_cpu_data()
     create_final_drive_data()
     create_laptop_data()
-    create_spec_laptop_data()
     create_laptop_test_data()
 
     print('Generating gigabyte data (as in just examples that use GB)')
@@ -66,17 +64,15 @@ def create_data():
 
     # Load all the data
     final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv')
-    final_laptop_df = pd.read_csv('data/train/final_laptop_data.csv')
-    final_spec_df = pd.read_csv('data/train/spec_train_data.csv')[:15000]
+    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')[:30000]
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
-    all_data = [final_computer_df, final_laptop_df, final_spec_df, final_pcpartpicker_data, more_cpu_data, more_drive_data, final_gb_df]
+    all_data = [final_computer_df, final_laptop_df, final_pcpartpicker_data, more_cpu_data, more_drive_data, final_gb_df]
 
     # Print the sizes of the data
     print('Computer df size: {}'.format(len(final_computer_df)))
     print('Laptop df size: {}'.format(len(final_laptop_df)))
-    print('Final spec df size: {}'.format(len(final_spec_df)))
     print('PCPartPicker df size: {}'.format(len(final_pcpartpicker_data)))
     print('More CPU df size: {}'.format(len(more_cpu_data)))
     print('More drive df size: {}'.format(len(more_drive_data)))

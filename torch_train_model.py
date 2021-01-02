@@ -73,7 +73,7 @@ opt = AdamW(net.parameters(), lr=1e-6)
 print("************* TRAINING *************")
 
 # 10 epochs
-for epoch in range(10):
+for epoch in range(3):
     # The size of each mini-batch
     BATCH_SIZE = 32
     
@@ -112,7 +112,7 @@ for epoch in range(10):
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
                 (epoch + 1, i + 1, loss, accuracy))
 
-    torch.save(net, 'models/0.2.0_BERT_epoch_' + str(epoch + 1))
+    torch.save(net, 'models/0.2.1_BERT_epoch_' + str(epoch + 1))
 
     # Iterate through each validation batch
     net.eval()
