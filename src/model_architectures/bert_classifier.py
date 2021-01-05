@@ -24,15 +24,19 @@ class SiameseNetwork(nn.Module):
         
         # We want to freeze all parameters except the last couple for training
         for idx, param in enumerate(self.bert.parameters()):
-            if idx < 170:
+            if idx < 85:
                 param.requires_grad = False
+
+        for idx, module in enumerate(self.bert.modules()):
+            if type(module) == torch.nn.modules.dropout.Dropout:
+                module = torch.nn.Dropout(p=0.4)
         
         # Fully-Connected layers
         self.fc1 = nn.Linear(self.h_size, 384)
         self.fc2 = nn.Linear(384, 2)
         
         # Dropout for overfitting
-        self.dropout = nn.Dropout(p=0.2)
+        self.dropout = nn.Dropout(p=0.5)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)

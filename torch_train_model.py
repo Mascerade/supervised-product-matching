@@ -73,13 +73,18 @@ opt = AdamW(net.parameters(), lr=1e-6)
 print("************* TRAINING *************")
 
 # 10 epochs
-for epoch in range(3):
+for epoch in range(5):
     # The size of each mini-batch
     BATCH_SIZE = 32
     
     # Iterate through each training batch
     net.train()
+    current_batch = 0
+    training_running_loss = 0.0
+    training_running_accuracy = 0.0
+    
     for i, position in enumerate(range(0, len(train_data), BATCH_SIZE)):
+        current_batch += 1
         if (position + BATCH_SIZE > len(train_data)):
             batch_data = train_data[position:]
             batch_labels = train_labels[position:]
@@ -98,9 +103,11 @@ for epoch in range(3):
 
         # Calculate loss
         loss = criterion(forward, batch_labels)
+        training_running_loss += loss.item()
 
         # Calculate accuracy
         accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
+        training_running_accuracy += accuracy
         
         # Backprop
         loss.backward()
@@ -109,14 +116,18 @@ for epoch in range(3):
         opt.step()
         
         # Print statistics every batch
-        print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
-                (epoch + 1, i + 1, loss, accuracy))
+        print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
+                (epoch + 1, i + 1, loss, accuracy, training_running_loss / current_batch, training_running_accuracy / current_batch))
 
-    torch.save(net, 'models/0.2.1_BERT_epoch_' + str(epoch + 1))
+    torch.save(net, 'models/0.2.1.1_BERT_epoch_' + str(epoch + 1) + '.pt')
 
     # Iterate through each validation batch
     net.eval()
+    val_running_loss = 0
+    val_running_accuracy = 0
+    current_batch = 0
     for i, position in enumerate(range(0, len(val_data), BATCH_SIZE)):
+        current_batch += 1
         if (position + BATCH_SIZE > len(val_data)):
             batch_data = val_data[position:]
             batch_labels = val_labels[position:]
@@ -136,16 +147,22 @@ for epoch in range(3):
 
         # Calculate loss
         loss = criterion(forward, batch_labels)
+        val_running_loss += loss.item()
 
         # Calculate accuracy
         accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
-        
+        val_running_accuracy += accuracy
+
         # Print statistics every batch
-        print('Validation Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
-                (epoch + 1, i + 1, loss, accuracy))
+        print('Validation Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
+                (epoch + 1, i + 1, loss, accuracy, val_running_loss / current_batch, val_running_accuracy / current_batch))
 
     # Iterate through the test laptop data
+    test_laptop_running_loss = 0.0
+    test_laptop_running_accuracy = 0.0
+    current_batch = 0
     for i, position in enumerate(range(0, len(test_laptop_data), BATCH_SIZE)):
+        current_batch += 1
         if (position + BATCH_SIZE > len(test_laptop_data)):
             batch_data = test_laptop_data[position:]
             batch_labels = test_laptop_labels[position:]
@@ -165,11 +182,12 @@ for epoch in range(3):
 
         # Calculate loss
         loss = criterion(forward, batch_labels)
+        test_laptop_running_loss += loss.item()
 
         # Calculate accuracy
         accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
+        test_laptop_running_accuracy += accuracy
         
         # Print statistics every batch
-        print('Test Laptop Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.3f' %
-                (epoch + 1, i + 1, loss, accuracy))
-
+        print('Test Laptop Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
+                (epoch + 1, i + 1, loss, accuracy, test_laptop_running_loss / current_batch, test_laptop_running_accuracy / current_batch))
