@@ -16,6 +16,9 @@ from create_data import create_data
 from src.model_architectures.model_functions import save_model
 from src.model_architectures.bert_classifier import SiameseNetwork
 
+# Get the model name from the terminal
+MODEL_NAME = sys.argv[1]
+
 # Create the data if it doesn't exist
 if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/train/final_laptop_test_data.csv'):
     create_data()
@@ -87,7 +90,6 @@ def forward_prop(batch_data, batch_labels):
 
     return loss, accuracy
 
-
 # 10 epochs
 for epoch in range(5):
     # The size of each mini-batch
@@ -127,7 +129,7 @@ for epoch in range(5):
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
 
-    torch.save(net, 'models/0.2.1.1_BERT_epoch_' + str(epoch + 1) + '.pt')
+    torch.save(net.state_dict(), 'models/' + MODEL_NAME + '_epoch' + str(epoch + 1) + '.pt')
 
     # Iterate through each validation batch
     net.eval()
@@ -146,6 +148,7 @@ for epoch in range(5):
         # Forward propagation
         loss, accuracy = forward_prop(batch_data, batch_labels)
 
+        # Add to running loss and accuracy (for the epoch)
         running_accuracy += accuracy
         running_loss += loss.item()
 
