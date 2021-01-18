@@ -1,7 +1,7 @@
 .vscode/
 __pycache__/
 .ipynb_checkpoints/
-models/bert_model.pt
+pretrained-models/
 data/numpy_data/*
 !data/numpy_data/.gitkeep
 data/train/*
@@ -18,3 +18,4 @@ DistanceSigmoidTestingGrounds.ipynb
 ExpSoftmax.ipynb
 UPDATES.md
 chromedriver.exe
+CharacterBERTTest.ipynb
