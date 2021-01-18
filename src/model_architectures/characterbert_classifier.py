@@ -1,3 +1,11 @@
+# CharacterBERT citation for authors:
+'''
+Paper Title: CharacterBERT: Reconciling ELMo and BERT for Word-Level Open-Vocabulary Representations From Characters
+Authors: Hicham El Boukkouri and Olivier Ferret and Thomas Lavergne and Hiroshi Noji and Pierre Zweigenbaum and Junichi Tsujii
+The characterbert_modeling and characterbert_utils were also created by them
+Their GitHub Repo is at: https://github.com/helboukkouri/character-bert
+'''
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

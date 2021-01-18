@@ -130,7 +130,7 @@ for epoch in range(5):
         # Forward propagation
         loss, accuracy = forward_prop(batch_data, batch_labels)
         
-        # Add to both the running accuracy and running loss (for the epoch)
+        # Add to both the running accuracy and running loss (every 10 batches)
         running_accuracy += accuracy
         running_loss += loss.item()
 
@@ -143,6 +143,12 @@ for epoch in range(5):
         # Print statistics every batch
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+        
+        # Clear our running variables every 10 batches
+        if (current_batch == 10):
+            current_batch = 0
+            running_loss = 0
+            running_accuracy = 0
 
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
@@ -163,13 +169,19 @@ for epoch in range(5):
         # Forward propagation
         loss, accuracy = forward_prop(batch_data, batch_labels)
 
-        # Add to running loss and accuracy (for the epoch)
+        # Add to running loss and accuracy (every 10 batches)
         running_accuracy += accuracy
         running_loss += loss.item()
 
         # Print statistics every batch
         print('Validation Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+
+        # Clear our running variables every 10 batches
+        if (current_batch == 10):
+            current_batch = 0
+            running_loss = 0
+            running_accuracy = 0
 
     # Iterate through the test laptop data
     running_loss = 0.0
@@ -187,10 +199,16 @@ for epoch in range(5):
         # Forward propagation
         loss, accuracy = forward_prop(batch_data, batch_labels)
 
-        # Add to running loss and accuracy (for the epoch)
+        # Add to running loss and accuracy (every 10 batches)
         running_loss += loss.item()
         running_accuracy += accuracy
         
         # Print statistics every batch
         print('Test Laptop Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+
+        # Clear our running variables every 10 batches
+        if (current_batch == 10):
+            current_batch = 0
+            running_loss = 0
+            running_accuracy = 0
