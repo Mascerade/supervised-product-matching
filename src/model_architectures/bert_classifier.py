@@ -26,10 +26,6 @@ class SiameseNetwork(nn.Module):
         for idx, param in enumerate(self.bert.parameters()):
             if idx < 85:
                 param.requires_grad = False
-
-        for idx, module in enumerate(self.bert.modules()):
-            if type(module) == torch.nn.modules.dropout.Dropout:
-                module = torch.nn.Dropout(p=0.4)
         
         # Fully-Connected layers
         self.fc1 = nn.Linear(self.h_size, 384)

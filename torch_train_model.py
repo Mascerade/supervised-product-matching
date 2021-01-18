@@ -14,10 +14,18 @@ from src.embeddings import load_embeddings_and_labels, save_embeddings, create_e
 from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
-from src.model_architectures.bert_classifier import SiameseNetwork
+
+# Get the folder name in models
+FOLDER = sys.argv[1]
 
 # Get the model name from the terminal
-MODEL_NAME = sys.argv[1]
+MODEL_NAME = sys.argv[2]
+
+print('\nOutputing models to {} with base name {}\n'.format(FOLDER, MODEL_NAME))
+
+# Create the folder for the model if it doesn't already exist
+if not os.path.exists('models/{}'.format(FOLDER)):
+    os.mkdir('models/{}'.format(FOLDER))
 
 # Create the data if it doesn't exist
 if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/train/final_laptop_test_data.csv'):
@@ -65,7 +73,14 @@ print('Laptop test shape:', str(test_laptop_data.shape))
 print('Laptop test labels shape:', str(test_laptop_labels.shape))
 
 # Initialize the model
-net = SiameseNetwork(Common.MAX_LEN)
+net = None
+if True:
+    from src.model_architectures.characterbert_classifier import SiameseNetwork
+    net = SiameseNetwork()
+
+else:
+    from src.model_architectures.bert_classifier import SiameseNetwork
+    net = SiameseNetwork(Common.MAX_LEN)
 
 # Using cross-entropy because we are making a classifier
 criterion = nn.CrossEntropyLoss()
@@ -129,7 +144,7 @@ for epoch in range(5):
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
 
-    torch.save(net.state_dict(), 'models/' + MODEL_NAME + '_epoch' + str(epoch + 1) + '.pt')
+    torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
     # Iterate through each validation batch
     net.eval()
