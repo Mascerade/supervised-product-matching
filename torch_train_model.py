@@ -86,7 +86,7 @@ else:
 criterion = nn.CrossEntropyLoss()
 
 # Using Adam optimizer
-opt = AdamW(net.parameters(), lr=1e-6)
+opt = AdamW(net.parameters(), lr=5e-5)
 
 print("************* TRAINING *************")
 
@@ -109,6 +109,9 @@ def forward_prop(batch_data, batch_labels):
 for epoch in range(5):
     # The size of each mini-batch
     BATCH_SIZE = 32
+
+    # How long we should accumulate for running loss and accuracy
+    PERIOD = 50
     
     # Iterate through each training batch
     net.train()
@@ -136,7 +139,10 @@ for epoch in range(5):
 
         # Backprop
         loss.backward()
-        
+
+        # Clip the gradient to minimize chance of exploding gradients
+        torch.nn.utils.clip_grad_norm_(net.parameters(), 0.01)
+
         # Apply the gradients
         opt.step()
         
@@ -145,7 +151,7 @@ for epoch in range(5):
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
         
         # Clear our running variables every 10 batches
-        if (current_batch == 10):
+        if (current_batch == PERIOD):
             current_batch = 0
             running_loss = 0
             running_accuracy = 0
@@ -178,7 +184,7 @@ for epoch in range(5):
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
 
         # Clear our running variables every 10 batches
-        if (current_batch == 10):
+        if (current_batch == PERIOD):
             current_batch = 0
             running_loss = 0
             running_accuracy = 0
@@ -208,7 +214,7 @@ for epoch in range(5):
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
 
         # Clear our running variables every 10 batches
-        if (current_batch == 10):
+        if (current_batch == PERIOD):
             current_batch = 0
             running_loss = 0
             running_accuracy = 0
