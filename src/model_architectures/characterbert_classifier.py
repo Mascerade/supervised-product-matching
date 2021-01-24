@@ -31,17 +31,12 @@ class SiameseNetwork(nn.Module):
         # CharacterBERT model
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
-        # We want to freeze all parameters except the last couple for training
-        # for idx, param in enumerate(self.bert.parameters()):
-        #     if idx < 85:
-        #         param.requires_grad = False
-
         # Fully-Connected layers
         self.fc1 = nn.Linear(self.h_size, 384)
         self.fc2 = nn.Linear(384, 2)
         
         # Dropout for overfitting
-        self.dropout = nn.Dropout(p=0.6)
+        self.dropout = nn.Dropout(p=0.5)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -99,9 +94,12 @@ class SiameseNetwork(nn.Module):
         # token embedding
         output1 = self.bert(input1)[1]
         output2 = self.bert(input2)[1]
-        
+
         # BERT calls for the addition of both 
         addition = output1 + output2
+
+        # Dropout
+        addition = self.dropout(addition)
         
         # Fully-Connected Layer 1 (input of 768 units and output of 384)
         addition = self.fc1(addition)
