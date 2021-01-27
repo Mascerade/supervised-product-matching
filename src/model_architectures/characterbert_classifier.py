@@ -32,11 +32,14 @@ class SiameseNetwork(nn.Module):
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
         # Fully-Connected layers
-        self.fc1 = nn.Linear(self.h_size, 384)
-        self.fc2 = nn.Linear(384, 2)
+        self.fc1 = nn.Linear(self.h_size, 2)
+        #self.fc2 = nn.Linear(384, 2)
         
         # Dropout for overfitting
         self.dropout = nn.Dropout(p=0.5)
+
+        # Dropout last
+        self.dropout_last = nn.Dropout(p=0.7)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -105,16 +108,16 @@ class SiameseNetwork(nn.Module):
         addition = self.fc1(addition)
         
         # ReLU Activation
-        addition = F.relu(addition)
-        
+        #addition = F.relu(addition)
+
         # Dropout
-        addition = self.dropout(addition)
+        addition = self.dropout_last(addition)
         
-        # Fully-Connected Layer 2 (input of 384 units, out of 2 for Softmax)
-        addition = self.fc2(addition)
-        
+        # Fully-Connected Layer 2 (input of 384 units and output of 2)
+        #addition = self.fc2(addition)
+
         # Dropout
-        addition = self.dropout(addition)
+        #addition = self.dropout(addition)
         
         # Softmax Activation to get predictions
         addition = self.softmax(addition)

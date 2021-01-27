@@ -101,15 +101,20 @@ def forward_prop(batch_data, batch_labels):
     loss = criterion(forward, batch_labels)
 
     # Add L2 Regularization to keep weights small
-    l2_lambda = 1e-4
-    l2_reg = torch.tensor(0.)
+    l2_lambda_fc = 1e-1
+    l2_reg_fc = torch.tensor(0.)
     for param in net.fc1.parameters():
-        l2_reg += torch.norm(param)
+        l2_reg_fc += torch.norm(param)
     
-    for param in net.fc2.parameters():
-        l2_reg += torch.norm(param)
+    # for param in net.fc2.parameters():
+    #     l2_reg_fc += torch.norm(param)
 
-    loss += l2_lambda * l2_reg
+    l2_lambda_bert = 7e-5
+    l2_reg_bert = torch.tensor(0.)
+    for param in net.bert.parameters():
+        l2_reg_bert += torch.norm(param)
+
+    loss += l2_lambda_fc * l2_reg_fc + l2_lambda_bert * l2_reg_bert
 
     # Calculate accuracy
     accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
@@ -119,7 +124,7 @@ def forward_prop(batch_data, batch_labels):
 # 10 epochs
 for epoch in range(5):
     # The size of each mini-batch
-    BATCH_SIZE = 64
+    BATCH_SIZE = 32
 
     # How long we should accumulate for running loss and accuracy
     PERIOD = 50
