@@ -10,12 +10,11 @@ from transformers import AutoTokenizer, AutoModel, AdamW
 
 """ LOCAL IMPORTS """
 from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert_preprocess_batch
-from src.embeddings import load_embeddings_and_labels, save_embeddings, create_embeddings
 from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
 
-USING_CHARACTER_BERT = False
+USING_CHARACTER_BERT = True
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
