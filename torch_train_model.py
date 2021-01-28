@@ -9,11 +9,13 @@ import torch.optim as optim
 from transformers import AutoTokenizer, AutoModel, AdamW
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc
+from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert_preprocess_batch
 from src.embeddings import load_embeddings_and_labels, save_embeddings, create_embeddings
 from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
+
+USING_CHARACTER_BERT = True
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
@@ -72,27 +74,9 @@ test_laptop_data = test_laptop_data[:, 0:2]
 print('Laptop test shape:', str(test_laptop_data.shape))
 print('Laptop test labels shape:', str(test_laptop_labels.shape))
 
-# Initialize the model
-net = None
-if True:
-    from src.model_architectures.characterbert_classifier import SiameseNetwork
-    net = SiameseNetwork()
-
-else:
-    from src.model_architectures.bert_classifier import SiameseNetwork
-    net = SiameseNetwork(Common.MAX_LEN)
-
-# Using cross-entropy because we are making a classifier
-criterion = nn.CrossEntropyLoss()
-
-# Using Adam optimizer
-opt = AdamW(net.parameters(), lr=5e-5)
-
-print("************* TRAINING *************")
-
-def forward_prop(batch_data, batch_labels):
+def character_bert_forward_prop(batch_data, batch_labels):
     # Forward propagation
-    forward = net(batch_data)
+    forward = net(*character_bert_preprocess_batch(batch_data))
 
     # Convert batch labels to Tensor
     batch_labels = torch.from_numpy(batch_labels).view(-1).long()
@@ -100,15 +84,13 @@ def forward_prop(batch_data, batch_labels):
     # Calculate loss
     loss = criterion(forward, batch_labels)
 
-    # Add L2 Regularization to keep weights small
+    # Add L2 Regularization to the final linear layer
     l2_lambda_fc = 1e-1
     l2_reg_fc = torch.tensor(0.)
     for param in net.fc1.parameters():
         l2_reg_fc += torch.norm(param)
-    
-    # for param in net.fc2.parameters():
-    #     l2_reg_fc += torch.norm(param)
 
+    # Add L2 Regularization to bert
     l2_lambda_bert = 7e-5
     l2_reg_bert = torch.tensor(0.)
     for param in net.bert.parameters():
@@ -120,6 +102,41 @@ def forward_prop(batch_data, batch_labels):
     accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
 
     return loss, accuracy
+
+def bert_forward_prop(batch_data, batch_labels):
+    # Forward propagation
+    forward = net(*bert_preprocess_batch(batch_data))
+
+    # Convert batch labels to Tensor
+    batch_labels = torch.from_numpy(batch_labels).view(-1).long()
+
+    # Calculate loss
+    loss = criterion(forward, batch_labels)
+
+    # Calculate accuracy
+    accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
+
+    return loss, accuracy
+
+# Initialize the model
+net = None
+if USING_CHARACTER_BERT:
+    from src.model_architectures.characterbert_classifier import SiameseNetwork
+    net = SiameseNetwork()
+    forward_prop = character_bert_forward_prop
+
+else:
+    from src.model_architectures.bert_classifier import SiameseNetwork
+    net = SiameseNetwork(Common.MAX_LEN)
+    forward_prop = bert_forward_prop
+
+# Using cross-entropy because we are making a classifier
+criterion = nn.CrossEntropyLoss()
+
+# Using Adam optimizer
+opt = AdamW(net.parameters(), lr=5e-5)
+
+print("************* TRAINING *************")
 
 # 10 epochs
 for epoch in range(5):

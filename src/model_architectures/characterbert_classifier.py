@@ -10,9 +10,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel
 from characterbert_modeling.character_bert import CharacterBertModel
-from characterbert_utils.character_cnn import CharacterIndexer
 
 class SiameseNetwork(nn.Module):
     def __init__(self, h_size=768):
@@ -25,21 +24,17 @@ class SiameseNetwork(nn.Module):
         super(SiameseNetwork, self).__init__()
         self.h_size = h_size
         
-        # CharacterBERT tokenizer
-        self.character_indexer = CharacterIndexer()
-        
         # CharacterBERT model
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
         # Fully-Connected layers
         self.fc1 = nn.Linear(self.h_size, 2)
-        #self.fc2 = nn.Linear(384, 2)
         
         # Dropout for overfitting
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout_5 = nn.Dropout(p=0.5)
 
         # Dropout last
-        self.dropout_last = nn.Dropout(p=0.7)
+        self.dropout_7 = nn.Dropout(p=0.7)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -63,33 +58,12 @@ class SiameseNetwork(nn.Module):
             np.array([' [SEP]'])
         )
 
-    def forward(self, x):
+    def forward(self, input1, input2):
         '''
         x is going to be a numpy array of [sentenceA, sentenceB].
         Model using CharacterBERT to make a prediction of whether the two titles represent 
         the same entity.
         '''
-
-        # The batch is originally of type 'object' and for add_tags to work properly
-        # they need to be unicode
-        x = x.astype('U')
-
-        # BERT for title similarity works having the two sentences (sentence1, sentence2)
-        # and ordering them in both combinations that they could be (sentence1 + sentence2)
-        # and (sentence2 + sentence1). That is why we do np.flip() on x (the input sentences)
-        # add_tags just adds the [CLS] and [SEP] tags to the strings
-        input1 = self.add_tags(x)
-        input2 = self.add_tags(np.flip(x, 1))
-
-
-        # We need to split up each token in the title by the space
-        # So, "intel core i7 7700k" becomes ["intel", "core", "i7", "7700k"]
-        input1 = np.char.split(input1)
-        input2 = np.char.split(input2)
-
-        # Now, we feed the input into the CharacterBERT tokenizer, which converts each 
-        input1 = self.character_indexer.as_padded_tensor(input1)
-        input2 = self.character_indexer.as_padded_tensor(input2)
 
         # Send the inputs through BERT
         # We index at 1 because that gives us the classification token (CLS)
@@ -102,22 +76,13 @@ class SiameseNetwork(nn.Module):
         addition = output1 + output2
 
         # Dropout
-        addition = self.dropout(addition)
+        addition = self.dropout_5(addition)
         
         # Fully-Connected Layer 1 (input of 768 units and output of 384)
         addition = self.fc1(addition)
         
-        # ReLU Activation
-        #addition = F.relu(addition)
-
         # Dropout
-        addition = self.dropout_last(addition)
-        
-        # Fully-Connected Layer 2 (input of 384 units and output of 2)
-        #addition = self.fc2(addition)
-
-        # Dropout
-        #addition = self.dropout(addition)
+        addition = self.dropout_7(addition)
         
         # Softmax Activation to get predictions
         addition = self.softmax(addition)

@@ -17,9 +17,6 @@ class SiameseNetwork(nn.Module):
         self.h_size = h_size
         self.max_length = max_length * 2
         
-        # BERT tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        
         # BERT model
         self.bert = AutoModel.from_pretrained("bert-base-uncased")
         
@@ -38,28 +35,13 @@ class SiameseNetwork(nn.Module):
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, x):
+    def forward(self, input1, input2):
         '''
         x is going to be a numpy array of [sentenceA, sentenceB].
         Model using BERT to make a prediction of whether the two titles represent 
         the same entity.
         '''
 
-        # BERT for title similarity works having the two sentences (sentence1, sentence2)
-        # and ordering them in both combinations that they could be (sentence1 + sentence2)
-        # and (sentence2 + sentence1). That is why we do np.flip() on x (the input sentences)
-        input1 = self.tokenizer(x.tolist(),
-                                return_tensors='pt',
-                                padding='max_length',
-                                truncation=True,
-                                max_length=self.max_length)
-
-        input2 = self.tokenizer(np.flip(x, 1).tolist(),
-                                return_tensors='pt',
-                                padding='max_length',
-                                truncation=True,
-                                max_length=self.max_length)
-        
         # Send the inputs through BERT
         # We index at 1 because that gives us the classification token (CLS)
         # that BERT talks about in the paper (as opposed to each hidden layer for each)
