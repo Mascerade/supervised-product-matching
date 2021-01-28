@@ -90,6 +90,10 @@ def character_bert_preprocess_batch(x):
     input1 = character_indexer.as_padded_tensor(input1)
     input2 = character_indexer.as_padded_tensor(input2)
 
+    # Send the data to the GPU
+    input1 = input1.to(Common.device)
+    input2 = input2.to(Common.device)
+
     return (input1, input2)
 
 def bert_preprocess_batch(x):
@@ -111,5 +115,9 @@ def bert_preprocess_batch(x):
                             padding='max_length',
                             truncation=True,
                             max_length=Common.MAX_LEN)
+
+    # Send the data to the GPU
+    input1 = input1.to(Common.device)
+    input2 = input2.to(Common.device)
 
     return (input1, input2)

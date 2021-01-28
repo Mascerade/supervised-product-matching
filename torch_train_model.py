@@ -78,7 +78,7 @@ def character_bert_forward_prop(batch_data, batch_labels, criterion):
     forward = net(*character_bert_preprocess_batch(batch_data))
 
     # Convert batch labels to Tensor
-    batch_labels = torch.from_numpy(batch_labels).view(-1).long()
+    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
 
     # Calculate loss
     loss = criterion(forward, batch_labels)
@@ -107,7 +107,7 @@ def bert_forward_prop(batch_data, batch_labels, criterion):
     forward = net(*bert_preprocess_batch(batch_data))
 
     # Convert batch labels to Tensor
-    batch_labels = torch.from_numpy(batch_labels).view(-1).long()
+    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
 
     # Calculate loss
     loss = criterion(forward, batch_labels)
@@ -121,12 +121,12 @@ def bert_forward_prop(batch_data, batch_labels, criterion):
 net = None
 if USING_CHARACTER_BERT:
     from src.model_architectures.characterbert_classifier import SiameseNetwork
-    net = SiameseNetwork()
+    net = SiameseNetwork().to(Common.device)
     forward_prop = character_bert_forward_prop
 
 else:
     from src.model_architectures.bert_classifier import SiameseNetwork
-    net = SiameseNetwork(Common.MAX_LEN)
+    net = SiameseNetwork(Common.MAX_LEN).to(Common.device)
     forward_prop = bert_forward_prop
 
 # Using cross-entropy because we are making a classifier
