@@ -4,8 +4,9 @@ import pandas as pd
 import numpy as np
 from nltk.corpus import stopwords
 from tqdm import tqdm
-from characterbert_utils.character_cnn import CharacterIndexer
 from transformers import AutoTokenizer
+from characterbert_utils.character_cnn import CharacterIndexer
+from src.common import Common
 
 # CharacterBERT tokenizer
 character_indexer = CharacterIndexer()
@@ -96,12 +97,12 @@ def bert_preprocess_batch(x):
                             return_tensors='pt',
                             padding='max_length',
                             truncation=True,
-                            max_length=self.max_length)
+                            max_length=Common.MAX_LEN)
 
     input2 = bert_tokenizer(np.flip(x, 1).tolist(),
                             return_tensors='pt',
                             padding='max_length',
                             truncation=True,
-                            max_length=self.max_length)
+                            max_length=Common.MAX_LEN)
 
     return (input1, input2)

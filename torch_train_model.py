@@ -15,7 +15,7 @@ from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
 
-USING_CHARACTER_BERT = True
+USING_CHARACTER_BERT = False
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
@@ -74,7 +74,7 @@ test_laptop_data = test_laptop_data[:, 0:2]
 print('Laptop test shape:', str(test_laptop_data.shape))
 print('Laptop test labels shape:', str(test_laptop_labels.shape))
 
-def character_bert_forward_prop(batch_data, batch_labels):
+def character_bert_forward_prop(batch_data, batch_labels, criterion):
     # Forward propagation
     forward = net(*character_bert_preprocess_batch(batch_data))
 
@@ -103,7 +103,7 @@ def character_bert_forward_prop(batch_data, batch_labels):
 
     return loss, accuracy
 
-def bert_forward_prop(batch_data, batch_labels):
+def bert_forward_prop(batch_data, batch_labels, criterion):
     # Forward propagation
     forward = net(*bert_preprocess_batch(batch_data))
 
@@ -164,7 +164,7 @@ for epoch in range(5):
         opt.zero_grad()
         
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels)
+        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
         
         # Add to both the running accuracy and running loss (every 10 batches)
         running_accuracy += accuracy
@@ -206,7 +206,7 @@ for epoch in range(5):
             batch_labels = val_labels[position:position + BATCH_SIZE]
         
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels)
+        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
 
         # Add to running loss and accuracy (every 10 batches)
         running_accuracy += accuracy
@@ -236,7 +236,7 @@ for epoch in range(5):
             batch_labels = test_laptop_labels[position:position + BATCH_SIZE]
 
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels)
+        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
 
         # Add to running loss and accuracy (every 10 batches)
         running_loss += loss.item()

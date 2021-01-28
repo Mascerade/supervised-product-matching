@@ -60,15 +60,11 @@ def create_data():
 
     print('Generating gigabyte data (as in just examples that use GB)')
 
-    #final_gb_df = create_final_data(gen_gb_pos_data(), gen_neg_gb_data())
-
     # Load all the data
     final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv')
     final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')[:30000]
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
-    #more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
-
     all_data = [final_computer_df, final_laptop_df, final_pcpartpicker_data, more_cpu_data]
 
     # Print the sizes of the data
@@ -76,8 +72,6 @@ def create_data():
     print('Laptop df size: {}'.format(len(final_laptop_df)))
     print('PCPartPicker df size: {}'.format(len(final_pcpartpicker_data)))
     print('More CPU df size: {}'.format(len(more_cpu_data)))
-    #print('More drive df size: {}'.format(len(more_drive_data)))
-    #print('GB df size: {}'.format(len(final_gb_df)))
 
     # Concatenate everything
     total_data = pd.concat(all_data)
