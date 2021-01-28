@@ -2,7 +2,8 @@
 __pycache__/
 .ipynb_checkpoints/
 .virtual_documents/
-pretrained-models/
+pretrained-models/*
+!pretrained-models/.gitkeep
 data/numpy_data/*
 !data/numpy_data/.gitkeep
 data/train/*
