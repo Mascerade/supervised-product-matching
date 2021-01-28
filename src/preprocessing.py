@@ -68,6 +68,9 @@ def add_tags(arr):
     )
 
 def character_bert_preprocess_batch(x):
+    """
+    Preprocess a batch before it goes into the CharacterBERT model
+    """
     x = x.astype('U')
 
     # BERT for title similarity works having the two sentences (sentence1, sentence2)
@@ -90,6 +93,10 @@ def character_bert_preprocess_batch(x):
     return (input1, input2)
 
 def bert_preprocess_batch(x):
+    """
+    Preprocess a batch before it goes into BERT
+    """
+
     # BERT for title similarity works having the two sentences (sentence1, sentence2)
     # and ordering them in both combinations that they could be (sentence1 + sentence2)
     # and (sentence2 + sentence1). That is why we do np.flip() on x (the input sentences)
