@@ -1,0 +1,3 @@
+[submodule "DownScaleTransformerEncoder"]
+	path = DownScaleTransformerEncoder
+	url = https://github.com/BinaryWiz/DownScaleTransformerEncoder
