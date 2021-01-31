@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from transformers import AutoTokenizer, AutoModel, AdamW
+import time
 
 """ LOCAL IMPORTS """
 from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert_preprocess_batch
@@ -14,7 +15,7 @@ from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
 
-USING_CHARACTER_BERT = True
+using_model = "scaled characterbert concat"
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
@@ -73,61 +74,24 @@ test_laptop_data = test_laptop_data[:, 0:2]
 print('Laptop test shape:', str(test_laptop_data.shape))
 print('Laptop test labels shape:', str(test_laptop_labels.shape))
 
-def character_bert_forward_prop(batch_data, batch_labels, criterion):
-    # Forward propagation
-    forward = net(*character_bert_preprocess_batch(batch_data))
-
-    # Convert batch labels to Tensor
-    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
-
-    # Calculate loss
-    loss = criterion(forward, batch_labels)
-
-    # Add L2 Regularization to the final linear layer
-    l2_lambda_fc = 1e-1
-    l2_reg_fc = torch.tensor(0.)
-    for param in net.fc1.parameters():
-        l2_reg_fc += torch.norm(param)
-
-    # Add L2 Regularization to bert
-    l2_lambda_bert = 7e-5
-    l2_reg_bert = torch.tensor(0.)
-    for param in net.bert.parameters():
-        l2_reg_bert += torch.norm(param)
-
-    loss += l2_lambda_fc * l2_reg_fc + l2_lambda_bert * l2_reg_bert
-
-    # Calculate accuracy
-    accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
-
-    return loss, accuracy
-
-def bert_forward_prop(batch_data, batch_labels, criterion):
-    # Forward propagation
-    forward = net(*bert_preprocess_batch(batch_data))
-
-    # Convert batch labels to Tensor
-    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
-
-    # Calculate loss
-    loss = criterion(forward, batch_labels)
-
-    # Calculate accuracy
-    accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
-
-    return loss, accuracy
-
 # Initialize the model
 net = None
-if USING_CHARACTER_BERT:
-    from src.model_architectures.characterbert_classifier import SiameseNetwork
+if using_model == "characterbert":
+    from src.model_architectures.characterbert_classifier import SiameseNetwork, forward_prop
     net = SiameseNetwork().to(Common.device)
-    forward_prop = character_bert_forward_prop
 
-else:
-    from src.model_architectures.bert_classifier import SiameseNetwork
+elif using_model == "bert":
+    from src.model_architectures.bert_classifier import SiameseNetwork, forward_prop
     net = SiameseNetwork(Common.MAX_LEN).to(Common.device)
-    forward_prop = bert_forward_prop
+
+elif using_model == "scaled characterbert concat":
+    from src.model_architectures.characterbert_transformer_concat import SiameseNetwork, forward_prop
+    net = SiameseNetwork(Common.MAX_LEN * 2 + 3)
+    net.load_state_dict(torch.load('./models/TransformerCharacterBERTConcat/model_epoch1_first.pt'))
+
+elif using_model == "scaled characterbert add":
+    from src.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop
+    net = SiameseNetwork()
 
 # Using cross-entropy because we are making a classifier
 criterion = nn.CrossEntropyLoss()
@@ -163,8 +127,8 @@ for epoch in range(5):
         opt.zero_grad()
         
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
-        
+        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
+
         # Add to both the running accuracy and running loss (every 10 batches)
         running_accuracy += accuracy
         running_loss += loss.item()
@@ -205,7 +169,7 @@ for epoch in range(5):
             batch_labels = val_labels[position:position + BATCH_SIZE]
         
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
+        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
 
         # Add to running loss and accuracy (every 10 batches)
         running_accuracy += accuracy
@@ -235,7 +199,7 @@ for epoch in range(5):
             batch_labels = test_laptop_labels[position:position + BATCH_SIZE]
 
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, criterion)
+        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
 
         # Add to running loss and accuracy (every 10 batches)
         running_loss += loss.item()

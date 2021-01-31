@@ -5,18 +5,20 @@ Authors: Hicham El Boukkouri and Olivier Ferret and Thomas Lavergne and Hiroshi 
 The characterbert_modeling and characterbert_utils were also created by them
 Their GitHub Repo is at: https://github.com/helboukkouri/character-bert
 '''
-
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from transformers import AutoModel
+from transformers import AutoModel;
 from characterbert_modeling.character_bert import CharacterBertModel
+sys.path.append('DownScaleTransformerEncoder/src/')
+from DownScaleTransformerEncoder.src.scaling_layer import ScalingLayer
 from src.common import Common
 from src.preprocessing import character_bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, h_size=768):
+    def __init__(self, sequence_length, h_size=768):
         '''
         Model that uses BERT to classify the titles.
         max_length: The max length a title could be for padding purposes
@@ -24,19 +26,24 @@ class SiameseNetwork(nn.Module):
         '''
 
         super(SiameseNetwork, self).__init__()
+        self.sequence_length = sequence_length
         self.h_size = h_size
         
         # CharacterBERT model
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
-        # Fully-Connected layers
-        self.fc1 = nn.Linear(self.h_size, 2)
+        # Define the Scaling Layers
+        self.scale1 = ScalingLayer(in_features=h_size, out_features=384, pwff_inner_features=2048, pwff_dropout=0.5)
+        self.scale2 = ScalingLayer(in_features=384, out_features=32, pwff_inner_features=768, pwff_dropout=0.5)
         
         # Dropout for overfitting
         self.dropout_5 = nn.Dropout(p=0.5)
 
         # Dropout last
         self.dropout_7 = nn.Dropout(p=0.7)
+
+        # Linear layer for classification'
+        self.classification = nn.Linear(in_features=self.sequence_length * 32, out_features=2)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -47,13 +54,13 @@ class SiameseNetwork(nn.Module):
         Model using CharacterBERT to make a prediction of whether the two titles represent 
         the same entity.
         '''
+        # Get the amount of batches from the input
+        batches = input1.size()[0]
 
         # Send the inputs through BERT
-        # We index at 1 because that gives us the classification token (CLS)
-        # that BERT talks about in the paper (as opposed to each hidden layer for each)
-        # token embedding
-        output1 = self.bert(input1)[1]
-        output2 = self.bert(input2)[1]
+        # We index at 0 because that gives us the output for each token
+        output1 = self.bert(input1)[0]
+        output2 = self.bert(input2)[0]
 
         # BERT calls for the addition of both 
         addition = output1 + output2
@@ -61,20 +68,33 @@ class SiameseNetwork(nn.Module):
         # Dropout
         addition = self.dropout_5(addition)
         
-        # Fully-Connected Layer 1 (input of 768 units and output of 384)
-        addition = self.fc1(addition)
+        # Forward propagate through first scaled Transformer
+        scaled = self.scale1(addition)
         
         # Dropout
-        addition = self.dropout_7(addition)
+        scaled = self.dropout_5(scaled)
         
+        # Forward propagate through second scaled Transformer
+        scaled = self.scale2(scaled)
+        scaled = scaled.view(batches, -1)
+        
+        # Dropout
+        scaled = self.dropout_7(scaled)
+
+        # Go through final linear layer
+        out = self.classification(scaled)
+
+        # Dropout
+        out = self.dropout_7(out)
+
         # Softmax Activation to get predictions
-        addition = self.softmax(addition)
-        
-        return addition
+        out = self.softmax(out)
+
+        return out
 
 def forward_prop(batch_data, batch_labels, net, criterion):
     # Forward propagation
-    forward = net(*character_bert_preprocess_batch(batch_data))
+    forward = net(*character_bert_preprocess_batch(batch_data, pad=True))
 
     # Convert batch labels to Tensor
     batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
@@ -82,11 +102,15 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     # Calculate loss
     loss = criterion(forward, batch_labels)
 
-    # Add L2 Regularization to the final linear layer
-    l2_lambda_fc = 1e-1
-    l2_reg_fc = torch.tensor(0.)
-    for param in net.fc1.parameters():
-        l2_reg_fc += torch.norm(param)
+    # Add L2 Regularization to the Transformers and final linear layer
+    l2_lambda = 2e-3
+    l2_reg = torch.tensor(0.)
+    for param in net.scale1.parameters():
+        l2_reg += torch.norm(param)
+    for param in net.scale2.parameters():
+        l2_reg += torch.norm(param)
+    for param in net.classification.parameters():
+        l2_reg += torch.norm(param)
 
     # Add L2 Regularization to bert
     l2_lambda_bert = 7e-5
@@ -94,7 +118,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
 
-    loss += l2_lambda_fc * l2_reg_fc + l2_lambda_bert * l2_reg_bert
+    loss += l2_lambda * l2_reg + l2_lambda_bert * l2_reg_bert
 
     # Calculate accuracy
     accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])

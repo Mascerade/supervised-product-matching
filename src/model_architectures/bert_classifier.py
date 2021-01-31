@@ -4,6 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
+from src.common import Common
+from src.preprocessing import bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
     def __init__(self, max_length, h_size=768):
@@ -71,3 +73,19 @@ class SiameseNetwork(nn.Module):
         addition = self.softmax(addition)
         
         return addition
+
+def forward_prop(batch_data, batch_labels, net, criterion):
+    # Forward propagation
+    forward = net(*bert_preprocess_batch(batch_data))
+
+    # Convert batch labels to Tensor
+    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
+
+    # Calculate loss
+    loss = criterion(forward, batch_labels)
+
+    # Calculate accuracy
+    accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
+
+    return loss, accuracy
+

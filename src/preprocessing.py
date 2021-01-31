@@ -67,7 +67,7 @@ def add_tags(arr):
         np.array([' [SEP]'])
     )
 
-def character_bert_preprocess_batch(x):
+def character_bert_preprocess_batch(x, pad=False):
     """
     Preprocess a batch before it goes into the CharacterBERT model
     """
@@ -87,8 +87,12 @@ def character_bert_preprocess_batch(x):
     input2 = np.char.split(input2)
 
     # Now, we feed the input into the CharacterBERT tokenizer, which converts each 
-    input1 = character_indexer.as_padded_tensor(input1)
-    input2 = character_indexer.as_padded_tensor(input2)
+    if pad:
+        input1 = character_indexer.as_padded_tensor(input1, maxlen=Common.MAX_LEN * 2 + 3)
+        input2 = character_indexer.as_padded_tensor(input2, maxlen=Common.MAX_LEN * 2 + 3)
+    else:
+        input1 = character_indexer.as_padded_tensor(input1)
+        input2 = character_indexer.as_padded_tensor(input2)
 
     # Send the data to the GPU
     input1 = input1.to(Common.device)
