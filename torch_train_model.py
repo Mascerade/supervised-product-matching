@@ -15,7 +15,7 @@ from src.common import Common, get_max_len
 from create_data import create_data
 from src.model_architectures.model_functions import save_model
 
-using_model = "scaled characterbert concat"
+using_model = "scaled characterbert add"
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
@@ -87,7 +87,6 @@ elif using_model == "bert":
 elif using_model == "scaled characterbert concat":
     from src.model_architectures.characterbert_transformer_concat import SiameseNetwork, forward_prop
     net = SiameseNetwork(Common.MAX_LEN * 2 + 3)
-    net.load_state_dict(torch.load('./models/TransformerCharacterBERTConcat/model_epoch1_first.pt'))
 
 elif using_model == "scaled characterbert add":
     from src.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop

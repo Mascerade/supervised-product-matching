@@ -10,7 +10,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from transformers import AutoModel;
 from characterbert_modeling.character_bert import CharacterBertModel
 sys.path.append('DownScaleTransformerEncoder/src/')
 from DownScaleTransformerEncoder.src.scaling_layer import ScalingLayer
@@ -32,18 +31,16 @@ class SiameseNetwork(nn.Module):
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
         # Define the Scaling Layers
-        self.scale = ScalingLayer(in_features=h_size, out_features=512, pwff_inner_features=2048, pwff_dropout=0.1)
-        
+        self.scale1 = ScalingLayer(in_features=h_size, out_features=512, pwff_inner_features=2048, pwff_dropout=0.1)
+        self.scale2 = ScalingLayer(in_features=512, out_features=256, pwff_inner_features=1028, pwff_dropout=0.1)
+
+        # Dropout layers
         self.dropout_1 = nn.Dropout(p=0.1)
-
-        # Dropout for overfitting
         self.dropout_5 = nn.Dropout(p=0.5)
-
-        # Dropout last
         self.dropout_7 = nn.Dropout(p=0.7)
 
         # Linear layer for classification'
-        self.classification = nn.Linear(in_features=512, out_features=2)
+        self.classification = nn.Linear(in_features=256, out_features=2)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -54,6 +51,7 @@ class SiameseNetwork(nn.Module):
         Model using CharacterBERT to make a prediction of whether the two titles represent 
         the same entity.
         '''
+
         # Get the amount of batches from the input
         sequence_length = x.size()[1]
 
@@ -65,10 +63,13 @@ class SiameseNetwork(nn.Module):
         bert_output = self.dropout_1(bert_output)
         
         # Forward propagate through first scaled Transformer
-        scaled = self.scale(bert_output)
+        scaled = self.scale1(bert_output)
         
         # Dropout
-        scaled = self.dropout_5(scaled)
+        scaled = self.dropout_1(scaled)
+
+        # Forward propagate through second scaled Transformer
+        scaled = self.scale2(scaled)
         
         # Average token embeddings
         scaled = scaled[:, 1:].sum(dim=1) / sequence_length
@@ -100,13 +101,15 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     # Add L2 Regularization to the Transformers and final linear layer
     l2_lambda = 3e-2
     l2_reg = torch.tensor(0.)
-    for param in net.scale.parameters():
+    for param in net.scale1.parameters():
+        l2_reg += torch.norm(param)
+    for param in net.scale2.parameters():
         l2_reg += torch.norm(param)
     for param in net.classification.parameters():
         l2_reg += torch.norm(param)
 
     # Add L2 Regularization to bert
-    l2_lambda_bert = 7e-5
+    l2_lambda_bert = 7e-6
     l2_reg_bert = torch.tensor(0.)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
