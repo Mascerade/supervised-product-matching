@@ -45,7 +45,7 @@ class SiameseNetwork(nn.Module):
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, x):
+    def forward(self, input1, input2):
         '''
         x is going to be a numpy array of the sequences
         Model using CharacterBERT to make a prediction of whether the two titles represent 
@@ -53,11 +53,15 @@ class SiameseNetwork(nn.Module):
         '''
 
         # Get the amount of batches from the input
-        sequence_length = x.size()[1]
+        sequence_length = input1.size()[1]
 
         # Send the inputs through BERT
         # We index at 0 because that gives us the output for each token
-        bert_output = self.bert(x)[0]
+        bert_output1 = self.bert(input1)[0]
+        bert_output2 = self.bert(input2)[0]
+
+        # Add the embeddings
+        bert_output = bert_output1 + bert_output2
 
         # Dropout
         bert_output = self.dropout_1(bert_output)
@@ -90,7 +94,7 @@ class SiameseNetwork(nn.Module):
 
 def forward_prop(batch_data, batch_labels, net, criterion):
     # Forward propagation
-    forward = net(character_bert_preprocess_batch(batch_data, pad=False)[0])
+    forward = net(*character_bert_preprocess_batch(batch_data, pad=False))
 
     # Convert batch labels to Tensor
     batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
@@ -99,14 +103,16 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     loss = criterion(forward, batch_labels)
 
     # Add L2 Regularization to the Transformers and final linear layer
-    l2_lambda = 3e-2
-    l2_reg = torch.tensor(0.)
+    l2_lambda_scale = 1e-4
+    l2_lambda_linear = 1e-2
+    l2_reg_scale = torch.tensor(0.)
+    l2_reg_linear = torch.tensor(0.)
     for param in net.scale1.parameters():
-        l2_reg += torch.norm(param)
+        l2_reg_scale += torch.norm(param)
     for param in net.scale2.parameters():
-        l2_reg += torch.norm(param)
+        l2_reg_scale += torch.norm(param)
     for param in net.classification.parameters():
-        l2_reg += torch.norm(param)
+        l2_reg_linear += torch.norm(param)
 
     # Add L2 Regularization to bert
     l2_lambda_bert = 7e-6
@@ -114,7 +120,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
 
-    loss += l2_lambda * l2_reg + l2_lambda_bert * l2_reg_bert
+    loss += l2_lambda_scale * l2_reg_scale + l2_lambda_linear * l2_reg_linear + l2_lambda_bert * l2_reg_bert
 
     # Calculate accuracy
     accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
