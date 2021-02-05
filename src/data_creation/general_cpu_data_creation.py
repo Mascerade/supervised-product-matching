@@ -35,7 +35,7 @@ def generate_pos_cpu_data():
     represent the same underlying CPU using the cpu_variations function.
     '''
     
-    cpu_df = pd.read_csv('data/train/cpu_data.csv')
+    cpu_df = pd.read_csv('data/base/cpu_data.csv')
     cpu_df_iloc = cpu_df.iloc()
     pos_df = []
     
@@ -59,7 +59,7 @@ def generate_neg_cpu_data():
     Creates negative CPU data that uses two different CPUs to create a pair. 
     '''
 
-    cpu_df = pd.read_csv('data/train/cpu_data.csv')
+    cpu_df = pd.read_csv('data/base/cpu_data.csv')
     cpu_df_iloc = cpu_df.iloc()
     neg_df = []
     

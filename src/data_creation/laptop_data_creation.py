@@ -3,7 +3,7 @@ import os
 import numpy as np
 import random
 from tqdm import tqdm
-from src.preprocessing import remove_stop_words
+from src.preprocessing import remove_stop_words, randomize_units
 from src.common import create_final_data, Common
 
 class LaptopAttributes():
@@ -38,21 +38,21 @@ def populate_spec():
     '''
 
     # Getting the CPU data into LaptopAttrbutes
-    cpu_df = pd.read_csv('data/train/cpu_data.csv')
+    cpu_df = pd.read_csv('data/base/cpu_data.csv')
     temp_iloc = cpu_df.iloc()
     for idx in range(len(cpu_df)):
         row = temp_iloc[idx]
         LaptopAttributes.cpu[row['name']] = [row['cores'], row['core_clock']]
 
     # Getting the video card data into LaptopAttributes
-    video_card_df = pd.read_csv('data/train/video-cards-data.csv')
+    video_card_df = pd.read_csv('data/base/video-cards-data.csv')
     temp_iloc = video_card_df.iloc()
     for idx in range(len(video_card_df)):
         row = temp_iloc[idx]
         LaptopAttributes.video_card.update([row['chipset']])
     
     # Getting the inches, screen, video card, and CPU data from laptops.csv
-    laptops_df = pd.read_csv('data/train/laptops.csv', encoding='latin-1')
+    laptops_df = pd.read_csv('data/base/laptops.csv', encoding='latin-1')
     LaptopAttributes.inches.update([str(row.Inches) for row in laptops_df[['Inches']].itertuples()])
     LaptopAttributes.screen.update([row.ScreenResolution for row in laptops_df[['ScreenResolution']].itertuples()])
     LaptopAttributes.video_card.update([row.Gpu for row in laptops_df[['Gpu']].itertuples()]) 
@@ -209,12 +209,13 @@ def create_laptop_data():
     if not os.path.exists(file_path):
         print('Generating data for laptops . . . ')
         populate_spec()
-        if not os.path.exists('data/train/spec_data_no_brand.csv'):
+        if not os.path.exists('data/base/spec_data_no_brand.csv'):
             print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
             gen_spec_combos()
-        spec_df = pd.read_csv('data/train/spec_data_no_brand.csv')
+        spec_df = pd.read_csv('data/base/spec_data_no_brand.csv')
         final_laptop_df = create_pos_neg_data(spec_df, neg_attrs=['cpu', 'ram', 'inches', 'hard_drive'])
-        print(len(final_laptop_df))
+        final_laptop_df.reset_index(inplace=True)
+        randomize_units(final_laptop_df, units=['gb'])
         final_laptop_df.to_csv(file_path)
 
     else:

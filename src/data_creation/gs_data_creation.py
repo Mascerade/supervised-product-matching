@@ -69,7 +69,7 @@ def create_computer_data():
     if not os.path.exists(computer_data_path):
         print('Generating simplifed Gold Standard computer data . . . ')
         # Load the data
-        computer_df = pd.read_json('data/train/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)    
+        computer_df = pd.read_json('data/base/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)    
 
         # Create and save the data if the simple and normalized data does not exist
         create_training_data(computer_df, computer_data_path)

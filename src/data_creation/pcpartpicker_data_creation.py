@@ -4,7 +4,7 @@ import random
 from itertools import combinations
 from tqdm import tqdm
 from src.common import create_final_data
-from src.preprocessing import remove_misc
+from src.preprocessing import remove_misc, remove_stop_words, randomize_units
 
 def generate_pos_pcpartpicker_data(df):
     '''
@@ -17,7 +17,7 @@ def generate_pos_pcpartpicker_data(df):
         row = df.iloc()[idx]
         titles = []
         for col in columns:
-            if not pd.isnull(row[col]): titles.append(row[col])
+            if not pd.isnull(row[col]): titles.append(remove_stop_words(row[col]))
         if len(titles) > 1:
             combs = combinations(titles, 2)
             for comb in combs:
@@ -47,7 +47,7 @@ def generate_neg_pcpartpicker_data(df):
                 while neg_title == None or pd.isnull(neg_title):
                     neg_title = df_list[neg_idx][random.choice(columns)]
                 
-                neg_df = neg_df.append(pd.DataFrame([[row[col], neg_title, 0]], columns=['title_one', 'title_two', 'label']))
+                neg_df = neg_df.append(pd.DataFrame([[remove_stop_words(row[col]), remove_stop_words(neg_title), 0]], columns=['title_one', 'title_two', 'label']))
     
     return neg_df
 
@@ -60,9 +60,9 @@ def create_pcpartpicker_data():
     file_path = 'data/train/final_pcpartpicker_data.csv'
     if not os.path.exists(file_path):
         print('Generating PCPartPicker data . . .')
-        ram_df = remove_misc(pd.read_csv('data/train/pos_ram_titles.csv'))
-        cpu_df = remove_misc(pd.read_csv('data/train/pos_cpu_titles.csv'))
-        hard_drive_df = remove_misc(pd.read_csv('data/train/pos_hard_drive_titles.csv'))
+        ram_df = remove_misc(pd.read_csv('data/base/pos_ram_titles.csv'))
+        cpu_df = remove_misc(pd.read_csv('data/base/pos_cpu_titles.csv'))
+        hard_drive_df = remove_misc(pd.read_csv('data/base/pos_hard_drive_titles.csv'))
 
         # Generate all the positive data for the categories
         pos_ram_data = generate_pos_pcpartpicker_data(ram_df)
@@ -83,6 +83,8 @@ def create_pcpartpicker_data():
         
         # Concatenate the data and save it
         final_pcpartpicker_df = pd.concat([final_ram_data, final_cpu_data, final_hard_drive_data])
+        final_pcpartpicker_df.reset_index(inplace=True)
+        randomize_units(final_pcpartpicker_df, units=['gb'])
         final_pcpartpicker_df.to_csv(file_path)
 
     else:

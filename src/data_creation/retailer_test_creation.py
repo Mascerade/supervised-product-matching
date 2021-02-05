@@ -72,7 +72,7 @@ def create_laptop_test_data():
     file_path = 'data/train/final_laptop_test_data.csv'
 
     # Load the test laptop data
-    laptop_df = pd.read_csv('data/train/retailer_test.csv')
+    laptop_df = pd.read_csv('data/base/retailer_test.csv')
     
     if not os.path.exists(file_path):
         print('Generating test laptop data . . . ')

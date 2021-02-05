@@ -3,7 +3,7 @@ from tqdm import tqdm
 import os
 import random
 from itertools import combinations
-from src.preprocessing import remove_misc, remove_stop_words
+from src.preprocessing import remove_misc, remove_stop_words, randomize_units
 from src.common import create_final_data, Common
 
 def generate_pos_hard_drive_data():
@@ -76,6 +76,8 @@ def create_final_drive_data():
 
         # Concatenate the data and save it
         final_df = create_final_data(pos_df, neg_df)
+        final_df.reset_index(inplace=True)
+        randomize_units(final_df, ['gb'])
         final_df.to_csv(file_path)
 
     else:

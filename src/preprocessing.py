@@ -1,5 +1,7 @@
 import os
 import sys
+import random
+import re
 import pandas as pd
 import numpy as np
 from nltk.corpus import stopwords
@@ -47,6 +49,34 @@ def remove_misc(df):
     df = df.drop(columns=['Unnamed: 0'])
     df = df.dropna(how='all')
     return df
+
+def randomize_units(df, units):
+    """
+    Replaces units like 8 gb with 8gb to have a better distribution across the dataset
+    """
+    
+    # Randomly replace the the unit without a space or with a space 
+    def random_replace(string, matches, unit):
+        for match in matches:
+            if random.random() > 0.5:
+                if ' ' in match:
+                    string = string.replace(match, match.replace(' ', ''))
+                else:
+                    num = match.split(unit)[0]
+                    string = string.replace(match, '{} {}'.format(num, unit))
+        
+        return string
+    
+    # For each unit, do the replacement on it
+    for unit in units:
+        matcher = re.compile('[0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
+        for idx in range(len(df)):
+            title_one = df.at[idx, 'title_one']
+            title_two = df.at[idx, 'title_two']
+            title_one_matches = matcher.findall(title_one)
+            title_two_matches = matcher.findall(title_two)
+            df.at[idx, 'title_one'] = random_replace(title_one, title_one_matches, unit)
+            df.at[idx, 'title_two'] = random_replace(title_two, title_two_matches, unit)
 
 def add_tags(arr):
     '''
