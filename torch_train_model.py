@@ -96,7 +96,8 @@ elif using_model == "scaled characterbert add":
 criterion = nn.CrossEntropyLoss()
 
 # Using Adam optimizer
-opt = optim.Adam(net.parameters(), lr=5e-5)
+#opt = AdamW(net.parameters(), lr=5e-5, weight_decay=0.01)
+opt = optim.Adam(net.parameters(), lr=1e-6)
 
 print("************* TRAINING *************")
 

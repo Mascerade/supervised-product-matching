@@ -36,6 +36,7 @@ class SiameseNetwork(nn.Module):
 
         # Dropout layers
         self.dropout_1 = nn.Dropout(p=0.1)
+        self.dropout_3 = nn.Dropout(p=0.3)
         self.dropout_5 = nn.Dropout(p=0.5)
         self.dropout_7 = nn.Dropout(p=0.7)
 
@@ -51,7 +52,6 @@ class SiameseNetwork(nn.Module):
         Model using CharacterBERT to make a prediction of whether the two titles represent 
         the same entity.
         '''
-
         # Get the amount of batches from the input
         sequence_length = input1.size()[1]
 
@@ -79,13 +79,13 @@ class SiameseNetwork(nn.Module):
         scaled = scaled[:, 1:].sum(dim=1) / sequence_length
         
         # Dropout
-        scaled = self.dropout_7(scaled)
+        scaled = self.dropout_5(scaled)
 
         # Go through final linear layer
         out = self.classification(scaled)
 
         # Dropout
-        out = self.dropout_7(out)
+        out = self.dropout_5(out)
 
         # Softmax Activation to get predictions
         out = self.softmax(out)
@@ -104,7 +104,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
 
     # Add L2 Regularization to the Transformers and final linear layer
     l2_lambda_scale = 1e-4
-    l2_lambda_linear = 1e-2
+    l2_lambda_linear = 4e-3
     l2_reg_scale = torch.tensor(0.)
     l2_reg_linear = torch.tensor(0.)
     for param in net.scale1.parameters():
@@ -115,7 +115,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
         l2_reg_linear += torch.norm(param)
 
     # Add L2 Regularization to bert
-    l2_lambda_bert = 7e-6
+    l2_lambda_bert = 3e-5
     l2_reg_bert = torch.tensor(0.)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
