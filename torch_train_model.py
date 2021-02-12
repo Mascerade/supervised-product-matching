@@ -33,7 +33,8 @@ if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/t
     create_data()
 
 # Get the data from the file
-total_data = pd.read_csv('data/train/total_data.csv', index_col=2)
+total_data = pd.read_csv('data/train/total_data.csv', index_col=False)
+del total_data['index']
 
 # Drop the Unnamed column
 total_data = remove_misc(total_data)
@@ -64,7 +65,7 @@ test_labels = total_data[Common.M - (split_size//2):][:, 2].astype('float32')
 print('Test labels shape:', str(test_labels.shape))
 
 # Get the test laptop data
-test_laptop_data = pd.read_csv('data/train/final_laptop_test_data.csv', index_col=False)
+test_laptop_data = pd.read_csv('data/train/final_laptop_test_data.csv')
 test_laptop_data = remove_misc(test_laptop_data).to_numpy()
 
 # Split the data into the titles and the labels
