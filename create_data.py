@@ -61,10 +61,10 @@ def create_data():
     print('Generating gigabyte data (as in just examples that use GB)')
 
     # Load all the data
-    final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv')
-    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')[:30000]
-    final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
-    more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
+    final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv', index_col=2)
+    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv', index_col=2)[:30000]
+    final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv', index_col=2).sample(frac=1)
+    more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv', index_col=2)
     all_data = [final_computer_df, final_laptop_df, final_pcpartpicker_data, more_cpu_data]
 
     # Print the sizes of the data

@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from tqdm import tqdm
 from src.common import Common, create_final_data
-from src.preprocessing import remove_stop_words
+from src.preprocessing import remove_stop_words, randomize_units
 
 def preprocessing(orig_data):
     '''
@@ -57,6 +57,8 @@ def create_training_data(df, path):
     norm_bal_data = create_train_df(preprocessing(df))
     
     # Save the new normalized and simplified data to a CSV file to load later
+    norm_bal_data.reset_index(inplace=True)
+    randomize_units(norm_bal_data, units=['gb'])
     norm_bal_data.to_csv(path, index=False)
 
 

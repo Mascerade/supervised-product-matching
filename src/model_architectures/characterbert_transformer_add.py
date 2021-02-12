@@ -80,13 +80,13 @@ class SiameseNetwork(nn.Module):
         scaled = scaled[:, 1:].sum(dim=1) / sequence_length
         
         # Dropout
-        scaled = self.dropout_7(scaled)
+        scaled = self.dropout_5(scaled)
 
         # Go through final linear layer
         out = self.classification(scaled)
 
         # Dropout
-        out = self.dropout_7(out)
+        out = self.dropout_5(out)
 
         # Softmax Activation to get predictions
         out = self.softmax(out)
@@ -101,13 +101,13 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
 
     # Calculate loss
-    loss = criterion(forward, batch_labels)
+    loss = criterion(forward, batch_labels).to(Common.device)
 
     # Add L2 Regularization to the Transformers and final linear layer
     #l2_lambda_scale = 1e-4
-    l2_lambda_linear = 7e-1
-    l2_reg_scale = torch.tensor(0.)
-    l2_reg_linear = torch.tensor(0.)
+    l2_lambda_linear = 5e-2
+    l2_reg_scale = torch.tensor(0.).to(Common.device)
+    l2_reg_linear = torch.tensor(0.).to(Common.device)
     # for param in net.scale1.parameters():
     #     l2_reg_scale += torch.norm(param)
     # for param in net.scale2.parameters():
