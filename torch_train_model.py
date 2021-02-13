@@ -91,7 +91,6 @@ elif using_model == "scaled characterbert concat":
 elif using_model == "scaled characterbert add":
     from src.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop
     net = SiameseNetwork().to(Common.device)
-    net.load_state_dict(torch.load('./models/TransformerCharacterBERTNormalized/model_epoch4.pt'))
 
 # Using cross-entropy because we are making a classifier
 criterion = nn.CrossEntropyLoss()
@@ -103,9 +102,9 @@ opt = optim.Adam(net.parameters(), lr=1e-5)
 print("************* TRAINING *************")
 
 # 10 epochs
-for epoch in [4]:
+for epoch in range(10):
     # The size of each mini-batch
-    BATCH_SIZE = 32
+    BATCH_SIZE = 16
 
     # How long we should accumulate for running loss and accuracy
     PERIOD = 50
