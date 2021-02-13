@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import random
 from tqdm import tqdm
+import sys
+sys.path.append(os.getcwd())
 from src.preprocessing import remove_stop_words
 from src.common import create_final_data
 from itertools import combinations
@@ -36,7 +38,7 @@ def create_neg_laptop_test_data(laptop_df):
     '''
     Creates the negative test laptop data
     '''
-
+    print(laptop_df)
     retailers = ['Amazon', 'Newegg', 'Walmart', 'BestBuy']
     neg_data = []
     for row in laptop_df.iloc:
@@ -47,10 +49,14 @@ def create_neg_laptop_test_data(laptop_df):
                 orig_product = row[retailer]
                 neg_product = ''
                 
+                # Get a subset of the laptop dataframe that has titles that are similar to the original, but still different
+                comp_df = laptop_df.loc[laptop_df['Company'] == row['Company']]
+                comp_df = comp_df.loc[laptop_df['index'] != row['index']]
+                idx = random.randint(0, len(comp_df) - 1)
+                neg_row = comp_df.iloc[idx]
+                print(row['Company'], neg_row['Company'])
+        
                 while True:
-                    idx = random.randint(0, len(laptop_df) - 1)
-                    neg_row = laptop_df.iloc[idx]
-            
                     rand_retailer = random.sample(retailers, 1)[0]
                     neg_product = neg_row[rand_retailer]
                     
@@ -73,6 +79,8 @@ def create_laptop_test_data():
 
     # Load the test laptop data
     laptop_df = pd.read_csv('data/base/retailer_test.csv')
+    laptop_df['index'] = laptop_df.index
+    laptop_df['index'].astype('object')
     
     if not os.path.exists(file_path):
         print('Generating test laptop data . . . ')
@@ -88,3 +96,6 @@ def create_laptop_test_data():
 
     else:
         print('Already have test laptop data. Moving on . . . ')
+
+if __name__ == "__main__":
+    create_laptop_test_data()
