@@ -38,7 +38,6 @@ def create_neg_laptop_test_data(laptop_df):
     '''
     Creates the negative test laptop data
     '''
-    print(laptop_df)
     retailers = ['Amazon', 'Newegg', 'Walmart', 'BestBuy']
     neg_data = []
     for row in laptop_df.iloc:
@@ -54,7 +53,6 @@ def create_neg_laptop_test_data(laptop_df):
                 comp_df = comp_df.loc[laptop_df['index'] != row['index']]
                 idx = random.randint(0, len(comp_df) - 1)
                 neg_row = comp_df.iloc[idx]
-                print(row['Company'], neg_row['Company'])
         
                 while True:
                     rand_retailer = random.sample(retailers, 1)[0]
