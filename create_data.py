@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc
+from src.preprocessing import remove_misc, randomize_units
 from src.common import Common
 from src.common import get_max_len, create_final_data
 from src.data_creation.general_cpu_data_creation import create_general_cpu_data
@@ -56,6 +56,9 @@ def create_data():
     create_general_cpu_data()
     create_final_drive_data()
     create_laptop_data()
+    final_gb_data = create_final_data(gen_gb_pos_data(), gen_neg_gb_data())
+    final_gb_data.reset_index(inplace=True)
+    randomize_units(final_gb_data, units=['gb'])
     create_laptop_test_data()
 
     print('Generating gigabyte data (as in just examples that use GB)')
@@ -65,13 +68,16 @@ def create_data():
     final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')[:30000]
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
-    all_data = [final_computer_df, final_laptop_df, more_cpu_data]
+    more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
+    all_data = [final_computer_df, final_laptop_df, more_cpu_data, final_gb_data, more_drive_data]
 
     # Print the sizes of the data
     print('Computer df size: {}'.format(len(final_computer_df)))
     print('Laptop df size: {}'.format(len(final_laptop_df)))
     print('PCPartPicker df size: {}'.format(len(final_pcpartpicker_data)))
-    print('More CPU df size: {}'.format(len(more_cpu_data)))
+    print('More Drive Data df size: {}'.format(len(more_drive_data)))
+    print('More CPU Data df size: {}'.format(len(more_cpu_data)))
+    print('Final GB Data: {}'.format(len(final_gb_data)))
 
     # Concatenate everything
     total_data = pd.concat(all_data)
