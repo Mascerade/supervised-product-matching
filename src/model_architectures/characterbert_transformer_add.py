@@ -42,7 +42,7 @@ class SiameseNetwork(nn.Module):
         self.dropout_7 = nn.Dropout(p=0.7)
 
         # Linear layer for classification'
-        self.classification = nn.Linear(in_features=1024, out_features=2)
+        self.classification = nn.Linear(in_features=256, out_features=2)
         
         # Softmax for prediction
         self.softmax = nn.Softmax(dim=1)
@@ -110,8 +110,8 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     l2_reg_linear = torch.tensor(0.).to(Common.device)
     for param in net.scale1.parameters():
         l2_reg_scale += torch.norm(param)
-    # for param in net.scale2.parameters():
-    #     l2_reg_scale += torch.norm(param)
+    for param in net.scale2.parameters():
+        l2_reg_scale += torch.norm(param)
     for param in net.classification.parameters():
         l2_reg_linear += torch.norm(param)
 
@@ -122,7 +122,6 @@ def forward_prop(batch_data, batch_labels, net, criterion):
         l2_reg_bert += torch.norm(param)
 
     loss += l2_lambda_scale * l2_reg_scale + l2_lambda_linear * l2_reg_linear + l2_lambda_bert * l2_reg_bert
-    #loss += l2_lambda_linear * l2_reg_linear
 
     # Calculate accuracy
     accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
