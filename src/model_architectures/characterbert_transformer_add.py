@@ -31,8 +31,8 @@ class SiameseNetwork(nn.Module):
         self.bert = CharacterBertModel.from_pretrained('./pretrained-models/general_character_bert/')
 
         # Define the Scaling Layers
-        self.scale1 = ScalingLayer(in_features=h_size, out_features=1024, pwff_inner_features=2048, pwff_dropout=0.1)
-        #self.scale2 = ScalingLayer(in_features=512, out_features=256, pwff_inner_features=1028, pwff_dropout=0.1)
+        self.scale1 = ScalingLayer(in_features=h_size, out_features=512, pwff_inner_features=2048, pwff_dropout=0.1)
+        self.scale2 = ScalingLayer(in_features=512, out_features=256, pwff_inner_features=1028, pwff_dropout=0.1)
 
         # Dropout layers
         self.dropout_1 = nn.Dropout(p=0.1)
@@ -71,10 +71,10 @@ class SiameseNetwork(nn.Module):
         scaled = self.scale1(bert_output)
         
         # Dropout
-        #scaled = self.dropout_1(scaled)
+        scaled = self.dropout_1(scaled)
 
         # Forward propagate through second scaled Transformer
-        #scaled = self.scale2(scaled)
+        scaled = self.scale2(scaled)
         
         # Average token embeddings
         scaled = scaled[:, 1:].sum(dim=1) / sequence_length
