@@ -50,6 +50,9 @@ def remove_misc(df):
     df = df.dropna(how='all')
     return df
 
+def unit_matcher(unit):
+    return re.compile(' [0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
+
 def randomize_units(df, units):
     """
     Replaces units like 8 gb with 8gb to have a better distribution across the dataset
@@ -58,6 +61,7 @@ def randomize_units(df, units):
     # Randomly replace the the unit without a space or with a space 
     def random_replace(string, matches, unit):
         for match in matches:
+            match = match.strip()
             if random.random() > 0.5:
                 if ' ' in match:
                     string = string.replace(match, match.replace(' ', ''))
@@ -69,7 +73,7 @@ def randomize_units(df, units):
     
     # For each unit, do the replacement on it
     for unit in units:
-        matcher = re.compile('[0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
+        matcher = unit_matcher(unit)
         for idx in range(len(df)):
             title_one = df.at[idx, 'title_one']
             title_two = df.at[idx, 'title_two']

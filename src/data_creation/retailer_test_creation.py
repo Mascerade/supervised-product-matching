@@ -73,7 +73,7 @@ def create_laptop_test_data():
     Creates positive and negative test laptop data and saves it to final_laptop_data.csv
     '''
     
-    file_path = 'data/train/final_laptop_test_data.csv'
+    file_path = 'data/test/final_laptop_test_data.csv'
 
     # Load the test laptop data
     laptop_df = pd.read_csv('data/base/retailer_test.csv')

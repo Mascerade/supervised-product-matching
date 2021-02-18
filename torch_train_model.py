@@ -101,11 +101,41 @@ opt = optim.Adam(net.parameters(), lr=1e-5)
 
 print("************* TRAINING *************")
 
+# The size of each mini-batch
+BATCH_SIZE = 16
+
+def validation(data, labels, name):
+    running_loss = 0.0
+    running_accuracy = 0.0
+    current_batch = 0
+    for i, position in enumerate(range(0, len(data), BATCH_SIZE)):
+        current_batch += 1
+        if (position + BATCH_SIZE > len(test_laptop_data)):
+            batch_data = data[position:]
+            batch_labels = data[position:]
+        else:
+            batch_data = data[position:position + BATCH_SIZE]
+            batch_labels = data[position:position + BATCH_SIZE]
+
+        # Forward propagation
+        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
+
+        # Add to running loss and accuracy (every 10 batches)
+        running_loss += loss.item()
+        running_accuracy += accuracy
+        
+        # Print statistics every batch
+        print('%s Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
+                (name, epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+
+        # Clear our running variables every 10 batches
+        if (current_batch == PERIOD):
+            current_batch = 0
+            running_loss = 0
+            running_accuracy = 0
+
 # 10 epochs
 for epoch in range(10):
-    # The size of each mini-batch
-    BATCH_SIZE = 16
-
     # How long we should accumulate for running loss and accuracy
     PERIOD = 50
     
@@ -154,63 +184,5 @@ for epoch in range(10):
 
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
-    # Iterate through each validation batch
-    net.eval()
-    running_loss = 0
-    running_accuracy = 0
-    current_batch = 0
-    for i, position in enumerate(range(0, len(val_data), BATCH_SIZE)):
-        current_batch += 1
-        if (position + BATCH_SIZE > len(val_data)):
-            batch_data = val_data[position:]
-            batch_labels = val_labels[position:]
-        else:
-            batch_data = val_data[position:position + BATCH_SIZE]
-            batch_labels = val_labels[position:position + BATCH_SIZE]
-        
-        # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
-
-        # Add to running loss and accuracy (every 10 batches)
-        running_accuracy += accuracy
-        running_loss += loss.item()
-
-        # Print statistics every batch
-        print('Validation Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
-                (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
-
-        # Clear our running variables every 10 batches
-        if (current_batch == PERIOD):
-            current_batch = 0
-            running_loss = 0
-            running_accuracy = 0
-
-    # Iterate through the test laptop data
-    running_loss = 0.0
-    running_accuracy = 0.0
-    current_batch = 0
-    for i, position in enumerate(range(0, len(test_laptop_data), BATCH_SIZE)):
-        current_batch += 1
-        if (position + BATCH_SIZE > len(test_laptop_data)):
-            batch_data = test_laptop_data[position:]
-            batch_labels = test_laptop_labels[position:]
-        else:
-            batch_data = test_laptop_data[position:position + BATCH_SIZE]
-            batch_labels = test_laptop_labels[position:position + BATCH_SIZE]
-
-        # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
-
-        # Add to running loss and accuracy (every 10 batches)
-        running_loss += loss.item()
-        running_accuracy += accuracy
-        
-        # Print statistics every batch
-        print('Test Laptop Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
-                (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
-
-        # Clear our running variables every 10 batches
-        if (current_batch == PERIOD):
-            current_batch = 0
-            running_loss = 0
-            running_accuracy = 0
+    validation(val_data, val_labels, 'Validation')
+    validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')

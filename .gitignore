@@ -8,6 +8,8 @@ data/numpy_data/*
 !data/numpy_data/.gitkeep
 data/train/*
 !data/train/.gitkeep
+data/test/*
+!data/test/.gitkeep
 data/base/*
 !data/base/.gitkeep
 data/pcpartpicker_misc/*
