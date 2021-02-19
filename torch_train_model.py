@@ -30,7 +30,7 @@ if not os.path.exists('models/{}'.format(FOLDER)):
     os.mkdir('models/{}'.format(FOLDER))
 
 # Create the data if it doesn't exist
-if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/train/final_laptop_test_data.csv'):
+if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/test/final_laptop_test_data.csv'):
     create_data()
 
 # Get the data from the file
@@ -122,6 +122,10 @@ def validation(data, labels, name):
     running_loss = 0.0
     running_accuracy = 0.0
     current_batch = 0
+    running_tn = 0
+    running_fp = 0
+    running_fn = 0
+    running_tp = 0
     for i, position in enumerate(range(0, len(data), VAL_BATCH_SIZE)):
         current_batch += 1
         if (position + VAL_BATCH_SIZE > len(data)):
@@ -143,6 +147,10 @@ def validation(data, labels, name):
         # Get the confusion matrix and calculate precision, recall and F1 score
         confusion = confusion_matrix(batch_labels, y_pred.detach().numpy(), labels=[0, 1])
         tn, fp, fn, tp = confusion.ravel()
+        running_tn += tn
+        running_fp += fp
+        running_fn += fn
+        running_tp += tp
         precision = tp / (tp + fp)
         recall = tp / (tp + fn)
         f1_score = 2 * ((precision * recall) / (precision + recall))
@@ -160,6 +168,12 @@ def validation(data, labels, name):
             current_batch = 0
             running_loss = 0
             running_accuracy = 0
+    
+    # Get the statistics for the whole data
+    final_precision = running_tp / (running_tp + running_fp)
+    final_recall = running_tp / (running_tp + running_fn)
+    final_f1_score = 2 * ((final_precision * final_recall) / (final_precision + final_recall))
+    print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
 # 10 epochs
 for epoch in range(10):    
