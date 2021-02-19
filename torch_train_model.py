@@ -132,7 +132,7 @@ def validation(data, labels, name):
         loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
         
         # Get the predictions from the net
-        y_pred = torch.argmax(forward, dim=1)
+        y_pred = torch.argmax(forward, dim=1).cpu()
 
         # Calculate accuracy
         accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(BATCH_SIZE)
@@ -181,7 +181,7 @@ for epoch in range(10):
         loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
 
         # Calculate accuracy
-        accuracy = np.sum(torch.argmax(forward, dim=1).detach().numpy() == batch_labels) / float(forward.size()[0])
+        accuracy = np.sum(torch.argmax(forward, dim=1).cpu().detach().numpy() == batch_labels) / float(forward.size()[0])
 
         # Add to both the running accuracy and running loss (every 10 batches)
         running_accuracy += accuracy
