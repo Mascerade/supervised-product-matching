@@ -64,15 +64,22 @@ print('Val labels shape:', str(val_labels.shape))
 test_labels = total_data[Common.M - (split_size//2):][:, 2].astype('float32')
 print('Test labels shape:', str(test_labels.shape))
 
-# Get the test laptop data
-test_laptop_data = pd.read_csv('data/train/final_laptop_test_data.csv')
-test_laptop_data = remove_misc(test_laptop_data).to_numpy()
+def split_test_data(df):
+    '''
+    Split test data into the data and the labels
+    '''
 
-# Split the data into the titles and the labels
-test_laptop_labels = test_laptop_data[:, 2].astype('float32')
-test_laptop_data = test_laptop_data[:, 0:2]
-print('Laptop test shape:', str(test_laptop_data.shape))
-print('Laptop test labels shape:', str(test_laptop_labels.shape))
+    df = remove_misc(df).to_numpy()
+    df_labels = df[:, 2].astype('float32')
+    df_data = df[:, 0:2]
+    return df_data, df_labels
+
+test_laptop_data, test_laptop_labels = split_test_data(pd.read_csv('data/test/final_laptop_test_data.csv')) # General laptop test data
+test_gb_space_data, test_gb_space_labels = split_test_data(pd.read_csv('data/test/final_gb_space_laptop_test.csv')) # Same titles; Substituted storage attributes
+test_gb_no_space_data, test_gb_no_space_labels = split_test_data(pd.read_csv('data/test/final_gb_no_space_laptop_test.csv')) # Same titles; Substituted storage attributes
+test_retailer_gb_space_data, test_retailer_gb_space_labels = split_test_data(pd.read_csv('data/test/final_retailer_gb_space_test.csv')) # Different titles; Substituted storage attributes
+test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels = split_test_data(pd.read_csv('data/test/final_retailer_gb_no_space_test.csv')) # Different titles; Substituted storage attributes
+print('Loaded all test files')
 
 # Initialize the model
 net = None
@@ -102,7 +109,10 @@ opt = optim.Adam(net.parameters(), lr=1e-5)
 print("************* TRAINING *************")
 
 # The size of each mini-batch
-BATCH_SIZE = 16
+BATCH_SIZE = 32
+
+# How long we should accumulate for running loss and accuracy
+PERIOD = 50
 
 def validation(data, labels, name):
     running_loss = 0.0
@@ -110,12 +120,12 @@ def validation(data, labels, name):
     current_batch = 0
     for i, position in enumerate(range(0, len(data), BATCH_SIZE)):
         current_batch += 1
-        if (position + BATCH_SIZE > len(test_laptop_data)):
+        if (position + BATCH_SIZE > len(data)):
             batch_data = data[position:]
-            batch_labels = data[position:]
+            batch_labels = labels[position:]
         else:
             batch_data = data[position:position + BATCH_SIZE]
-            batch_labels = data[position:position + BATCH_SIZE]
+            batch_labels = labels[position:position + BATCH_SIZE]
 
         # Forward propagation
         loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
@@ -125,8 +135,8 @@ def validation(data, labels, name):
         running_accuracy += accuracy
         
         # Print statistics every batch
-        print('%s Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
-                (name, epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+        print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
+                (name, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
 
         # Clear our running variables every 10 batches
         if (current_batch == PERIOD):
@@ -135,10 +145,7 @@ def validation(data, labels, name):
             running_accuracy = 0
 
 # 10 epochs
-for epoch in range(10):
-    # How long we should accumulate for running loss and accuracy
-    PERIOD = 50
-    
+for epoch in range(10):    
     # Iterate through each training batch
     net.train()
     current_batch = 0
@@ -184,5 +191,10 @@ for epoch in range(10):
 
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
+    net.eval()
     validation(val_data, val_labels, 'Validation')
     validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')
+    validation(test_gb_space_data, test_gb_space_labels, 'Test Laptop (Same Title) (Space)')
+    validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space')
+    validation(test_retailer_gb_space_data, test_retailer_gb_space_labels, 'Test Laptop (Different Title) (Space)')
+    validation(test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, 'Test Laptop (Different Title) (No Space)')
