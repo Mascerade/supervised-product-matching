@@ -50,6 +50,32 @@ def remove_misc(df):
     df = df.dropna(how='all')
     return df
 
+def replace_space(string, matches, unit, space=True):
+    '''
+    Randomly replace the the unit without a space or with a space
+    '''
+    
+    for match in matches:
+        match = match.strip()
+        num = match.split(unit)[0].strip()
+        if space:
+            string = string.replace(match, '{} {}'.format(num, unit))
+        else:
+            string = string.replace(match, '{}{}'.format(num, unit))
+    return string
+
+def replace_space_df(df, units, space=True):
+    # For each unit, do the replacement on it
+    for unit in units:
+        matcher = unit_matcher(unit)
+        for idx in range(len(df)):
+            title_one = df.at[idx, 'title_one']
+            title_two = df.at[idx, 'title_two']
+            title_one_matches = matcher.findall(title_one)
+            title_two_matches = matcher.findall(title_two)
+            df.at[idx, 'title_one'] = replace_space(title_one, title_one_matches, unit, space)
+            df.at[idx, 'title_two'] = replace_space(title_two, title_two_matches, unit, space)
+
 def unit_matcher(unit):
     return re.compile(' [0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
 

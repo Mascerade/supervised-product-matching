@@ -6,25 +6,11 @@ import random
 from tqdm import tqdm
 import sys
 from src.data_creation.retailer_test_creation import create_pos_laptop_test_data
-from src.preprocessing import remove_stop_words, unit_matcher
+from src.preprocessing import remove_stop_words, unit_matcher, replace_space
 from src.common import create_final_data
 
 ram = [2, 4, 8, 12, 16, 32, 64]
 drive = [64, 128, 256, 512]
-
-def replace_space(string, matches, unit, space=True):
-    '''
-    Randomly replace the the unit without a space or with a space
-    '''
-    
-    for match in matches:
-        match = match.strip()
-        num = match.split(unit)[0].strip()
-        if space:
-            string = string.replace(match, '{} {}'.format(num, unit))
-        else:
-            string = string.replace(match, '{}{}'.format(num, unit))
-    return string
 
 def replace_units(string, matches, unit, space=True):
     '''
