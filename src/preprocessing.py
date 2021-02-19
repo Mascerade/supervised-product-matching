@@ -77,7 +77,7 @@ def replace_space_df(df, units, space=True):
             df.at[idx, 'title_two'] = replace_space(title_two, title_two_matches, unit, space)
 
 def unit_matcher(unit):
-    return re.compile(' [0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
+    return re.compile(' ?[0-9]+.{0,1}' + unit + '(?!\S)', re.IGNORECASE)
 
 def randomize_units(df, units):
     """
@@ -88,12 +88,11 @@ def randomize_units(df, units):
     def random_replace(string, matches, unit):
         for match in matches:
             match = match.strip()
-            if random.random() > 0.5:
-                if ' ' in match:
-                    string = string.replace(match, match.replace(' ', ''))
-                else:
-                    num = match.split(unit)[0]
-                    string = string.replace(match, '{} {}'.format(num, unit))
+            num = match.split(unit)[0].strip()
+            if random.random() > 0.7:
+                string = string.replace(match, '{}{}'.format(num, unit))
+            else:
+                string = string.replace(match, '{} {}'.format(num, unit))
         
         return string
     

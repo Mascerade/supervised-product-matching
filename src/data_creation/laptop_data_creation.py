@@ -3,7 +3,7 @@ import os
 import numpy as np
 import random
 from tqdm import tqdm
-from src.preprocessing import remove_stop_words, randomize_units
+from src.preprocessing import remove_stop_words, randomize_units, replace_space_df
 from src.common import create_final_data, Common
 
 class LaptopAttributes():

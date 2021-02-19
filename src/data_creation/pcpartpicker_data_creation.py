@@ -4,7 +4,7 @@ import random
 from itertools import combinations
 from tqdm import tqdm
 from src.common import create_final_data
-from src.preprocessing import remove_misc, remove_stop_words, randomize_units
+from src.preprocessing import remove_misc, remove_stop_words, randomize_units, replace_space_df
 
 def generate_pos_pcpartpicker_data(df):
     '''
