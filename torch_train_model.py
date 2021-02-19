@@ -112,6 +112,9 @@ print("************* TRAINING *************")
 # The size of each mini-batch
 BATCH_SIZE = 32
 
+# The size of the validation mini-batch
+VAL_BATCH_SIZE = 16
+
 # How long we should accumulate for running loss and accuracy
 PERIOD = 50
 
@@ -119,14 +122,14 @@ def validation(data, labels, name):
     running_loss = 0.0
     running_accuracy = 0.0
     current_batch = 0
-    for i, position in enumerate(range(0, len(data), BATCH_SIZE)):
+    for i, position in enumerate(range(0, len(data), VAL_BATCH_SIZE)):
         current_batch += 1
-        if (position + BATCH_SIZE > len(data)):
+        if (position + VAL_BATCH_SIZE > len(data)):
             batch_data = data[position:]
             batch_labels = labels[position:]
         else:
-            batch_data = data[position:position + BATCH_SIZE]
-            batch_labels = labels[position:position + BATCH_SIZE]
+            batch_data = data[position:position + VAL_BATCH_SIZE]
+            batch_labels = labels[position:position + VAL_BATCH_SIZE]
 
         # Forward propagation
         loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
@@ -135,7 +138,7 @@ def validation(data, labels, name):
         y_pred = torch.argmax(forward, dim=1).cpu()
 
         # Calculate accuracy
-        accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(BATCH_SIZE)
+        accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(VAL_BATCH_SIZE)
 
         # Get the confusion matrix and calculate precision, recall and F1 score
         confusion = confusion_matrix(batch_labels, y_pred.detach().numpy(), labels=[0, 1])
