@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from transformers import AutoTokenizer, AutoModel, AdamW
+from sklearn.metrics import confusion_matrix
 import time
 
 """ LOCAL IMPORTS """
@@ -128,15 +129,28 @@ def validation(data, labels, name):
             batch_labels = labels[position:position + BATCH_SIZE]
 
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
+        loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
+        
+        # Get the predictions from the net
+        y_pred = torch.argmax(forward, dim=1)
+
+        # Calculate accuracy
+        accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(BATCH_SIZE)
+
+        # Get the confusion matrix and calculate precision, recall and F1 score
+        confusion = confusion_matrix(batch_labels, y_pred.detach().numpy(), labels=[0, 1])
+        tn, fp, fn, tp = confusion.ravel()
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        f1_score = 2 * ((precision * recall) / (precision + recall))
 
         # Add to running loss and accuracy (every 10 batches)
         running_loss += loss.item()
         running_accuracy += accuracy
         
         # Print statistics every batch
-        print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f' %
-                (name, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+        print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f, Precision: %.3f, Recall: %.3f, F1 Score: %.3f' %
+                (name, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch, precision, recall, f1_score))
 
         # Clear our running variables every 10 batches
         if (current_batch == PERIOD):
@@ -164,7 +178,10 @@ for epoch in range(10):
         opt.zero_grad()
         
         # Forward propagation
-        loss, accuracy = forward_prop(batch_data, batch_labels, net, criterion)
+        loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
+
+        # Calculate accuracy
+        accuracy = np.sum(torch.argmax(forward, dim=1).detach().numpy() == batch_labels) / float(forward.size()[0])
 
         # Add to both the running accuracy and running loss (every 10 batches)
         running_accuracy += accuracy
@@ -191,6 +208,7 @@ for epoch in range(10):
 
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
+    # Test the model
     net.eval()
     validation(val_data, val_labels, 'Validation')
     validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')

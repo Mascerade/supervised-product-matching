@@ -123,7 +123,4 @@ def forward_prop(batch_data, batch_labels, net, criterion):
 
     loss += l2_lambda_scale * l2_reg_scale + l2_lambda_linear * l2_reg_linear + l2_lambda_bert * l2_reg_bert
 
-    # Calculate accuracy
-    accuracy = torch.sum(torch.argmax(forward, dim=1) == batch_labels) / float(forward.size()[0])
-
-    return loss, accuracy
+    return loss, forward
