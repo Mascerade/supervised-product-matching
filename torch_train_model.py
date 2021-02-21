@@ -176,7 +176,7 @@ def validation(data, labels, name):
     print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
 # 10 epochs
-for epoch in range(10):    
+for epoch in range(5):    
     # Iterate through each training batch
     net.train()
     current_batch = 0
