@@ -61,20 +61,24 @@ class SiameseNetwork(nn.Module):
         bert_output1 = self.bert(input1)[0]
         bert_output2 = self.bert(input2)[0]
 
-        # Add the embeddings
-        bert_output = bert_output1 + bert_output2
+        # Dropout
+        bert_output1 = self.dropout_1(bert_output1)
+        bert_output2 = self.dropout_1(bert_output1)
+
+        # Use the first Transformer on each output
+        scaled1 = self.scale1(bert_output1)
+        scaled2 = self.scale1(bert_output2)
 
         # Dropout
-        bert_output = self.dropout_1(bert_output)
-        
-        # Forward propagate through first scaled Transformer
-        scaled = self.scale1(bert_output)
-        
-        # Dropout
-        scaled = self.dropout_1(scaled)
+        scaled1 = self.dropout_1(scaled1)
+        scaled2 = self.dropout_1(scaled2)
 
-        # Forward propagate through second scaled Transformer
-        scaled = self.scale2(scaled)
+        # Use the second Transformer on each output
+        scaled1 = self.scale2(scaled1)
+        scaled2 = self.scale2(scaled2)
+
+        # Dropout
+        scaled = scaled1 + scaled2
         
         # Average token embeddings
         scaled = scaled[:, 1:].sum(dim=1) / sequence_length
