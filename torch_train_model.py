@@ -105,7 +105,7 @@ criterion = nn.CrossEntropyLoss()
 
 # Using Adam optimizer
 #opt = AdamW(net.parameters(), lr=5e-5, weight_decay=0.001)
-opt = optim.Adam(net.parameters(), lr=9e-6)
+opt = optim.Adam(net.parameters(), lr=1e-5)
 
 print("************* TRAINING *************")
 
