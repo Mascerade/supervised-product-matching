@@ -142,7 +142,7 @@ def validation(data, labels, name):
         y_pred = torch.argmax(forward, dim=1).cpu()
 
         # Calculate accuracy
-        accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(VAL_BATCH_SIZE)
+        accuracy = np.sum(y_pred.detach().numpy() == batch_labels) / float(batch_labels.shape[0])
 
         # Get the confusion matrix and calculate precision, recall and F1 score
         confusion = confusion_matrix(batch_labels, y_pred.detach().numpy(), labels=[0, 1])
@@ -175,8 +175,8 @@ def validation(data, labels, name):
     final_f1_score = 2 * ((final_precision * final_recall) / (final_precision + final_recall))
     print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
-# 10 epochs
-for epoch in range(5):    
+# 7 epochs
+for epoch in range(7):    
     # Iterate through each training batch
     net.train()
     current_batch = 0
