@@ -130,11 +130,30 @@ def concatenate_row(row):
     if (random.random() > 0.5 and not product_removed):
         row['company'] = ''
     
+    body_modifier = ''
+    if (random.random() < 0.6):
+        body_modifier = random.choice(Common.BODY_ADD_INS)
+
+    begin_modifier = ''
+    if (random.random() < 0.6):
+        begin_modifier = random.choice(Common.MODIFIERS)
+
+    screen_modifier = ''
+    if (random.random() < 0.6):
+        screen_modifier = random.choice(Common.SCREEN_MODIFIERS)
+    
+    end_modifiers = []
+    if (random.random() < 0.6):
+        end_modifiers = random.sample(Common.END_ADD_INS, random.randint(3, 6))
+
     
     # Create a list for all the product attributes
-    order_attrs = [row['company'],
+    order_attrs = [begin_modifier,
+                   row['company'],
                    row['product'],
+                   body_modifier,
                    inch_attr,
+                   screen_modifier
                   ]
 
     # Have a chance of adding "laptop" to the title
@@ -152,7 +171,7 @@ def concatenate_row(row):
     
     # Shuffle only the attributte
     random.shuffle(spec_attrs)
-    order_attrs = order_attrs + spec_attrs
+    order_attrs = order_attrs + spec_attrs + end_modifiers
     
     return ' '.join(order_attrs)
 
@@ -185,16 +204,9 @@ def create_pos_neg_data(df, neg_attrs):
         
         neg = pos.copy()
         neg[neg_attr] = new_attr
-        
-        pos_pair_1 = remove_stop_words(concatenate_row(pos.copy()))
-        pos_pair_2 = remove_stop_words(concatenate_row(pos.copy()))
-        neg_pair_1 = remove_stop_words(concatenate_row(neg.copy()))
-        #neg_pair_2 = remove_stop_words(concatenate_row(neg.copy()))
-        
-        temp.append([pos_pair_1, pos_pair_2, 1])
-        #temp.append([neg_pair_1, neg_pair_2, 1])
-        temp.append([pos_pair_1, neg_pair_1, 0])
-        #temp.append([pos_pair_2, neg_pair_2, 0])
+
+        temp.append([remove_stop_words(concatenate_row(pos.copy())), remove_stop_words(concatenate_row(pos.copy())), 1])
+        temp.append([remove_stop_words(concatenate_row(pos.copy())), remove_stop_words(concatenate_row(neg.copy())), 0])
     
     return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 

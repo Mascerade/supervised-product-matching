@@ -22,9 +22,11 @@ class Common():
 
     # These are words that commonly come up with laptops
     MODIFIERS = ['premium', 'new', 'fast', 'latest model']
-    ADD_INS = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'USB-A&C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
+    BODY_ADD_INS = ['thin and light', 'lightweight', 'ultra slim', 'slim', 'light']
+    SCREEN_MODIFIERS = ['infinityedge', 'nanoedge', 'slim bezel']
+    END_ADD_INS = ['USB 3.0', 'USB 3.1 Type-C', 'USB Type-C', 'USB-A&C', 'Bluetooth', 'WIFI', 'Webcam', 'FP Reader',
                 'HDMI', '802.11ac', 'home', 'flagship', 'business', 'GbE LAN', 'DVD-RW',
-                'DVD', 'Windows 10', 'Office 365', 'lightweight']
+                'DVD', 'Windows 10', 'Office 365']
 
     # For creating laptop data
     HARD_DRIVE_TYPES = ['HDD', 'Hard Drive', 'Internal Hard Drive']
