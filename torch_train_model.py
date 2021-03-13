@@ -105,7 +105,7 @@ criterion = nn.CrossEntropyLoss()
 
 # Using Adam optimizer
 #opt = AdamW(net.parameters(), lr=5e-5, weight_decay=0.001)
-opt = optim.Adam(net.parameters(), lr=1e-5)
+opt = optim.Adam(net.parameters(), lr=2e-5)
 
 print("************* TRAINING *************")
 
@@ -175,8 +175,8 @@ def validation(data, labels, name):
     final_f1_score = 2 * ((final_precision * final_recall) / (final_precision + final_recall))
     print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
-# 7 epochs
-for epoch in range(7):    
+# 10 epochs
+for epoch in range(10):    
     # Iterate through each training batch
     net.train()
     current_batch = 0
