@@ -34,6 +34,8 @@ class Common():
 
     # The column names for all the DataFrames
     COLUMN_NAMES = ['title_one', 'title_two', 'label']
+
+    NO_SPACE_RATIO = 0.62
     
 def get_max_len(df):
     '''

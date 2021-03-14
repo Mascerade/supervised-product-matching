@@ -89,7 +89,7 @@ def randomize_units(df, units):
         for match in matches:
             match = match.strip()
             num = match.split(unit)[0].strip()
-            if random.random() < 0.7:
+            if random.random() < Common.NO_SPACE_RATIO:
                 string = string.replace(match, '{}{}'.format(num, unit))
             else:
                 string = string.replace(match, '{} {}'.format(num, unit))
