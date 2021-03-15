@@ -38,6 +38,7 @@ class SiameseNetwork(nn.Module):
         self.dropout_1 = nn.Dropout(p=0.1)
         self.dropout_2 = nn.Dropout(p=0.2)
         self.dropout_3 = nn.Dropout(p=0.3)
+        self.dropout_4 = nn.Dropout(p=0.4)
         self.dropout_5 = nn.Dropout(p=0.5)
         self.dropout_7 = nn.Dropout(p=0.7)
 
@@ -62,16 +63,16 @@ class SiameseNetwork(nn.Module):
         bert_output2 = self.bert(input2)[0]
 
         # Dropout
-        bert_output1 = self.dropout_1(bert_output1)
-        bert_output2 = self.dropout_1(bert_output1)
+        bert_output1 = self.dropout_3(bert_output1)
+        bert_output2 = self.dropout_3(bert_output1)
 
         # Use the first Transformer on each output
         scaled1 = self.scale1(bert_output1)
         scaled2 = self.scale1(bert_output2)
 
         # Dropout
-        scaled1 = self.dropout_1(scaled1)
-        scaled2 = self.dropout_1(scaled2)
+        scaled1 = self.dropout_4(scaled1)
+        scaled2 = self.dropout_4(scaled2)
 
         # Use the second Transformer on each output
         scaled1 = self.scale2(scaled1)
