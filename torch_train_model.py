@@ -104,13 +104,13 @@ elif using_model == "scaled characterbert add":
 criterion = nn.CrossEntropyLoss()
 
 # Using Adam optimizer
-opt = AdamW(net.parameters(), lr=1e-5, weight_decay=0.005)
-#opt = optim.Adam(net.parameters(), lr=1e-5)
+#opt = AdamW(net.parameters(), lr=1e-5, weight_decay=0.001)
+opt = optim.Adam(net.parameters(), lr=1e-5)
 
 print("************* TRAINING *************")
 
 # The size of each mini-batch
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 
 # The size of the validation mini-batch
 VAL_BATCH_SIZE = 16
