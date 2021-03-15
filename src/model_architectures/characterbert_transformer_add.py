@@ -63,16 +63,16 @@ class SiameseNetwork(nn.Module):
         bert_output2 = self.bert(input2)[0]
 
         # Dropout
-        bert_output1 = self.dropout_3(bert_output1)
-        bert_output2 = self.dropout_3(bert_output1)
+        bert_output1 = self.dropout_1(bert_output1)
+        bert_output2 = self.dropout_1(bert_output1)
 
         # Use the first Transformer on each output
         scaled1 = self.scale1(bert_output1)
         scaled2 = self.scale1(bert_output2)
 
         # Dropout
-        scaled1 = self.dropout_4(scaled1)
-        scaled2 = self.dropout_4(scaled2)
+        scaled1 = self.dropout_1(scaled1)
+        scaled2 = self.dropout_1(scaled2)
 
         # Use the second Transformer on each output
         scaled1 = self.scale2(scaled1)
@@ -121,7 +121,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
         l2_reg_linear += torch.norm(param)
 
     # Add L2 Regularization to bert
-    l2_lambda_bert = 5e-5
+    l2_lambda_bert = 3e-4
     l2_reg_bert = torch.tensor(0.).to(Common.device)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
