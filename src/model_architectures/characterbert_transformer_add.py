@@ -121,7 +121,7 @@ def forward_prop(batch_data, batch_labels, net, criterion):
         l2_reg_linear += torch.norm(param)
 
     # Add L2 Regularization to bert
-    l2_lambda_bert = 3e-4
+    l2_lambda_bert = 5e-5
     l2_reg_bert = torch.tensor(0.).to(Common.device)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
