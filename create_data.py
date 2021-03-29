@@ -52,7 +52,7 @@ def create_data():
     pd.set_option('mode.chained_assignment', None)
 
     # Run the functions
-    create_computer_data()
+    #create_computer_data()
     create_pcpartpicker_data()
     create_general_cpu_data()
     create_final_drive_data()
@@ -66,8 +66,8 @@ def create_data():
     print('Generating gigabyte data (as in just examples that use GB)')
 
     # Load all the data
-    final_computer_df = pd.read_csv('data/train/computers_train_bal_shuffle.csv')
-    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')[:30000]
+    final_computer_df = pd.read_csv('data/train/wdc_computers.csv')
+    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
