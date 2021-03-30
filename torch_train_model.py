@@ -128,6 +128,8 @@ def validation(data, labels, name):
     running_fn = 0
     running_tp = 0
     for i, position in enumerate(range(0, len(data), VAL_BATCH_SIZE)):
+        gc.collect()
+        torch.cuda.empty_cache()
         current_batch += 1
         if (position + VAL_BATCH_SIZE > len(data)):
             batch_data = data[position:]
@@ -161,7 +163,7 @@ def validation(data, labels, name):
         running_accuracy += accuracy
         
         # Print statistics every batch
-        print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved())
+        print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
         print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f, Precision: %.3f, Recall: %.3f, F1 Score: %.3f' %
                 (name, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch, precision, recall, f1_score))
 
@@ -185,6 +187,8 @@ for epoch in range(10):
     running_loss = 0.0
     running_accuracy = 0.0
     for i, position in enumerate(range(0, len(train_data), BATCH_SIZE)):
+        gc.collect()
+        torch.cuda.empty_cache()
         current_batch += 1
         if (position + BATCH_SIZE > len(train_data)):
             batch_data = train_data[position:]
