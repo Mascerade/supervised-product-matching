@@ -111,7 +111,7 @@ opt = optim.Adam(net.parameters(), lr=1e-5)
 print("************* TRAINING *************")
 
 # The size of each mini-batch
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 
 # The size of the validation mini-batch
 VAL_BATCH_SIZE = 4
@@ -176,10 +176,10 @@ def validation(data, labels, name):
                     running_accuracy = 0
                 
                 break
-
+            
             except RuntimeError as e:
                 if "out of memory" in str(e):
-                    print("WARNING: Ran out of memory. Retrying Batch.")
+                    print("WARNING: Ran out of memory. Skipping Batch.")
                     gc.collect()
                     torch.cuda.empty_cache()
     
@@ -197,18 +197,18 @@ for epoch in range(10):
     running_loss = 0.0
     running_accuracy = 0.0
     for i, position in enumerate(range(0, len(train_data), BATCH_SIZE)):
+        gc.collect()
+        torch.cuda.empty_cache()
+        current_batch += 1
+        if (position + BATCH_SIZE > len(train_data)):
+            batch_data = train_data[position:]
+            batch_labels = train_labels[position:]
+        else:
+            batch_data = train_data[position:position + BATCH_SIZE]
+            batch_labels = train_labels[position:position + BATCH_SIZE]
+        
         while True:
             try:
-                gc.collect()
-                torch.cuda.empty_cache()
-                current_batch += 1
-                if (position + BATCH_SIZE > len(train_data)):
-                    batch_data = train_data[position:]
-                    batch_labels = train_labels[position:]
-                else:
-                    batch_data = train_data[position:position + BATCH_SIZE]
-                    batch_labels = train_labels[position:position + BATCH_SIZE]
-        
                 # Zero the parameter gradients
                 opt.zero_grad()
                 
@@ -243,13 +243,10 @@ for epoch in range(10):
                     running_accuracy = 0
 
                 break
-
+                        
             except RuntimeError as e:
                 if "out of memory" in str(e):
-                    print("WARNING: Ran out of memory. Retrying Batch.")
-                    for p in net.parameters():
-                        if p.grad is not None:
-                            del p.grad
+                    print("WARNING: Ran out of memory. Skipping Batch.")
                     gc.collect()
                     torch.cuda.empty_cache()
 
