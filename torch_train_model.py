@@ -3,6 +3,7 @@ import numpy as np
 import nltk
 import os
 import sys
+import gc
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -45,7 +46,7 @@ total_data = total_data.to_numpy()
 Common.M = total_data.shape[0]
 
 # The split between training and test/validation 
-split_size = 8000
+split_size = 16000
 
 train_data = total_data[:Common.M - split_size][:, 0:2]
 print('Training shape: ' + str(train_data.shape))
@@ -110,10 +111,10 @@ opt = optim.Adam(net.parameters(), lr=1e-5)
 print("************* TRAINING *************")
 
 # The size of each mini-batch
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 
 # The size of the validation mini-batch
-VAL_BATCH_SIZE = 16
+VAL_BATCH_SIZE = 4
 
 # How long we should accumulate for running loss and accuracy
 PERIOD = 50
@@ -160,6 +161,7 @@ def validation(data, labels, name):
         running_accuracy += accuracy
         
         # Print statistics every batch
+        print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved())
         print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f, Precision: %.3f, Recall: %.3f, F1 Score: %.3f' %
                 (name, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch, precision, recall, f1_score))
 
@@ -212,8 +214,9 @@ for epoch in range(10):
 
         # Apply the gradients
         opt.step()
-        
+
         # Print statistics every batch
+        print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
         print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
                 (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
         

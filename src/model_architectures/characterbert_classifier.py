@@ -80,17 +80,17 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
 
     # Calculate loss
-    loss = criterion(forward, batch_labels)
+    loss = criterion(forward, batch_labels).to(Common.device)
 
     # Add L2 Regularization to the final linear layer
     l2_lambda_fc = 1e-1
-    l2_reg_fc = torch.tensor(0.)
+    l2_reg_fc = torch.tensor(0.).to(Common.device)
     for param in net.fc1.parameters():
         l2_reg_fc += torch.norm(param)
 
     # Add L2 Regularization to bert
     l2_lambda_bert = 7e-5
-    l2_reg_bert = torch.tensor(0.)
+    l2_reg_bert = torch.tensor(0.).to(Common.device)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
 
