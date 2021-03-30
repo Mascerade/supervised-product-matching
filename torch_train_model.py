@@ -242,10 +242,14 @@ for epoch in range(10):
                     running_loss = 0
                     running_accuracy = 0
 
-                break            
+                break
+
             except RuntimeError as e:
                 if "out of memory" in str(e):
                     print("WARNING: Ran out of memory. Retrying Batch.")
+                    for p in net.parameters():
+                        if p.grad is not None:
+                            del p.grad
                     gc.collect()
                     torch.cuda.empty_cache()
 
