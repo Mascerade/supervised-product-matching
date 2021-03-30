@@ -196,39 +196,46 @@ for epoch in range(10):
         else:
             batch_data = train_data[position:position + BATCH_SIZE]
             batch_labels = train_labels[position:position + BATCH_SIZE]
+        
+        try:
+            # Zero the parameter gradients
+            opt.zero_grad()
             
-        # Zero the parameter gradients
-        opt.zero_grad()
+            # Forward propagation
+            loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
+
+            # Calculate accuracy
+            accuracy = np.sum(torch.argmax(forward, dim=1).cpu().detach().numpy() == batch_labels) / float(forward.size()[0])
+
+            # Add to both the running accuracy and running loss (every 10 batches)
+            running_accuracy += accuracy
+            running_loss += loss.item()
+
+            # Backprop
+            loss.backward()
+
+            # Clip the gradient to minimize chance of exploding gradients
+            torch.nn.utils.clip_grad_norm_(net.parameters(), 0.01)
+
+            # Apply the gradients
+            opt.step()
+
+            # Print statistics every batch
+            #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
+            print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
+                    (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
+            
+            # Clear our running variables every 10 batches
+            if (current_batch == PERIOD):
+                current_batch = 0
+                running_loss = 0
+                running_accuracy = 0
         
-        # Forward propagation
-        loss, forward = forward_prop(batch_data, batch_labels, net, criterion)
-
-        # Calculate accuracy
-        accuracy = np.sum(torch.argmax(forward, dim=1).cpu().detach().numpy() == batch_labels) / float(forward.size()[0])
-
-        # Add to both the running accuracy and running loss (every 10 batches)
-        running_accuracy += accuracy
-        running_loss += loss.item()
-
-        # Backprop
-        loss.backward()
-
-        # Clip the gradient to minimize chance of exploding gradients
-        torch.nn.utils.clip_grad_norm_(net.parameters(), 0.01)
-
-        # Apply the gradients
-        opt.step()
-
-        # Print statistics every batch
-        print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
-        print('Training Epoch: %d, Batch %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy %.6f' %
-                (epoch + 1, i + 1, loss, accuracy, running_loss / current_batch, running_accuracy / current_batch))
-        
-        # Clear our running variables every 10 batches
-        if (current_batch == PERIOD):
-            current_batch = 0
-            running_loss = 0
-            running_accuracy = 0
+        except RuntimeError as e:
+            if "out of memory" in str(e):
+                print("WARNING: Ran out of memory. Retrying batch")
+                gc.collect()
+                torch.cuda.empty_cache()
 
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
