@@ -16,7 +16,7 @@ from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert
 from src.common import Common, get_max_len
 from create_data import create_data
 
-using_model = "scaled characterbert add"
+using_model = "characterbert"
 
 # Get the folder name in models
 FOLDER = sys.argv[1]
