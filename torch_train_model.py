@@ -128,8 +128,6 @@ def validation(data, labels, name):
     running_fn = 0
     running_tp = 0
     for i, position in enumerate(range(0, len(data), VAL_BATCH_SIZE)):
-        gc.collect()
-        torch.cuda.empty_cache()
         current_batch += 1
         if (position + VAL_BATCH_SIZE > len(data)):
             batch_data = data[position:]
@@ -195,8 +193,6 @@ for epoch in range(10):
     running_loss = 0.0
     running_accuracy = 0.0
     for i, position in enumerate(range(0, len(train_data), BATCH_SIZE)):
-        gc.collect()
-        torch.cuda.empty_cache()
         current_batch += 1
         if (position + BATCH_SIZE > len(train_data)):
             batch_data = train_data[position:]
