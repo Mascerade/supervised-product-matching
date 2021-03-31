@@ -244,4 +244,5 @@ def get_pos_data():
     df.to_csv('/home/jason/Documents/Supervised-Product-Similarity/data/train/{}.csv'.format(csv_name))
     link_file.close()
 
-video_card_collector()
+if __name__ == "__main__":
+    video_card_collector()
