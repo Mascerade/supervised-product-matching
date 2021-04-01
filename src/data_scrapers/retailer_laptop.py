@@ -191,5 +191,30 @@ def intel_processor_collector(link):
     
     df.to_csv('../../data/base/intel_cpus.csv', index=False)
 
+def amd_processor_collector():
+    column_names = ['title']
+    if not os.path.exists('../../data/base/amd_cpus.csv'):
+        df = pd.DataFrame(columns = column_names)
+    
+    else:
+        df = pd.read_csv('../../data/base/amd_cpus.csv')
+    
+    driver = webdriver.Chrome()
+    driver.get('https://en.wikipedia.org/wiki/List_of_AMD_Athlon_microprocessors')
+    soup = BeautifulSoup(driver.page_source, 'lxml')
+    time.sleep(random.randint(5, 10))
+    driver.quit()
+
+    for product in soup.find_all('th', attrs={'style': 'text-align:left;'}):
+        try:
+            cpu = product.text.split('[')[0]
+            print("Title: {}".format(cpu))
+            df = df.append(pd.DataFrame([[cpu]], columns=column_names))
+        
+        except AttributeError as e:
+            print(str(e))
+    
+    df.to_csv('../../data/base/amd_cpus.csv', index=False)
+
 if __name__ == "__main__":
-    newegg_laptop_collector()
+    amd_processor_collector()
