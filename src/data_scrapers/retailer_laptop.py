@@ -102,7 +102,7 @@ def amazon_laptop_title_collector():
             except AttributeError as e:
                 print(str(e))
         
-    df.to_csv(file_path)
+    df.to_csv(file_path, index=False)
 
 def walmart_laptop_collector():
     """
@@ -133,7 +133,34 @@ def walmart_laptop_collector():
             except AttributeError as e:
                 print(str(e))
         
-        df.to_csv('../../data/base/walmart_laptop_titles.csv')
+        df.to_csv('../../data/base/walmart_laptop_titles.csv', index=False)
+        time.sleep(random.randint(5, 10))
+
+def newegg_laptop_collector():
+    column_names = ['title']
+    if not os.path.exists('../../data/base/newegg_laptop_titles.csv'):
+        df = pd.DataFrame(columns = column_names)
+    
+    else:
+        df = pd.read_csv('../../data/base/newegg_laptop_titles.csv')
+    
+    for page in range(100):
+        driver = webdriver.Chrome()
+        driver.get('https://www.newegg.com/p/pl?d=laptops&page={}'.format(page + 1))
+        soup = BeautifulSoup(driver.page_source, 'lxml')
+        time.sleep(random.randint(8, 12))
+        driver.quit()
+
+        for product in soup.find_all('div', attrs={'class': 'item-cell'}):
+            try:
+                title = product.find('a', {'class': 'item-title'}).text
+                print("Title: {}".format(title))
+                df = df.append(pd.DataFrame([[title]], columns=column_names))
+            
+            except AttributeError as e:
+                print(str(e))
+        
+        df.to_csv('../../data/base/newegg_laptop_titles.csv', index=False)
         time.sleep(random.randint(5, 10))
 
 def intel_processor_collector(link):
@@ -165,5 +192,4 @@ def intel_processor_collector(link):
     df.to_csv('../../data/base/intel_cpus.csv', index=False)
 
 if __name__ == "__main__":
-    for link in celeron_links:
-        intel_processor_collector(link)
+    newegg_laptop_collector()
