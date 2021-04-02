@@ -72,7 +72,21 @@ def gen_spec_combos():
     df = pd.DataFrame(data=combos, columns=['cpu', 'hard_drive', 'ram'])
     df.to_csv('data/train/spec_data_no_brand.csv')
 
-    
+def cpu_token_alter(cpu_attr: str) -> str:
+    cpu_attr = cpu_attr.split(' ')
+    if random.choice([0, 1]):
+        if 'Intel' in cpu_attr:
+            cpu_attr.remove('Intel')
+    if random.choice([0, 1]):
+        if 'Core' in cpu_attr:
+            cpu_attr.remove('Core')
+    if random.choice([0, 1]):
+        if 'AMD' in cpu_attr:
+            cpu_attr.remove('AMD')
+
+    cpu_attr = ' '.join(cpu_attr)
+    return cpu_attr
+
 def concatenate_row(row):
     '''
     Creates a string out of the row of product attributes (so row is a Pandas DataFrame)
@@ -96,18 +110,7 @@ def concatenate_row(row):
     ghz = LaptopAttributes.cpu[cpu_attr][1]
     
     if random.random() > 0.5:
-        cpu_attr = cpu_attr.split(' ')
-        if random.choice([0, 1]):
-            if 'Intel' in cpu_attr:
-                cpu_attr.remove('Intel')
-        if random.choice([0, 1]):
-            if 'Core' in cpu_attr:
-                cpu_attr.remove('Core')
-        if random.choice([0, 1]):
-            if 'AMD' in cpu_attr:
-                cpu_attr.remove('AMD')
-    
-        cpu_attr = ' '.join(cpu_attr)
+        cpu_attr = cpu_token_alter(cpu_attr)
     
     # Random chance of putting the cores in the CPU attribute
     if cores != None:
