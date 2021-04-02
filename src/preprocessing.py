@@ -24,7 +24,7 @@ bert_tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 # * Creating the embedding representations that will actually get fed into the neural network
 # Organizing and normalizing the data
 
-def remove_stop_words(phrase):
+def remove_stop_words(phrase, omit_punctuation=[]):
     '''
     Removes the stop words from a string
     '''
@@ -32,6 +32,9 @@ def remove_stop_words(phrase):
     # Creates the stopwords
     to_stop = stopwords.words('english')
     punctuation = "!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~ "
+    for x in omit_punctuation:
+        if x in punctuation:
+            punctuation = punctuation.replace(x, '')
     for c in punctuation:
         to_stop.append(c)
     to_stop.append('null')
