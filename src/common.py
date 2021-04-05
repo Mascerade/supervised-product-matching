@@ -44,11 +44,14 @@ def get_max_len(df):
 
     max_len = 0
     for row in df.itertuples():
-        if len(row.title_one.split(' ')) > max_len:
-            max_len = len(row.title_one.split(' '))
-            
-        if len(row.title_two.split(' ')) > max_len:
-            max_len = len(row.title_two.split(' '))
+        try:
+            if len(row.title_one.split(' ')) > max_len:
+                max_len = len(row.title_one.split(' '))
+                
+            if len(row.title_two.split(' ')) > max_len:
+                max_len = len(row.title_two.split(' '))
+        except Exception:
+            print(row.title_one)
     
     return max_len
 

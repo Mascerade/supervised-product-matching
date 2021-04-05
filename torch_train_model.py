@@ -34,37 +34,22 @@ if not os.path.exists('models/{}'.format(FOLDER)):
 if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/test/final_laptop_test_data.csv'):
     create_data()
 
-# Get the data from the file
-total_data = pd.read_csv('data/train/total_data.csv', index_col=False)
-del total_data['index']
+# The size of each mini-batch
+BATCH_SIZE = 32
 
-# Drop the Unnamed column
-total_data = remove_misc(total_data)
+# The size of the validation mini-batch
+VAL_BATCH_SIZE = 8
 
-# Convert the dataframe to numpy
-total_data = total_data.to_numpy()
-Common.M = total_data.shape[0]
+# Data size for training
+TRAIN_SIZE = 455000
 
-# The split between training and test/validation 
-split_size = 16000
-
-train_data = total_data[:Common.M - split_size][:, 0:2]
-print('Training shape: ' + str(train_data.shape))
-
-val_data = total_data[Common.M - split_size: Common.M - (split_size//2)][:, 0:2]
-print('Validation shape: ' + str(val_data.shape))
-
-test_data = total_data[Common.M - (split_size//2):][:, 0:2]
-print('Test shape: ' + str(test_data.shape))
-
-train_labels = total_data[:Common.M - split_size][:, 2].astype('float32')
-print('Training labels shape:', str(train_labels.shape))
-
-val_labels = total_data[Common.M - split_size: Common.M - (split_size//2)][:, 2].astype('float32')
-print('Val labels shape:', str(val_labels.shape))
-
-test_labels = total_data[Common.M - (split_size//2):][:, 2].astype('float32')
-print('Test labels shape:', str(test_labels.shape))
+# Load the data
+train_data = pd.read_csv('data/train/total_data.csv', nrows=TRAIN_SIZE, chunksize=BATCH_SIZE)
+val_data = pd.read_csv('data/train/total_data.csv', skiprows=TRAIN_SIZE, names=['title_one', 'title_two', 'label', 'index'])
+del val_data['index']
+val_data = val_data.to_numpy()
+val_labels = val_data[:, 2].astype('float32')
+val_data = val_data[:, 0:2]
 
 def split_test_data(df):
     '''
@@ -109,12 +94,6 @@ criterion = nn.CrossEntropyLoss()
 opt = optim.Adam(net.parameters(), lr=1e-5)
 
 print("************* TRAINING *************")
-
-# The size of each mini-batch
-BATCH_SIZE = 8
-
-# The size of the validation mini-batch
-VAL_BATCH_SIZE = 4
 
 # How long we should accumulate for running loss and accuracy
 PERIOD = 50
@@ -186,20 +165,19 @@ def validation(data, labels, name):
     print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
 # 10 epochs
-for epoch in range(10):    
+for epoch in range(10):
     # Iterate through each training batch
     net.train()
     current_batch = 0
     running_loss = 0.0
     running_accuracy = 0.0
-    for i, position in enumerate(range(0, len(train_data), BATCH_SIZE)):
+    for i, position in enumerate(range(0, TRAIN_SIZE, BATCH_SIZE)):
         current_batch += 1
-        if (position + BATCH_SIZE > len(train_data)):
-            batch_data = train_data[position:]
-            batch_labels = train_labels[position:]
-        else:
-            batch_data = train_data[position:position + BATCH_SIZE]
-            batch_labels = train_labels[position:position + BATCH_SIZE]
+        batch_data = next(train_data)
+        del batch_data['index']
+        batch_data = batch_data.to_numpy()
+        batch_labels = batch_data[:, 2].astype('float32')
+        batch_data = batch_data[:, 0:2]
         
         try:
             # Zero the parameter gradients
@@ -242,6 +220,7 @@ for epoch in range(10):
                 gc.collect()
                 torch.cuda.empty_cache()
 
+    train_data = pd.read_csv('data/train/total_data.csv', nrows=TRAIN_SIZE, chunksize=BATCH_SIZE)
     torch.save(net.state_dict(), 'models/{}/{}.pt'.format(FOLDER, MODEL_NAME + '_epoch' + str(epoch + 1)))
 
     # Test the model

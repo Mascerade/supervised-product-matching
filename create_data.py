@@ -71,7 +71,8 @@ def create_data():
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
-    all_data = [final_computer_df, final_laptop_df, more_cpu_data, final_gb_data, more_drive_data]
+    retailer_laptop_df = pd.read_csv('data/train/retailer_laptop_data.csv')
+    all_data = [final_computer_df, final_laptop_df, more_cpu_data, final_gb_data, more_drive_data, retailer_laptop_df]
 
     # Print the sizes of the data
     print('Computer df size: {}'.format(len(final_computer_df)))
@@ -80,6 +81,7 @@ def create_data():
     print('More Drive Data df size: {}'.format(len(more_drive_data)))
     print('More CPU Data df size: {}'.format(len(more_cpu_data)))
     print('Final GB Data: {}'.format(len(final_gb_data)))
+    print('Retailer Laptop Data: {}'.format(len(retailer_laptop_df)))
 
     # Concatenate everything
     total_data = pd.concat(all_data)
@@ -92,7 +94,7 @@ def create_data():
     print('Total data size: {}'.format(len(total_data)))
 
     # Save the data
-    total_data.to_csv('data/train/total_data.csv')
+    total_data.to_csv('data/train/total_data.csv', index=False)
 
 
 if __name__ == "__main__":
