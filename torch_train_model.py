@@ -35,10 +35,10 @@ if not os.path.exists('data/train/total_data.csv') or not os.path.exists('data/t
     create_data()
 
 # The size of each mini-batch
-BATCH_SIZE = 32
+BATCH_SIZE = 4
 
 # The size of the validation mini-batch
-VAL_BATCH_SIZE = 8
+VAL_BATCH_SIZE = 2
 
 # Data size for training
 TRAIN_SIZE = 455000
