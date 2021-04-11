@@ -1,4 +1,6 @@
 import pandas as pd
+import re
+from src.preprocessing import remove_stop_words
 
 class LaptopAttributes():
     '''
@@ -56,10 +58,11 @@ def populate_spec():
             LaptopAttributes.cpu[' '.join(row.Cpu.split(' ')[:-1])] = [None, row.Cpu.split(' ')[-1]]
 
 class LaptopRetailerRegEx:
+    populate_spec()
     laptop_brands = {'gateway', 'panasonic', 'toughbook', 'msi'}
     product_attrs = {'vivobook'}
     cpu_attributes = {'intel', 'm 2', '2 core', '4 core', '6 core', '8 core'}
-
+    
     for brand in LaptopAttributes.laptop_brands:
         laptop_brands.add(brand.split(' ')[0].lower())
         product_attrs.add(' '.join(brand.split(' ')[1: ]).lower())

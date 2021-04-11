@@ -159,7 +159,7 @@ def create_pos_neg_data(df, neg_attrs):
     
     return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
 
-def create_laptop_data():
+def create_pseudo_laptop_data():
     '''
     If spec_data.csv has not been created, we create that first.
     Afterwards, create the positive and negative spec data (just more laptop data) 
@@ -168,8 +168,7 @@ def create_laptop_data():
 
     file_path = 'data/train/spec_train_data_new.csv'
     if not os.path.exists(file_path):
-        print('Generating data for laptops . . . ')
-        populate_spec()
+        print('Generating data for pseudo-laptops . . . ')
         if not os.path.exists('data/base/spec_data_no_brand.csv'):
             print('Generating spec data combinations. WARNING: THIS WILL CONSUME RESOURCES AND TAKE A LONG TIME.')
             gen_spec_combos()
@@ -180,4 +179,4 @@ def create_laptop_data():
         final_laptop_df.to_csv(file_path)
 
     else:
-        print('Already have spec data. Moving on . . .')
+        print('Already have pseudo-laptop data. Moving on . . .')

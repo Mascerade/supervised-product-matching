@@ -6,11 +6,11 @@ import os
 from src.preprocessing import remove_misc, randomize_units
 from src.common import Common
 from src.common import get_max_len, create_final_data
-from src.laptop_data_classes import populate_spec
+from src.data_creation.laptop_data_classes import populate_spec
 from src.data_creation.general_cpu_data_creation import create_general_cpu_data
 from src.data_creation.general_drive_data import create_final_drive_data
-from src.data_creation.gs_data_creation import create_computer_data
-from src.data_creation.laptop_data_creation import create_laptop_data
+from src.data_creation.gs_data_creation import create_computer_gs_data
+from src.data_creation.laptop_data_creation import create_pseudo_laptop_data
 from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_data
 from src.data_creation.retailer_test_creation import create_laptop_test_data
 from src.data_creation.neg_laptop_test_creation import create_neg_laptop_test_data
@@ -58,28 +58,29 @@ def create_data():
     create_pcpartpicker_data()
     create_general_cpu_data()
     create_final_drive_data()
-    create_laptop_data()
+    create_pseudo_laptop_data()
     final_gb_data = create_final_data(gen_gb_pos_data(), gen_neg_gb_data())
     final_gb_data.reset_index(inplace=True)
     randomize_units(final_gb_data, units=['gb'])
     create_laptop_test_data()
     create_neg_laptop_test_data()
     create_retailer_laptop_train_data()
+    create_computer_gs_data()
 
     print('Generating gigabyte data (as in just examples that use GB)')
 
     # Load all the data
     final_computer_df = pd.read_csv('data/train/wdc_computers.csv')
-    final_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')
+    final_pseudo_laptop_df = pd.read_csv('data/train/spec_train_data_new.csv')
     final_pcpartpicker_data = pd.read_csv('data/train/final_pcpartpicker_data.csv').sample(frac=1)
     more_cpu_data = pd.read_csv('data/train/more_cpu_data.csv')
     more_drive_data = pd.read_csv('data/train/more_drive_data.csv')
     retailer_laptop_df = pd.read_csv('data/train/retailer_laptop_data.csv')
-    all_data = [final_computer_df, final_laptop_df, more_cpu_data, final_gb_data, more_drive_data, retailer_laptop_df]
+    all_data = [final_computer_df, final_pseudo_laptop_df, more_cpu_data, final_gb_data, more_drive_data, retailer_laptop_df]
 
     # Print the sizes of the data
     print('Computer df size: {}'.format(len(final_computer_df)))
-    print('Laptop df size: {}'.format(len(final_laptop_df)))
+    print('Pseudo-Laptop df size: {}'.format(len(final_pseudo_laptop_df)))
     print('PCPartPicker df size: {}'.format(len(final_pcpartpicker_data)))
     print('More Drive Data df size: {}'.format(len(more_drive_data)))
     print('More CPU Data df size: {}'.format(len(more_cpu_data)))
