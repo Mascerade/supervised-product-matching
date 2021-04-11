@@ -3,63 +3,9 @@ import os
 import numpy as np
 import random
 from tqdm import tqdm
+from src.data_creation.laptop_data_classes import LaptopAttributes
 from src.preprocessing import remove_stop_words, randomize_units, replace_space_df
 from src.common import create_final_data, Common
-
-class LaptopAttributes():
-    '''
-    Different from LaptopAttributes, this is specific for creating spec data.
-    The spec data was gathered from PCPartPicker and is used to create more laptop data.
-    '''
-
-    video_card = {'GeForce RTX 2070'}
-    ram = [str(x) + ' GB' for x in range(2, 130, 2)]
-    hard_drive = [str(x) + ' GB' for x in range(120, 513, 8)] + [str(x) + ' TB' for x in range(1, 8)]
-    cpu = {}
-    laptop_brands = ['Lenovo ThinkPad', 'Lenovo ThinkBook', 'Lenovo IdeaPad', 'Lenovo Yoga', 'Lenovo Legion', 'HP Envy', 'HP Chromebook', 'HP Spectre', 'HP ZBook', 'HP Probook', 'HP Elitebook', 'HP Pavilion', 'HP Omen', 'Dell Alienware', 'Dell Vostro', 'Dell Inspiron', 'Dell Latitude', 'Dell XPS', 'Dell G Series', 'Dell Precision', 'Apple Macbook', 'Apple Macbook Air', 'Apple Mac', 'Acer Aspire', 'Acer Swift', 'Acer Spin', 'Acer Switch', 'Acer Extensa', 'Acer Travelmate', 'Acer Nitro', 'Acer Enduro', 'Acer Predator', 'Asus ZenBook', 'Asus Vivobook', 'Asus Republic of Gamers', 'Asus ROG', 'Asus TUF GAMING']
-    screen = {'1440x900'}
-    inches = {'13.3'}
-    
-    @staticmethod
-    def get_all_data():
-        return {
-            'cpu': LaptopAttributes.cpu.keys(),
-            'ram': LaptopAttributes.ram,
-            'hard_drive': LaptopAttributes.hard_drive,
-            'video_card': LaptopAttributes.video_card,
-            'brand': LaptopAttributes.laptop_brands,
-            'screen': LaptopAttributes.screen,
-            'inches': LaptopAttributes.inches
-        }
-
-def populate_spec():
-    '''
-    Creates a string out of the row of product attributes (so row is a Pandas DataFrame).
-    '''
-
-    # Getting the CPU data into LaptopAttrbutes
-    cpu_df = pd.read_csv('data/base/cpu_data.csv')
-    temp_iloc = cpu_df.iloc()
-    for idx in range(len(cpu_df)):
-        row = temp_iloc[idx]
-        LaptopAttributes.cpu[row['name']] = [row['cores'], row['core_clock']]
-
-    # Getting the video card data into LaptopAttributes
-    video_card_df = pd.read_csv('data/base/video-cards-data.csv')
-    temp_iloc = video_card_df.iloc()
-    for idx in range(len(video_card_df)):
-        row = temp_iloc[idx]
-        LaptopAttributes.video_card.update([row['chipset']])
-    
-    # Getting the inches, screen, video card, and CPU data from laptops.csv
-    laptops_df = pd.read_csv('data/base/laptops.csv', encoding='latin-1')
-    LaptopAttributes.inches.update([str(row.Inches) for row in laptops_df[['Inches']].itertuples()])
-    LaptopAttributes.screen.update([row.ScreenResolution for row in laptops_df[['ScreenResolution']].itertuples()])
-    LaptopAttributes.video_card.update([row.Gpu for row in laptops_df[['Gpu']].itertuples()]) 
-    
-    for row in laptops_df.iloc:
-        if row.Company != 'Apple':
-            LaptopAttributes.cpu[' '.join(row.Cpu.split(' ')[:-1])] = [None, row.Cpu.split(' ')[-1]]
 
 def gen_spec_combos():
     '''

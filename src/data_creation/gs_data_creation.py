@@ -1,80 +1,204 @@
-import pandas as pd
 import os
-from tqdm import tqdm
-from src.common import Common, create_final_data
-from src.preprocessing import remove_stop_words, randomize_units, replace_space_df
+import sys
+import pandas as pd
+import numpy as np
+import math
+import random
+from gensim import corpora
+from gensim.similarities import SparseMatrixSimilarity
+from src.preprocessing import remove_stop_words
+from src.common import create_final_data
 
-def preprocessing(orig_data):
+def combinations(total, choose):
     '''
-    Normalizes the data by getting rid of stopwords and punctuation
+    Simple function to compute combinations
     '''
 
-    # Iterate over the original dataframe (I know it is slow and there are probably better ways to do it)
-    iloc_data = orig_data.iloc
-    
-    # Will temporarily store the title data before it gets put into a DataFrame
-    temp = []
-    
-    # Iterate over the data
-    for idx in tqdm(range(len(orig_data))):
-        row = iloc_data[idx]
-        title_left = remove_stop_words(row.title_left)
-        title_right = remove_stop_words(row.title_right)
+    return int(math.factorial(total) / (math.factorial(choose) * math.factorial(total - choose)))
 
-        # Append the newly created row (title_left, title_right, label) to the the temporary list
-        temp.append([title_left, title_right, row.label])
+def chunk_data():
+    '''
+    Chunks the WDC Product Corpus into files of 100,000 rows each
+    '''
+
+    chunk_size = 100000
+    batch = 1
+    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json', lines=True, nrows= 100000000000000, chunksize=chunk_size):
+        chunk.to_json('data/base/product_corpus/chunk' + str(batch) + '.json')
+        batch += 1
+
+def generate_computer_data():
+    '''
+    Gets the computer data from the WDC Product Corpus
+    '''
+    chunk_size = 100000
+    computer_df = pd.DataFrame()
+    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json', lines=True, nrows= 100000000000000, chunksize=chunk_size):
+        computer_df = computer_df.append(chunk[chunk['category'].values == 'Computers_and_Accessories'])
+    return computer_df
+
+def extract_key_features(cluster):
+    '''
+    Simplies the DataFrames extracted from the WDC Product Corpus
+    Only includes the ID, description, title, and title + description
+    '''
+
+    new_cluster = cluster.loc[:, ("id", "description", "title")]
+    new_cluster["title"] = new_cluster["title"].map(lambda x: remove_stop_words(x))
+    new_cluster["description"] = new_cluster["description"].map(lambda x: remove_stop_words(str(x)))
+    new_cluster["titleDesc"] = new_cluster["title"].map(lambda x: x.split(" ")) + new_cluster["description"].map(lambda x: x.split(" ")).map(lambda x: x[0:6])
+    return new_cluster
+
+def get_valid_clusters(df):
+    '''
+    Returns the IDs of all the clusters that have more than 1 but less than 80 titles in them
+    '''
+
+    MAX_CLUSTER_SIZE = 80
+    valid_clusters = (((df['cluster_id'].value_counts() > 1) & 
+                        (df['cluster_id'].value_counts() <= MAX_CLUSTER_SIZE)))
+
+    valid_clusters = list(valid_clusters[valid_clusters == True].index)
+    all_clusters = df[df['cluster_id'].isin(valid_clusters)]['cluster_id'].values
+    return set(all_clusters)
+
+def create_pos_from_cluster(data, cluster_id):
+    '''
+    Creates positive pairs from a cluster
+    '''
+
+    MAX_PAIRS = 16
+    cluster = data.loc[data["cluster_id"].values == cluster_id]
+    cluster = extract_key_features(cluster)
+    max_combos = combinations(len(cluster), 2)
+    
+    dictionary = corpora.Dictionary(cluster["titleDesc"])
+    cluster_dict = [dictionary.doc2bow(title) for title in cluster["title"].map(lambda x: x.split(" "))]
+    sim_matrix = np.array(SparseMatrixSimilarity(cluster_dict, num_features=len(dictionary)))
+    
+    # Because the matrix is redundant (the rows and columns represent the same titles)
+    # we set the bottom half of the similarities (including the diagonal) to 100
+    # so that we don't have to worry about them when doing argmin()
+    for row in range(sim_matrix.shape[0]):
+        for column in range(sim_matrix.shape[1]):
+            if (row >= column):
+                sim_matrix[row][column] = 100
+    
+    # If the maximum amount of combinations we can make is less than our set max,
+    # set the maximum to the max combos
+    if max_combos < MAX_PAIRS:
+        MAX_PAIRS = max_combos
+    
+    # Half of the pairs should be hard positives and the other half random
+    hard_pos = MAX_PAIRS // 2
+    random_pos = MAX_PAIRS - hard_pos
+    
+    pairs = []
+
+    # Hard positives are those that are from the same cluster, but with the least similarity
+    for x in range(hard_pos):
+        # Keep getting the pairs with the lowest similarity score
+        min_sim = np.unravel_index(sim_matrix.argmin(), sim_matrix.shape)
+        pair = [cluster["title"].iloc[min_sim[0]], cluster["title"].iloc[min_sim[1]], 1]
+        pairs.append(pair)
+        sim_matrix[min_sim[0]][min_sim[1]] = 100
+    
+    # The amount of available pairs (given that some are gone from hard positive creation)
+    avail_indices = np.argwhere(sim_matrix != 100)
+
+    # Get random pairs within the same cluster
+    for x in range(random_pos):
+        ran_idx = random.sample(list(range(len(avail_indices))), 1)
+        choice = avail_indices[ran_idx][0]
+        pair = [cluster["title"].iloc[choice[0]],
+                cluster["title"].iloc[choice[1]], 1]
+        pairs.append(pair)
+        avail_indices = np.delete(avail_indices, ran_idx, 0)
+    
+    return pd.DataFrame(pairs, columns=["title_one", "title_two", "label"])
+
+def create_neg_from_cluster(data, cluster_id, all_clusters):
+    '''
+    Creates negative pairs from a cluster
+    '''
+
+    # Get the cluster
+    cluster = data.loc[data["cluster_id"].values == cluster_id]
+    cluster = extract_key_features(cluster)
+    pairs = []
+    hard_neg = len(cluster) // 2
+    
+    # Hard negatives are those that are from different clusters, but we get the pair with the highest similarity
+    for row in range(hard_neg):
+        # Keep choosing random titles until we get one that is not our own
+        neg_cluster_id = cluster_id        
+        while neg_cluster_id == cluster_id:
+            neg_cluster_id = random.choice(all_clusters)
         
-    # Return DataFrame of the title data, simplified
-    return pd.DataFrame(temp, columns=Common.COLUMN_NAMES)
-
-def create_train_df(df):
-    '''
-    Returns a shuffled dataframe with an equal amount of positive and negative examples
-    '''
-
-    # Get the positive and negative examples
-    pos_df = df.loc[df['label'] == 1]
-    neg_df = df.loc[df['label'] == 0]
+        # Extract data about this cluster
+        neg_cluster = data.loc[data["cluster_id"].values == neg_cluster_id].copy()
+        neg_cluster = extract_key_features(neg_cluster)
+        
+        # Add the current title of the cluster to the beginning of this random cluster so that
+        # the first row in the similarity matrix will refer to this title
+        neg_cluster = pd.concat([pd.DataFrame([cluster.iloc[row].values], columns=["id", "description", "title", "titleDesc"]),
+                                 neg_cluster])
+        
+        # Get the similarity between the title and the random cluster
+        dictionary = corpora.Dictionary(neg_cluster["titleDesc"])
+        neg_cluster_dict = [dictionary.doc2bow(title) for title in neg_cluster["title"].map(lambda x: x.split(" "))]
+        sim_matrix = np.array(SparseMatrixSimilarity(neg_cluster_dict, num_features=len(dictionary)))
+        
+        # First row is the similarity between the current title and the rest of the random cluster
+        # so get the max similarity of this (+1 is because we don't include the similarity with ourself)
+        max_val = sim_matrix[0][1:].argmax() + 1
+        
+        # Add the pair
+        pair = [cluster["title"].iloc[row], neg_cluster["title"].iloc[max_val], 0]
+        pairs.append(pair)
     
-    # Shuffle the data
-    pos_df = pos_df.sample(frac=1)
-    neg_df = neg_df.sample(frac=1)
+    for row in range(hard_neg, len(cluster)):
+        # Keep choosing random titles until we get one that is not our own
+        neg_cluster_id = cluster_id
+        while neg_cluster_id == cluster_id:
+            neg_cluster_id = random.choice(all_clusters)
+        
+        # Randomly get a title from the random cluster
+        neg_cluster = data.loc[data["cluster_id"].values == neg_cluster_id].copy()
+        neg_cluster = extract_key_features(neg_cluster)
+        neg_title = neg_cluster["title"].iloc[random.choice(list(range(len(neg_cluster))))]
+        
+        # Add the pair
+        pair = [cluster["title"].iloc[row], neg_title, 0]
+        pairs.append(pair)
     
-    # Concatenate the positive and negative examples and 
-    # make sure there are only as many negative examples as positive examples
-    final_df = pd.concat([pos_df[:min(len(pos_df), len(neg_df))], neg_df[:min(len(pos_df), len(neg_df))]])
-    
-    # Shuffle the final data once again
-    final_df.sample(frac=1)
-    
-    return final_df
+    return pd.DataFrame(pairs, columns=["title_one", "title_two", "label"])
 
-def create_training_data(df, path):
-    '''
-    Creates and saves a simpler version of the original data that only contains the the two titles and the label.
-    '''
-    
-    norm_bal_data = create_train_df(preprocessing(df))
-    
-    # Save the new normalized and simplified data to a CSV file to load later
-    norm_bal_data.reset_index(inplace=True)
-    randomize_units(norm_bal_data, units=['gb'])
-    norm_bal_data.to_csv(path, index=False)
+def create_computer_gs_data():
+    file_path = 'data/train/wdc_computers.csv'
+    if not os.path.exists(file_path):
+        # Get the titles from the WDC Product Corpus
+        if not os.path.exists('data/base/computer_wdc_whole_no_duplicates.csv'):
+            computer_df = generate_computer_data()
+            computer_df = computer_df.drop_duplicates('title')
+            computer_df.to_csv('data/base/computer_wdc_whole_no_duplicates.csv')
+        
+        else:
+            computer_df = pd.read_csv('data/base/computer_wdc_whole_no_duplicates.csv')
+        
+        # Get "good" clusters from the data
+        valid_clusters = list(get_valid_clusters(computer_df))
+        computer_train_wdc_pos = pd.DataFrame(columns=["title_one", "title_two", "label"])
+        computer_train_wdc_neg = pd.DataFrame(columns=["title_one", "title_two", "label"])
 
+    # Positive data creation
+    for cluster in pos_clusters:
+        computer_train_wdc_pos = computer_train_wdc_pos.append(create_pos_from_cluster(computer_df, cluster))
 
-def create_computer_data():
-    '''
-    Simplifies the Gold Standard comptuer data and saves it to computers_train_bal_shuffle.csv
-    '''
-    
-    computer_data_path = 'data/train/computers_train_bal_shuffle.csv'
-    if not os.path.exists(computer_data_path):
-        print('Generating simplifed Gold Standard computer data . . . ')
-        # Load the data
-        computer_df = pd.read_json('data/base/computers_train_xlarge_normalized.json.gz', compression='gzip', lines=True)    
+    # Negative data creation
+    for cluster in pos_clusters:
+        computer_train_wdc_neg = computer_train_wdc_neg.append(create_neg_from_cluster(computer_df, cluster, pos_clusters))
 
-        # Create and save the data if the simple and normalized data does not exist
-        create_training_data(computer_df, computer_data_path)
-
-    else: 
-        print('Already have Gold Standard computer data. Moving on . . . ')
+    # Concatenate the data
+    computer_train_wdc = create_final_data(computer_train_wdc_pos, computer_train_wdc_neg)
+    computer_train_wdc.to_csv('data/train/wdc_computers.csv')

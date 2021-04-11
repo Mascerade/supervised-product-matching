@@ -6,6 +6,7 @@ import os
 from src.preprocessing import remove_misc, randomize_units
 from src.common import Common
 from src.common import get_max_len, create_final_data
+from src.laptop_data_classes import populate_spec
 from src.data_creation.general_cpu_data_creation import create_general_cpu_data
 from src.data_creation.general_drive_data import create_final_drive_data
 from src.data_creation.gs_data_creation import create_computer_data
@@ -13,6 +14,7 @@ from src.data_creation.laptop_data_creation import create_laptop_data
 from src.data_creation.pcpartpicker_data_creation import create_pcpartpicker_data
 from src.data_creation.retailer_test_creation import create_laptop_test_data
 from src.data_creation.neg_laptop_test_creation import create_neg_laptop_test_data
+from src.data_creation.retailer_laptop_train_creation import create_retailer_laptop_train_data
 
 def gen_gb_pos_data():
     '''
@@ -52,7 +54,7 @@ def create_data():
     pd.set_option('mode.chained_assignment', None)
 
     # Run the functions
-    #create_computer_data()
+    populate_spec()
     create_pcpartpicker_data()
     create_general_cpu_data()
     create_final_drive_data()
@@ -62,6 +64,7 @@ def create_data():
     randomize_units(final_gb_data, units=['gb'])
     create_laptop_test_data()
     create_neg_laptop_test_data()
+    create_retailer_laptop_train_data()
 
     print('Generating gigabyte data (as in just examples that use GB)')
 
