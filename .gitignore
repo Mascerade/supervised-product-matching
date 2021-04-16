@@ -31,5 +31,5 @@ LaptopAttributes.ipynb
 src/data_scrapers/venv
 src/data_scrapers/pyvenv.cfg
 test.csv
-!RetailerDataCreation.ipynb
-!WDCDataCreation.ipnb
+RetailerDataCreation.ipynb
+WDCDataCreation.ipnb
