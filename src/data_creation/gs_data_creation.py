@@ -23,7 +23,7 @@ def chunk_data():
 
     chunk_size = 100000
     batch = 1
-    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json', lines=True, nrows= 100000000000000, chunksize=chunk_size):
+    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json.gz', lines=True, nrows= 100000000000000, chunksize=chunk_size):
         chunk.to_json('data/base/product_corpus/chunk' + str(batch) + '.json')
         batch += 1
 
@@ -33,7 +33,7 @@ def generate_computer_data():
     '''
     chunk_size = 100000
     computer_df = pd.DataFrame()
-    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json', lines=True, nrows= 100000000000000, chunksize=chunk_size):
+    for chunk in pd.read_json('data/base/offers_corpus_english_v2.json.gz', lines=True, nrows= 100000000000000, chunksize=chunk_size):
         computer_df = computer_df.append(chunk[chunk['category'].values == 'Computers_and_Accessories'])
     return computer_df
 
