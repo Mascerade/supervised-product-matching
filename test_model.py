@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 import time
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert_preprocess_batch
+from src.preprocessing import remove_misc, remove_stop_words, character_bert_preprocess_batch, bert_preprocess_batch
 from src.common import Common, get_max_len
 from create_data import create_data
 
@@ -79,6 +79,10 @@ VAL_BATCH_SIZE = 16
 PERIOD = 50
 
 def validation(data, labels, name):
+    '''
+    Validate the model
+    '''
+
     running_loss = 0.0
     running_accuracy = 0.0
     current_batch = 0
@@ -135,9 +139,34 @@ def validation(data, labels, name):
     final_f1_score = 2 * ((final_precision * final_recall) / (final_precision + final_recall))
     print('%s: Precision: %.3f, Recall: %.3f, F1 Score: %.3f' % (name, final_precision, final_recall, final_f1_score))
 
+def inference():
+    '''
+    Test model using your own titles
+    '''
+    
+    title1 = input('First title: ')
+    title2 = input('Second title: ')
+    
+    title1 = remove_stop_words(title1)
+    title2 = remove_stop_words(title2)
+    
+    data = np.array([title1, title2]).reshape(1, 2)
+    forward = net(*character_bert_preprocess_batch(data))
+    np_forward = forward.detach().numpy()[0]
+    
+    print('Output: {}'.format(torch.argmax(forward)))
+    print('Softmax: Negative {:.4f}%, Positive {:.4f}%'.format(np_forward[0], np_forward[1]))
+
+user_input = input('Would you like to validate, or manually test the model? (validate/test) ')
+
 net.eval()
-validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')
-validation(test_gb_space_data, test_gb_space_labels, 'Test Laptop (Same Title) (Space)')
-validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space')
-validation(test_retailer_gb_space_data, test_retailer_gb_space_labels, 'Test Laptop (Different Title) (Space)')
-validation(test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, 'Test Laptop (Different Title) (No Space)')
+if user_input.lower() == 'validate':
+    validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')
+    validation(test_gb_space_data, test_gb_space_labels, 'Test Laptop (Same Title) (Space)')
+    validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space')
+    validation(test_retailer_gb_space_data, test_retailer_gb_space_labels, 'Test Laptop (Different Title) (Space)')
+    validation(test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, 'Test Laptop (Different Title) (No Space)')
+
+else:
+    while True:
+        inference()
