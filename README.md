@@ -1,68 +1,60 @@
 # Product Matching Neural Network
+This project aims to create a model using CharacterBERT (and added Transformers in some models) that is able to classify two product titles as representing the same entity or not.
+This project train a model to specifically discern between <b>electronics titles</b>.
 
-## Usage
-The iPython Notebook is meant to be used as a testing ground for the neural network. `TestingGrounds.ipynb` is just a place to understand the different functions and the models. It is also where I write new code before putting it into actual python files.
+### Example 1:
+Title 1: ASUS VivoBook Thin and Lightweight FHD WideView Laptop, 8th Gen Intel Core i5-8250U, 8GB DDR4 RAM, 128GB SSD+1TB HDD, USB Type-C, NanoEdge, Fingerprint Reader, Windows 10 - F510UA-AH55
+
+Title 2: ASUS Laptop 15.6, Intel Core i5-8250U 1.6GHz, Intel HD, 1TB HDD + 128GB SSD, 8GB RAM, F510UA-AH55
+
+Using these two titles, the model should output a <b>1</b>
+
+### Example 2:
+Title 1: AMD Ryzen 5 5600X 6-core, 12-Thread Unlocked Desktop Processor with Wraith Stealth Cooler
+
+Title 2: AMD Ryzen 7 5800X 8-Core 3.8 GHz Socket AM4 105W 100-100000063WOF Desktop Processor
+
+Using these two titles, the model should output a <b>0</b>
+
+## Project Overview
+`data/base` contains data that is going to be transformed into training data.
+
+`data/train` contains data used to actually train.
+
+`data/test` contains data used to validate the models trained.
 
 `torch_train_model.py` is where to train the model.
 
-`TestingModels.ipnb.py` allows you to test your own different titles/strings to see how well the model does. 
+`test_model.py` allows you to use the validation script on a specific model. 
+
+`create_data.py` uses functions under `src/data_creation` to transform data found in `base`
 
 The `src` directory are the functions that create data and generate the model.
 
 The `models` directory contains the different models trained so far and also the fastText model (if you want to use the ).
 
-The `data_scrapers` directory contains scripts to scrape data for creating training data.
+The `src/data_scrapers` directory contains scripts to scrape data for creating training data.
 
+The `pretrained-models` directory is where the user should put the bert and character_bert models.
+* The CharacterBERT model can be downloaded using the author's repository [here](https://github.com/helboukkouri/character-bert)
+* The BERT model can be downloaded using HuggingFace Transformers
 
-### For Old Models using FastText Embeddings (Versions <0.2.0)
-* Download and unzip the [fastText model](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip) and put the `.bin` file into the `models` directory
-   * <b>This is only if you want to use the old models.</b>
-   * Also must un-comment the loading of the fastText model in `src/common.py`.
+The `characterbert_modeling` and `characterbert_utils` directories are directly from CharacterBERT's authors and can be found in the same directory previously mentioned ([here](https://github.com/helboukkouri/character-bert))
 
-#### fastText Embeddings (OLD METHOD)
-* I have just been experimenting with the fastText word embedding matrix
-   * I got the largest one they had (600 billion tokens) and it works with n-grams so even if a word is not explicitly in the word embedding, it will stil find a similar word to it and get a word embedding based on that.
+`DownScaleTransformerEncoder` contains my custom Transformer encoder model and is a GitHub sub-module.
 
-#### LSTM + fastText Model (OLD METHOD)
-* There are many variations of this model that I used. The architectures can be found in  `src/model_architectures`.
+## The Data
+All the data can be found in the repository's latest release.
 
-## Notes About The Network
+## Source Code (Under `src`)
+The `data_creation` directory contains scripts that transforms data in `base` into usable training data.
 
-### BERT
-* For the latest models (>= 0.2.0), I use a pre-trained BERT model from [PyTorch HuggingFace](https://huggingface.co/transformers/)
-   * ([Google's Paper On BERT](https://arxiv.org/pdf/1810.04805.pdf))
-* I simply fine-tune BERT on the new data (so the last couple layers of BERT) and add a classification head on top of it.
-* The architecture can be found in `src/model_architectures/bert_classifier.py`
+The `data_scrapers` directory uses web scraping scripts to get raw data (like product titles for laptops off of different retailers) to be processed into training data.
 
-### Dataset
+The `model_architectures` directory contains different neural network architectures to use for training (all written using pytorch). They include:
+* BERT
+* CharacterBERT
+* CharacterBERT with my custom Transformer added on top
+* CharacterBERT that concatenates word embeddings together as opposed to adding and averaging
 
-#### WDC Product Corpus
-* For the training data, I am going to use the WDC Gold Standard database of products (http://webdatacommons.org/largescaleproductcorpus/v2/index.html).
-
-* After further looking at the data, it seems like each product in the dataset as a cluser_id.
-   * Essentially, this means that we can just use the cluster_id to build the positive examples of matches and use random examples outside of the cluster to build our negative training examples.
-
-* The way the dataset works is that for each entry in it, there is a title_right and a title_left. These are the two titles represented in a pair. There is a label that tells you whether the titles represent the same product or not. Using this, we already have built a dataset of positive and negative example pairs.
-   * I also have created a seperate CSV file that is a simpler version of the original dataset. It ony containes the titles with a label (either 0 or 1).
-
-* The WDC Product Data researchers also did their own experiments, and they actually have a model that they trained using their own custom fastText encoding model.
-   * They got about 90% accuracy on their training set which included computers, cameras, watches and shoes
-      * They used a regular vanilla RNN which I find odd because an LSTM would surely capture the relatability between the tokens much better than a standard LSTM.
-   * I find this odd because computers and cameras do not make up a lot of the training set.
-      * There are 26 million offers, with office products making up about 13.13% of the dataset, so surely they could have used some of those
-      * If the issue were the correlation between the different product categories (electronics related to book related to health related to toys etc.), then why would they pair computers and cameras with watches and shoes?
-
-#### Custom Made Laptop Data (laptops.csv)
-* After creating the initial model (v0.1), I decided that I wanted to create data catered specifically to getting better at laptop data, as it is a common electronic to shop for.
-
-* The data can be found at https://www.kaggle.com/ionaskel/laptop-prices
-
-* I normalize the data and then substitute different key attributes (CPU, Graphics, Size, etc.) in order to create negative data and remove certain attributes (Screentype, brand, laptop type, etc.) and add in random words manufacturers like to use, like "premium", "NEW", etc. in order to to create the positive data.
-
-* I also randomize the order of tokens so that the does not overfit to certain positions of tokens.
-
-#### More Custom Made Laptop Data (`spec_data.csv`)
-* Using a custom-made `csv` file called `spec_data.csv`, I can essentially create all the fake-laptop data I want. Data size in no longer an issue for laptops, it is just the quality of data that has to be improved. Using this file, the data used to train is `spec_train_data.csv`
-
-#### Rest of The Data
-* The rest of the data used is for CPUs, RAM, Drives, etc. It is used to both classify these types of items and for the model to understand better what them for laptop classification.  
+`common.py` and `preprocessing.py` are functions used throughout the other scripts
