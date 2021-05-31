@@ -1,19 +1,19 @@
 import pandas as pd
 import numpy as np
-import nltk
+import requests
 import os
 import sys
 import gc
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from transformers import AutoTokenizer, AutoModel, AdamW
+from transformers import AdamW
 from sklearn.metrics import confusion_matrix
 import time
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc, character_bert_preprocess_batch, bert_preprocess_batch
-from src.common import Common, get_max_len
+from src.preprocessing import remove_misc
+from src.common import Common
 from create_data import create_data
 
 using_model = "characterbert"
@@ -23,6 +23,9 @@ FOLDER = sys.argv[1]
 
 # Get the model name from the terminal
 MODEL_NAME = sys.argv[2]
+
+# Make POST request to model server
+requests.post('http://localhost:3000/create_db', json={'model_name': MODEL_NAME})
 
 print('\nOutputing models to {} with base name {}\n'.format(FOLDER, MODEL_NAME))
 
@@ -201,6 +204,33 @@ for epoch in range(10):
 
             # Apply the gradients
             opt.step()
+
+            batch_epoch = np.tile(np.array([epoch + 1, i + 1]), (BATCH_SIZE, 1))
+            train_examples = np.concatenate((batch_epoch, # epoch/batch
+                                            batch_data, # titles
+                                            np.round(forward[:, 1].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
+                                            np.round(forward[:, 0].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
+                                            torch.argmax(forward, dim=1).cpu().detach().numpy().reshape(BATCH_SIZE, 1),
+                                            batch_labels.astype(int).reshape(BATCH_SIZE, 1)),
+                                            axis=1)
+            put_batch_labels = ['epoch', 'batch', 'accuracy', 'loss', 'runningAccuracy', 'runningLoss']
+            train_examples_labels = ['epoch', 'batch', 'title1', 'title2', 'positivePercentage', 'negativePercentage', 'modelPrediction', 'label']
+            train_examples = train_examples.tolist()
+            put_batch = [epoch + 1, 
+                        i + 1,
+                        float('%.4f'%(accuracy)),
+                        float('%.4f'%(loss.item())),
+                        float('%.4f'%(running_accuracy / current_batch)),
+                        float('%.4f'%(running_loss / current_batch))]
+            
+            put_batch = [dict(zip(put_batch_labels, put_batch))]
+            train_examples_data = []
+            for example in train_examples:
+                train_examples_data.append(dict(zip(train_examples_labels, example)))
+            train_examples_data = [train_examples_data]
+
+            requests.put('http://localhost:3000/add_batch_data', json={'model_name': MODEL_NAME, 'data': put_batch})
+            requests.put('http://localhost:3000/add_examples_data', json={'model_name': MODEL_NAME, 'data': train_examples_data})
 
             # Print statistics every batch
             #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
