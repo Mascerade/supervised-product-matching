@@ -101,6 +101,43 @@ print("************* TRAINING *************")
 # How long we should accumulate for running loss and accuracy
 PERIOD = 50
 
+def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_accuracy, running_loss):
+    # To send the training examples, we need the epoch and batch number on each example
+    batch_epoch = np.tile(np.array([epoch, batch_num]), (BATCH_SIZE, 1))
+
+    # Includes, the epoch, batch number, positive softmax, negative softmax, prediction, and labels
+    train_examples = np.concatenate((batch_epoch, # epoch/batch
+                                    batch_data, # titles
+                                    np.round(forward[:, 1].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
+                                    np.round(forward[:, 0].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
+                                    torch.argmax(forward, dim=1).cpu().detach().numpy().reshape(BATCH_SIZE, 1),
+                                    labels.astype(int).reshape(BATCH_SIZE, 1)),
+                                    axis=1)
+
+    # Need to put the data into a dictionary to send it, so these are the keys for sending the batch data and training examples
+    put_batch_labels = ['epoch', 'batch', 'accuracy', 'loss', 'runningAccuracy', 'runningLoss']
+    train_examples_labels = ['epoch', 'batch', 'title1', 'title2', 'positivePercentage', 'negativePercentage', 'modelPrediction', 'label']
+    train_examples = train_examples.tolist()
+
+    # Going to use zip() to create the dictionary, so have a list of the elements in order
+    batch_info = [epoch, 
+                i + 1,
+                float('%.4f'%(accuracy)),
+                float('%.4f'%(loss.item())),
+                float('%.4f'%(running_accuracy)),
+                float('%.4f'%(running_loss))]
+    
+    # Put the data that needs to be send into dictionaries
+    batch_info = [dict(zip(put_batch_labels, batch_info))]
+    train_examples_data = []
+    for example in train_examples:
+        train_examples_data.append(dict(zip(train_examples_labels, example)))
+    train_examples_data = [train_examples_data]
+    
+    # Make the put request
+    requests.put('http://localhost:3000/add_batch_data', json={'model_name': MODEL_NAME, 'data': batch_info})
+    requests.put('http://localhost:3000/add_examples_data', json={'model_name': MODEL_NAME, 'data': train_examples_data})
+
 def validation(data, labels, name):
     running_loss = 0.0
     running_accuracy = 0.0
@@ -205,32 +242,15 @@ for epoch in range(10):
             # Apply the gradients
             opt.step()
 
-            batch_epoch = np.tile(np.array([epoch + 1, i + 1]), (BATCH_SIZE, 1))
-            train_examples = np.concatenate((batch_epoch, # epoch/batch
-                                            batch_data, # titles
-                                            np.round(forward[:, 1].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
-                                            np.round(forward[:, 0].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
-                                            torch.argmax(forward, dim=1).cpu().detach().numpy().reshape(BATCH_SIZE, 1),
-                                            batch_labels.astype(int).reshape(BATCH_SIZE, 1)),
-                                            axis=1)
-            put_batch_labels = ['epoch', 'batch', 'accuracy', 'loss', 'runningAccuracy', 'runningLoss']
-            train_examples_labels = ['epoch', 'batch', 'title1', 'title2', 'positivePercentage', 'negativePercentage', 'modelPrediction', 'label']
-            train_examples = train_examples.tolist()
-            put_batch = [epoch + 1, 
-                        i + 1,
-                        float('%.4f'%(accuracy)),
-                        float('%.4f'%(loss.item())),
-                        float('%.4f'%(running_accuracy / current_batch)),
-                        float('%.4f'%(running_loss / current_batch))]
-            
-            put_batch = [dict(zip(put_batch_labels, put_batch))]
-            train_examples_data = []
-            for example in train_examples:
-                train_examples_data.append(dict(zip(train_examples_labels, example)))
-            train_examples_data = [train_examples_data]
-
-            requests.put('http://localhost:3000/add_batch_data', json={'model_name': MODEL_NAME, 'data': put_batch})
-            requests.put('http://localhost:3000/add_examples_data', json={'model_name': MODEL_NAME, 'data': train_examples_data})
+            # Send the data to the NLPDashboardServer
+            send_batch_data(epoch + 1,
+                            i + 1,
+                            forward,
+                            batch_labels,
+                            accuracy,
+                            loss,
+                            running_accuracy / current_batch,
+                            running_loss / current_batch)
 
             # Print statistics every batch
             #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
