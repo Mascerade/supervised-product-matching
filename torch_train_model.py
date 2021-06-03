@@ -18,14 +18,18 @@ from create_data import create_data
 
 using_model = "characterbert"
 
+# Parameter if we are using the dashboard
+USING_DASHBOARD = sys.argv[1].lower() == 'true'
+
 # Get the folder name in models
-FOLDER = sys.argv[1]
+FOLDER = sys.argv[2]
 
 # Get the model name from the terminal
-MODEL_NAME = sys.argv[2]
+MODEL_NAME = sys.argv[3]
 
-# Make POST request to model server
-requests.post('http://localhost:3000/create_db', json={'model_name': MODEL_NAME})
+if USING_DASHBOARD:
+    # Make POST request to model server
+    requests.post('http://localhost:3000/create_db', json={'model_name': MODEL_NAME})
 
 print('\nOutputing models to {} with base name {}\n'.format(FOLDER, MODEL_NAME))
 
@@ -241,16 +245,17 @@ for epoch in range(10):
 
             # Apply the gradients
             opt.step()
-
-            # Send the data to the NLPDashboardServer
-            send_batch_data(epoch + 1,
-                            i + 1,
-                            forward,
-                            batch_labels,
-                            accuracy,
-                            loss,
-                            running_accuracy / current_batch,
-                            running_loss / current_batch)
+            
+            if USING_DASHBOARD:
+                # Send the data to the NLPDashboardServer
+                send_batch_data(epoch + 1,
+                                i + 1,
+                                forward,
+                                batch_labels,
+                                accuracy,
+                                loss,
+                                running_accuracy / current_batch,
+                                running_loss / current_batch)
 
             # Print statistics every batch
             #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
