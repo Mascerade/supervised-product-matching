@@ -29,7 +29,13 @@ MODEL_NAME = sys.argv[3]
 
 if USING_DASHBOARD:
     # Make POST request to model server
-    requests.post('http://localhost:3000/create_db', json={'model_name': MODEL_NAME})
+    requests.post('http://localhost:3000/create_db', json={'model_name': MODEL_NAME, 'tables': ['Training',
+                                                                                                'Validation',
+                                                                                                'Test Laptop (General)',
+                                                                                                'Test Laptop (Same Title) (Space)',
+                                                                                                'Test Laptop (Same Title) (No Space)',
+                                                                                                'Test Laptop (Different Title) (Space)',
+                                                                                                'Test Laptop (Different Title) (No Space)']})
 
 print('\nOutputing models to {} with base name {}\n'.format(FOLDER, MODEL_NAME))
 
@@ -105,7 +111,7 @@ print("************* TRAINING *************")
 # How long we should accumulate for running loss and accuracy
 PERIOD = 50
 
-def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_accuracy, running_loss):
+def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_accuracy, running_loss, table):
     # To send the training examples, we need the epoch and batch number on each example
     batch_epoch = np.tile(np.array([epoch, batch_num]), (BATCH_SIZE, 1))
 
@@ -139,8 +145,8 @@ def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_a
     train_examples_data = [train_examples_data]
     
     # Make the put request
-    requests.put('http://localhost:3000/add_batch_data', json={'model_name': MODEL_NAME, 'data': batch_info})
-    requests.put('http://localhost:3000/add_examples_data', json={'model_name': MODEL_NAME, 'data': train_examples_data})
+    requests.put('http://localhost:3000/add_batch_data', json={'model_name': MODEL_NAME, 'data': batch_info, 'table': table})
+    requests.put('http://localhost:3000/add_examples_data', json={'model_name': MODEL_NAME, 'data': train_examples_data, 'table': table})
 
 def validation(data, labels, name):
     running_loss = 0.0
@@ -255,7 +261,8 @@ for epoch in range(10):
                                 accuracy,
                                 loss,
                                 running_accuracy / current_batch,
-                                running_loss / current_batch)
+                                running_loss / current_batch,
+                                'Training')
 
             # Print statistics every batch
             #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
@@ -283,6 +290,6 @@ for epoch in range(10):
     validation(val_data, val_labels, 'Validation')
     validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')
     validation(test_gb_space_data, test_gb_space_labels, 'Test Laptop (Same Title) (Space)')
-    validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space')
+    validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space)')
     validation(test_retailer_gb_space_data, test_retailer_gb_space_labels, 'Test Laptop (Different Title) (Space)')
     validation(test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, 'Test Laptop (Different Title) (No Space)')
