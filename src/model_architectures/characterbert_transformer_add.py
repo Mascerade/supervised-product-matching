@@ -11,8 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from characterbert_modeling.character_bert import CharacterBertModel
-sys.path.append('DownScaleTransformerEncoder/src/')
-from DownScaleTransformerEncoder.src.scaling_layer import ScalingLayer
+from scale_transformer_encoder.scaling_layer import ScalingLayer
 from src.common import Common
 from src.preprocessing import character_bert_preprocess_batch
 
