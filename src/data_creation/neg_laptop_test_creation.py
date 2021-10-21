@@ -1,13 +1,9 @@
-import re
-import math
 import pandas as pd
 import os
 import random
-from tqdm import tqdm
-import sys
 from src.data_creation.retailer_test_creation import create_pos_laptop_test_data
-from src.preprocessing import remove_stop_words, unit_matcher, replace_space
-from src.common import create_final_data
+from src.data_preprocessing import unit_matcher, replace_space
+from supervised_product_matching.model_preprocessing import remove_stop_words
 
 ram = [2, 4, 8, 12, 16, 32, 64]
 drive = [64, 128, 256, 512]

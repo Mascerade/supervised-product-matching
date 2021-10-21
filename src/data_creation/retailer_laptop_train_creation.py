@@ -1,16 +1,11 @@
-import re
-import math
 import pandas as pd
 import os
 import random
-from tqdm import tqdm
-import sys
 from itertools import combinations
-from nltk.corpus import stopwords
-sys.path.append(os.getcwd())
-from src.data_creation.laptop_data_classes import LaptopAttributes, LaptopRetailerRegEx
-from src.preprocessing import unit_matcher, remove_misc, remove_stop_words
-from src.common import create_final_data, get_max_len
+from src.data_creation.laptop_data_classes import LaptopRetailerRegEx
+from src.data_preprocessing import remove_misc
+from supervised_product_matching.model_preprocessing import remove_stop_words
+from src.common import create_final_data
 
 def get_key_attrs(title:str) -> tuple:
     """

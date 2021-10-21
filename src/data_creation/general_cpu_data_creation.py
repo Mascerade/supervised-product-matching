@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 import random
 from itertools import combinations
-from src.preprocessing import remove_misc, remove_stop_words
+from supervised_product_matching.model_preprocessing import remove_stop_words
 from src.common import create_final_data
 
 def cpu_variations(cpu):

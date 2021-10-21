@@ -1,11 +1,9 @@
-import math
 import pandas as pd
 import os
 import random
-from tqdm import tqdm
 import sys
 sys.path.append(os.getcwd())
-from src.preprocessing import remove_stop_words
+from supervised_product_matching.model_preprocessing import remove_stop_words
 from src.common import create_final_data
 from itertools import combinations
 

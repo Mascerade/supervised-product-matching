@@ -12,8 +12,8 @@ import torch.nn.functional as F
 import numpy as np
 from transformers import AutoModel
 from characterbert_modeling.character_bert import CharacterBertModel
-from src.common import Common
-from src.preprocessing import character_bert_preprocess_batch
+from spm.config import ModelConfig
+from spm.model_preprocessing import character_bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
     def __init__(self, h_size=768):
@@ -77,20 +77,20 @@ def forward_prop(batch_data, batch_labels, net, criterion):
     forward = net(*character_bert_preprocess_batch(batch_data))
 
     # Convert batch labels to Tensor
-    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(Common.device)
+    batch_labels = torch.from_numpy(batch_labels).view(-1).long().to(ModelConfig.device)
 
     # Calculate loss
-    loss = criterion(forward, batch_labels).to(Common.device)
+    loss = criterion(forward, batch_labels).to(ModelConfig.device)
 
     # Add L2 Regularization to the final linear layer
     l2_lambda_fc = 5e-1
-    l2_reg_fc = torch.tensor(0.).to(Common.device)
+    l2_reg_fc = torch.tensor(0.).to(ModelConfig.device)
     for param in net.fc1.parameters():
         l2_reg_fc += torch.norm(param)
 
     # Add L2 Regularization to bert
     l2_lambda_bert = 7e-5
-    l2_reg_bert = torch.tensor(0.).to(Common.device)
+    l2_reg_bert = torch.tensor(0.).to(ModelConfig.device)
     for param in net.bert.parameters():
         l2_reg_bert += torch.norm(param)
 

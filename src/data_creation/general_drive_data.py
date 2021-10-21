@@ -1,9 +1,8 @@
 import pandas as pd
-from tqdm import tqdm
 import os
 import random
-from itertools import combinations
-from src.preprocessing import remove_misc, remove_stop_words, randomize_units, replace_space_df
+from src.data_preprocessing import randomize_units
+from supervised_product_matching.model_preprocessing import remove_stop_words
 from src.common import create_final_data, Common
 
 def generate_pos_hard_drive_data():

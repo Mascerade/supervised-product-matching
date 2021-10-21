@@ -4,8 +4,9 @@ import numpy as np
 import random
 from tqdm import tqdm
 from src.data_creation.laptop_data_classes import LaptopAttributes
-from src.preprocessing import remove_stop_words, randomize_units, replace_space_df
-from src.common import create_final_data, Common
+from src.data_preprocessing import randomize_units
+from supervised_product_matching.model_preprocessing import remove_stop_words
+from src.common import Common
 
 def gen_spec_combos():
     '''

@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np
-import os
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc, randomize_units
+from src.data_preprocessing import remove_misc, randomize_units
 from src.common import Common
 from src.common import get_max_len, create_final_data
 from src.data_creation.laptop_data_classes import populate_spec
@@ -93,7 +92,7 @@ def create_data():
     total_data = remove_misc(total_data)
 
     # Get the max length of the data for padding in BERT
-    Common.MAX_LEN = get_max_len(total_data)
+    print('Max Length of Data: {}'.format(get_max_len(total_data)))
 
     print('Total data size: {}'.format(len(total_data)))
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from src.preprocessing import remove_stop_words
+from supervised_product_matching.model_preprocessing import remove_stop_words
 
 class LaptopAttributes():
     '''

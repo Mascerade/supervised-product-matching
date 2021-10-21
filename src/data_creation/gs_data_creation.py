@@ -1,13 +1,19 @@
 import os
-import sys
 import pandas as pd
 import numpy as np
 import math
 import random
+from tqdm import tqdm
 from gensim import corpora
 from gensim.similarities import SparseMatrixSimilarity
-from src.preprocessing import remove_stop_words
+from supervised_product_matching.model_preprocessing import remove_stop_words
 from src.common import create_final_data
+
+"""
+Much of this algorithm is based on the paper Intermediate Training of BERT for Product Matching
+which is by the people who made the WDC Product Corpus:
+http://data.dws.informatik.uni-mannheim.de/largescaleproductcorpus/data/v2/papers/DI2KG2020_Peeters.pdf
+"""
 
 def combinations(total, choose):
     '''
@@ -177,7 +183,7 @@ def create_neg_from_cluster(data, cluster_id, all_clusters):
 def create_computer_gs_data():
     file_path = 'data/train/wdc_computers.csv'
     if not os.path.exists(file_path):
-        print('Generating Gold Standard Computer data . . .')
+        print('Generating Gold Standard Computer data (takes a long time) . . .')
         # Get the titles from the WDC Product Corpus
         if not os.path.exists('data/base/computer_wdc_whole_no_duplicates.csv'):
             computer_df = generate_computer_data()
@@ -193,11 +199,13 @@ def create_computer_gs_data():
         computer_train_wdc_neg = pd.DataFrame(columns=["title_one", "title_two", "label"])
 
         # Positive data creation
-        for cluster in valid_clusters:
+        print('    Generating postive example . . .')
+        for cluster in tqdm(valid_clusters):
             computer_train_wdc_pos = computer_train_wdc_pos.append(create_pos_from_cluster(computer_df, cluster))
 
         # Negative data creation
-        for cluster in valid_clusters:
+        print('    Generating negative examples . . .')
+        for cluster in tqdm(valid_clusters):
             computer_train_wdc_neg = computer_train_wdc_neg.append(create_neg_from_cluster(computer_df, cluster, valid_clusters))
 
         # Concatenate the data
