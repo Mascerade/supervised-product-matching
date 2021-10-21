@@ -8,16 +8,14 @@ from supervised_product_matching.config import ModelConfig
 from supervised_product_matching.model_preprocessing import bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, max_length, h_size=768):
+    def __init__(self, h_size=768):
         '''
         Model that uses BERT to classify the titles.
-        max_length: The max length a title could be for padding purposes
         h_size: The hidden layer size for the classification token (CLS) in BERT (Default: 768)
         '''
 
         super(SiameseNetwork, self).__init__()
         self.h_size = h_size
-        self.max_length = max_length * 2
         
         # BERT model
         self.bert = AutoModel.from_pretrained("bert-base-uncased")

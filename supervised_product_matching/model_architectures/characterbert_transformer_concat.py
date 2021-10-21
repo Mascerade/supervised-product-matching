@@ -13,7 +13,7 @@ from supervised_product_matching.config import ModelConfig
 from supervised_product_matching.model_preprocessing import character_bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, sequence_length, h_size=768):
+    def __init__(self, h_size=768):
         '''
         Model that uses BERT to classify the titles.
         max_length: The max length a title could be for padding purposes
@@ -21,7 +21,7 @@ class SiameseNetwork(nn.Module):
         '''
 
         super(SiameseNetwork, self).__init__()
-        self.sequence_length = sequence_length
+        self.sequence_length = ModelConfig.max_len * 2 + 3
         self.h_size = h_size
         
         # CharacterBERT model

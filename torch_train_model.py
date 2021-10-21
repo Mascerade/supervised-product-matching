@@ -254,15 +254,18 @@ if __name__ == '__main__':
 
     elif using_model == "bert":
         from supervised_product_matching.model_architectures.bert_classifier import SiameseNetwork, forward_prop
-        net = SiameseNetwork(Common.MAX_LEN).to(Common.device)
+        net = SiameseNetwork().to(Common.device)
 
     elif using_model == "scaled-characterbert-concat":
         from supervised_product_matching.model_architectures.characterbert_transformer_concat import SiameseNetwork, forward_prop
-        net = SiameseNetwork(Common.MAX_LEN * 2 + 3)
+        net = SiameseNetwork().to(Common.device)
 
     elif using_model == "scaled-characterbert-add":
         from supervised_product_matching.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop
         net = SiameseNetwork().to(Common.device)
+    else:
+        print('Model {} not found.').format(using_model)
+        sys.exit(1)
 
     # Using cross-entropy because we are making a classifier
     criterion = nn.CrossEntropyLoss()
