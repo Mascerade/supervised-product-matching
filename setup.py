@@ -4,7 +4,7 @@ with open("README.md", 'r') as f:
     long_description = f.read()
 
 setup(
-   name='scale-transformer-encoder',
+   name='supervised-product-matching',
    version='0.1',
    description='Neural network for product matching, aka classifying whether two product titles represent the same entity.',
    license="MIT",

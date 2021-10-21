@@ -29,11 +29,12 @@ PERIOD = 50
 def usage():
     print('Usage: torch_train_model.py [OPTIONS] <SUBCOMMAND> [ARGS]')
     print('  OPTIONS:')
-    print('     -visualizer                Send data to NLP Dashboard to see training results in real-time.')
     print('     -O <folder> <model-name>   The folder to output the models generated and the name they will use. Folder default is "default", model name default is "model"')
     print('     -M <model-to-use>          Give the name of the model to use for training. Options are bert, characterbert, scaled-characterbert-concat, scaled-charactertbert-add. Default is characterbert.')
+    print('     -visualizer                Send data to NLP Dashboard to see training results in real-time.')
+    print('     -dtable                    Delete the database for NLP Dashboard before creating new one (must come after -O option).')
     print('  SUBCOMMAND:')
-    print('     --help                        Prints out this usage information and exit.')
+    print('     --help                     Prints out this usage information and exit.')
 
 def split_test_data(df):
     '''
@@ -45,17 +46,17 @@ def split_test_data(df):
     df_data = df[:, 0:2]
     return df_data, df_labels
 
-def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_accuracy, running_loss, table):
+def send_batch_data(epoch, batch_num, batch_data, batch_size, forward, labels, accuracy, loss, running_accuracy, running_loss, table):
     # To send the training examples, we need the epoch and batch number on each example
-    batch_epoch = np.tile(np.array([epoch, batch_num]), (BATCH_SIZE, 1))
+    batch_epoch = np.tile(np.array([epoch, batch_num]), (batch_size, 1))
 
     # Includes, the epoch, batch number, positive softmax, negative softmax, prediction, and labels
     train_examples = np.concatenate((batch_epoch, # epoch/batch
                                     batch_data, # titles
-                                    np.round(forward[:, 1].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
-                                    np.round(forward[:, 0].cpu().detach().numpy().reshape(BATCH_SIZE, 1), 4).astype(str).astype(float),
-                                    torch.argmax(forward, dim=1).cpu().detach().numpy().reshape(BATCH_SIZE, 1),
-                                    labels.astype(int).reshape(BATCH_SIZE, 1)),
+                                    np.round(forward[:, 1].cpu().detach().numpy().reshape(batch_size, 1), 4).astype(str).astype(float),
+                                    np.round(forward[:, 0].cpu().detach().numpy().reshape(batch_size, 1), 4).astype(str).astype(float),
+                                    torch.argmax(forward, dim=1).cpu().detach().numpy().reshape(batch_size, 1),
+                                    labels.astype(int).reshape(batch_size, 1)),
                                     axis=1)
 
     # Need to put the data into a dictionary to send it, so these are the keys for sending the batch data and training examples
@@ -65,11 +66,11 @@ def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_a
 
     # Going to use zip() to create the dictionary, so have a list of the elements in order
     batch_info = [epoch, 
-                i + 1,
-                float('%.4f'%(accuracy)),
-                float('%.4f'%(loss.item())),
-                float('%.4f'%(running_accuracy)),
-                float('%.4f'%(running_loss))]
+                  batch_num,
+                  float('%.4f'%(accuracy)),
+                  float('%.4f'%(loss.item())),
+                  float('%.4f'%(running_accuracy)),
+                  float('%.4f'%(running_loss))]
     
     # Put the data that needs to be send into dictionaries
     batch_info = [dict(zip(put_batch_labels, batch_info))]
@@ -82,7 +83,7 @@ def send_batch_data(epoch, batch_num, forward, labels, accuracy, loss, running_a
     requests.put('http://localhost:3000/add_batch_data', json={'model_name': model_name, 'data': batch_info, 'table': table})
     requests.put('http://localhost:3000/add_examples_data', json={'model_name': model_name, 'data': train_examples_data, 'table': table})
 
-def validation(data, labels, name):
+def validation(net, epoch, data, labels, using_dashboard, name):
     running_loss = 0.0
     running_accuracy = 0.0
     current_batch = 0
@@ -123,16 +124,21 @@ def validation(data, labels, name):
             # Add to running loss and accuracy (every 10 batches)
             running_loss += loss.item()
             running_accuracy += accuracy
-            
-            send_batch_data(epoch + 1,
-                i + 1,
-                forward,
-                batch_labels,
-                accuracy,
-                loss,
-                running_accuracy / current_batch,
-                running_loss / current_batch,
-                name)
+
+            # Send the data to the NLPDashboardServer
+            if using_dashboard:   
+                send_batch_data(epoch,
+                                i + 1,
+                                batch_data,
+                                VAL_BATCH_SIZE,
+                                forward,
+                                batch_labels,
+                                accuracy,
+                                loss,
+                                running_accuracy / current_batch,
+                                running_loss / current_batch,
+                                name)
+
             # Print statistics every batch
             #print("Torch memory allocator: {} bytes".format(torch.cuda.memory_reserved()))
             print('%s Batch: %5d, Loss: %.6f, Accuracy: %.6f, Running Loss: %.6f, Running Accuracy: %.6f, Precision: %.3f, Recall: %.3f, F1 Score: %.3f' %
@@ -188,6 +194,10 @@ if __name__ == '__main__':
             using_model = argv[0]
             argv = argv[1:]
         
+        elif argv[0] == '-dtable':
+            argv = argv[1:]
+            requests.delete('http://localhost:3000/delete_db', json={'model_name': model_name})
+
         else:
             break
 
@@ -301,10 +311,12 @@ if __name__ == '__main__':
                 # Apply the gradients
                 opt.step()
                 
+                # Send the data to the NLPDashboardServer
                 if using_dashboard:
-                    # Send the data to the NLPDashboardServer
                     send_batch_data(epoch + 1,
                                     i + 1,
+                                    batch_data,
+                                    BATCH_SIZE,
                                     forward,
                                     batch_labels,
                                     accuracy,
@@ -336,9 +348,9 @@ if __name__ == '__main__':
 
         # Test the model
         net.eval()
-        validation(val_data, val_labels, 'Validation')
-        validation(test_laptop_data, test_laptop_labels, 'Test Laptop (General)')
-        validation(test_gb_space_data, test_gb_space_labels, 'Test Laptop (Same Title) (Space)')
-        validation(test_gb_no_space_data, test_gb_no_space_labels, 'Test Laptop (Same Title) (No Space)')
-        validation(test_retailer_gb_space_data, test_retailer_gb_space_labels, 'Test Laptop (Different Title) (Space)')
-        validation(test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, 'Test Laptop (Different Title) (No Space)')
+        validation(net, epoch + 1, val_data, val_labels, using_dashboard, 'Validation')
+        validation(net, epoch + 1, test_laptop_data, test_laptop_labels, using_dashboard, 'Test Laptop (General)')
+        validation(net, epoch + 1, test_gb_space_data, test_gb_space_labels, using_dashboard, 'Test Laptop (Same Title) (Space)')
+        validation(net, epoch + 1, test_gb_no_space_data, test_gb_no_space_labels, using_dashboard, 'Test Laptop (Same Title) (No Space)')
+        validation(net, epoch + 1, test_retailer_gb_space_data, test_retailer_gb_space_labels, using_dashboard, 'Test Laptop (Different Title) (Space)')
+        validation(net, epoch + 1, test_retailer_gb_no_space_data, test_retailer_gb_no_space_labels, using_dashboard, 'Test Laptop (Different Title) (No Space)')
