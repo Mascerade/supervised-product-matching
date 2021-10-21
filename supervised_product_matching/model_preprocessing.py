@@ -1,9 +1,7 @@
-import torch
 import numpy as np
 from nltk.corpus import stopwords
-from tqdm import tqdm
 from transformers import AutoTokenizer
-from characterbert_utils.character_cnn import CharacterIndexer
+from character_bert.utils.character_cnn import CharacterIndexer
 from supervised_product_matching.config import ModelConfig
 
 # CharacterBERT tokenizer

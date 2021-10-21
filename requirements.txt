@@ -1,0 +1,32 @@
+certifi==2021.10.8
+-e git+https://github.com/Mascerade/character-bert@c44d0f1e7d2e822296a0578eecba52ddadd22d0e#egg=character_bert
+charset-normalizer==2.0.7
+click==8.0.3
+filelock==3.3.1
+gensim==4.1.2
+huggingface-hub==0.0.19
+idna==3.3
+joblib==1.1.0
+nltk==3.6.5
+numpy==1.21.3
+packaging==21.0
+pandas==1.3.4
+pyparsing==2.4.7
+python-dateutil==2.8.2
+pytz==2021.3
+PyYAML==6.0
+regex==2021.10.21
+requests==2.26.0
+sacremoses==0.0.46
+-e git+https://github.com/Mascerade/scale-transformer-encoder@f684132c63cf7f8d771decd6fb560c9158ced361#egg=scale_transformer_encoder
+scikit-learn==1.0
+scipy==1.7.1
+six==1.16.0
+smart-open==5.2.1
+threadpoolctl==3.0.0
+tokenizers==0.10.3
+torch==1.9.1
+tqdm==4.62.3
+transformers==4.11.3
+typing-extensions==3.10.0.2
+urllib3==1.26.7

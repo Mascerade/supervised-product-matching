@@ -5,16 +5,12 @@ Authors: Hicham El Boukkouri and Olivier Ferret and Thomas Lavergne and Hiroshi 
 The characterbert_modeling and characterbert_utils were also created by them
 Their GitHub Repo is at: https://github.com/helboukkouri/character-bert
 '''
-import sys
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
-from transformers import AutoModel;
-from characterbert_modeling.character_bert import CharacterBertModel
+from character_bert.modeling.character_bert import CharacterBertModel
 from scale_transformer_encoder.scaling_layer import ScalingLayer
-from spm.config import ModelConfig
-from spm.model_preprocessing import character_bert_preprocess_batch
+from supervised_product_matching.config import ModelConfig
+from supervised_product_matching.model_preprocessing import character_bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
     def __init__(self, sequence_length, h_size=768):

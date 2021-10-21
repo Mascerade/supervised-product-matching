@@ -29,7 +29,9 @@ Using these two titles, the model should output a <b>0</b>
 
 `create_data.py` uses functions under `src/data_creation` to transform data found in `base`
 
-The `src` directory are the functions that create data and generate the model.
+The `supervised_product_matching` directory contains code associated with the model.
+
+The `src` directory are the functions that create data.
 
 The `models` directory contains the different models trained so far and also the fastText model (if you want to use the ).
 
@@ -41,8 +43,6 @@ The `pretrained-models` directory is where the user should put the bert and char
 
 The `characterbert_modeling` and `characterbert_utils` directories are directly from CharacterBERT's authors and can be found in the same directory previously mentioned ([here](https://github.com/helboukkouri/character-bert))
 
-`DownScaleTransformerEncoder` contains my custom Transformer encoder model and is a GitHub sub-module.
-
 ## The Data
 All the data can be found in the repository's latest release.
 
@@ -51,10 +51,17 @@ The `data_creation` directory contains scripts that transforms data in `base` in
 
 The `data_scrapers` directory uses web scraping scripts to get raw data (like product titles for laptops off of different retailers) to be processed into training data.
 
+`common.py` and `preprocessing.py` are functions used throughout the other scripts
+
+## Package (Under `supervised_product_matching`)
 The `model_architectures` directory contains different neural network architectures to use for training (all written using pytorch). They include:
 * BERT
 * CharacterBERT
 * CharacterBERT with my custom Transformer added on top
 * CharacterBERT that concatenates word embeddings together as opposed to adding and averaging
 
-`common.py` and `preprocessing.py` are functions used throughout the other scripts
+`config.py` just contains variables needed to define the model architectures.
+`model_preprocessing` contains code to format data to feed into the model.
+
+The reason for the seperate folder (which is really a package) is to make the model more portable. By installing this package using:
+`pip install git+https://github.com/Mascerade/supervised-product-matching#egg=supervised_product_matching`, the models generated can be used in other projects.

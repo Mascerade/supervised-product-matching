@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
-from spm.config import ModelConfig
-from spm.model_preprocessing import bert_preprocess_batch
+from supervised_product_matching.config import ModelConfig
+from supervised_product_matching.model_preprocessing import bert_preprocess_batch
 
 class SiameseNetwork(nn.Module):
     def __init__(self, max_length, h_size=768):
