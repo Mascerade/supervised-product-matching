@@ -59,7 +59,15 @@ The `model_architectures` directory contains different neural network architectu
 * CharacterBERT that concatenates word embeddings together as opposed to adding and averaging
 
 `config.py` just contains variables needed to define the model architectures.
+
 `model_preprocessing` contains code to format data to feed into the model.
 
-The reason for the seperate folder (which is really a package) is to make the model more portable. By installing this package using:
-`pip install git+https://github.com/Mascerade/supervised-product-matching#egg=supervised_product_matching`, the models generated can be used in other projects.
+The reason for the seperate folder (which is really a package) is to make the model more portable. First, install Character BERT using:
+```
+pip install -e git+https://github.com/Mascerade/character-bert#egg=character_bert
+```
+
+Then, install this package using:
+```
+pip install -e git+https://github.com/Mascerade/supervised-product-matching#egg=supervised_product_matching
+```
