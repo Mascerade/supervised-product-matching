@@ -17,6 +17,6 @@ setup(
                      'transformers',
                      'nltk',
                      'numpy',
-                     'scale_transformer_encoder @ git+ssh://git@github.com/Mascerade/scale-transformer-encoder@v0.1#egg=scale_transformer_encoder',
-                     'character_bert @ git+ssh://git@github.com/Mascerade/character-bert@v1.0#egg=character_bert']
+                     'scale_transformer_encoder @ git+https://github.com/Mascerade/scale-transformer-encoder@f684132c63cf7f8d771decd6fb560c9158ced361#egg=scale_transformer_encoder',
+                     'character_bert @ git+https://github.com/Mascerade/character-bert@c44d0f1e7d2e822296a0578eecba52ddadd22d0e#egg=character_bert']
 )
