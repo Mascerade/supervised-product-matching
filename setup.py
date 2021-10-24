@@ -12,7 +12,7 @@ setup(
    author='Jason Acheampong',
    author_email='jason.acheampong24@gmail.com',
    url="https://github.com/Mascerade/supervised-product-matching",
-   packages=['supervised_product_matching'],
+   packages=['supervised_product_matching', 'supervised_product_matching.model_architectures'],
    install_requires=['torch',
                      'transformers',
                      'nltk',
