@@ -1,5 +1,5 @@
 certifi==2021.10.8
--e git+https://github.com/Mascerade/character-bert@c44d0f1e7d2e822296a0578eecba52ddadd22d0e#egg=character_bert
+-e git+https://github.com/Mascerade/character-bert@d4ced7a313f0ba4144f026f27844f557e9611151#egg=character_bert
 charset-normalizer==2.0.7
 click==8.0.3
 filelock==3.3.1
