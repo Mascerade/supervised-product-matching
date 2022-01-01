@@ -1,19 +1,15 @@
 import pandas as pd
 import numpy as np
-import nltk
-import os
 import sys
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from transformers import AutoTokenizer, AutoModel, AdamW
 from sklearn.metrics import confusion_matrix
 import time
 
 """ LOCAL IMPORTS """
-from src.preprocessing import remove_misc, remove_stop_words, character_bert_preprocess_batch, bert_preprocess_batch
-from src.common import Common, get_max_len
-from create_data import create_data
+from src.data_preprocessing import remove_misc
+from supervised_product_matching.model_preprocessing import remove_stop_words, character_bert_preprocess_batch, bert_preprocess_batch
+from src.common import Common
 
 using_model = "characterbert"
 
@@ -43,19 +39,19 @@ print('Loaded all test files')
 # Initialize the model
 net = None
 if using_model == "characterbert":
-    from src.model_architectures.characterbert_classifier import SiameseNetwork, forward_prop
+    from supervised_product_matching.model_architectures.characterbert_classifier import SiameseNetwork, forward_prop
     net = SiameseNetwork().to(Common.device)
 
 elif using_model == "bert":
-    from src.model_architectures.bert_classifier import SiameseNetwork, forward_prop
-    net = SiameseNetwork(Common.MAX_LEN).to(Common.device)
+    from supervised_product_matching.model_architectures.bert_classifier import SiameseNetwork, forward_prop
+    net = SiameseNetwork().to(Common.device)
 
 elif using_model == "scaled characterbert concat":
-    from src.model_architectures.characterbert_transformer_concat import SiameseNetwork, forward_prop
-    net = SiameseNetwork(Common.MAX_LEN * 2 + 3)
+    from supervised_product_matching.model_architectures.characterbert_transformer_concat import SiameseNetwork, forward_prop
+    net = SiameseNetwork()
 
 elif using_model == "scaled characterbert add":
-    from src.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop
+    from supervised_product_matching.model_architectures.characterbert_transformer_add import SiameseNetwork, forward_prop
     net = SiameseNetwork().to(Common.device)
 
 if (torch.cuda.is_available()):
