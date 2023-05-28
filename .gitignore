@@ -4,6 +4,8 @@ __pycache__/
 .virtual_documents/
 .mypy_cache/
 venv/
+src/character-bert/
+src/scale-transformer-encoder/
 pretrained-models/*
 !pretrained-models/.gitkeep
 data/numpy_data/*

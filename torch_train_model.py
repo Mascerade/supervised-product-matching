@@ -167,9 +167,6 @@ if __name__ == '__main__':
     argv = sys.argv[1:]
     using_model = "characterbert"
 
-    # Parameter if we are using the dashboard
-    using_dashboard = sys.argv[1].lower() == 'true'
-
     # Get the folder name in models
     folder = 'default'
 
