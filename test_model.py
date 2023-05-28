@@ -1,12 +1,8 @@
 import pandas as pd
 import numpy as np
-import nltk
-import os
 import sys
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from transformers import AutoTokenizer, AutoModel, AdamW
 from sklearn.metrics import confusion_matrix
 import time
 
